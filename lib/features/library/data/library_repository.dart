@@ -31,6 +31,11 @@ class LibraryRepository {
       (_db.select(_db.sources)..where((tbl) => tbl.id.equals(id)))
           .getSingleOrNull();
 
+  /// Fetches a single source by exact [name].
+  Future<Source?> getSourceByName(String name) =>
+      (_db.select(_db.sources)..where((tbl) => tbl.name.equals(name)))
+          .getSingleOrNull();
+
   /// Fetches a single unit by [id].
   Future<Unit?> getUnit(int id) =>
       (_db.select(_db.units)..where((tbl) => tbl.id.equals(id)))
@@ -125,7 +130,8 @@ class LibraryRepository {
           SELECT 
             k.id AS item_id,
             k.character AS item_primary,
-            (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id) AS item_secondary,
+            (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id AND type = 0) AS on_readings,
+            (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id AND type = 1) AS kun_readings,
             k.meaning_my AS item_meaning,
             NULL AS item_connection,
             COALESCE(p.streak, 0) AS item_streak
@@ -225,7 +231,8 @@ class LibraryRepository {
           SELECT 
             k.id AS item_id,
             k.character AS item_primary,
-            (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id) AS item_secondary,
+            (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id AND type = 0) AS on_readings,
+            (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id AND type = 1) AS kun_readings,
             k.meaning_my AS item_meaning,
             NULL AS item_connection,
             COALESCE(p.streak, 0) AS item_streak
@@ -355,14 +362,30 @@ class LibraryRepository {
     }
   }
 
-  StudyItem _mapStudyItem(QueryRow row) => StudyItem(
-        id: row.read<int>('item_id'),
-        primary: row.read<String>('item_primary'),
-        secondary: row.readNullable<String>('item_secondary'),
-        meaning: row.readNullable<String>('item_meaning'),
-        connection: row.readNullable<String>('item_connection'),
-        streak: row.read<int>('item_streak'),
-      );
+  StudyItem _mapStudyItem(QueryRow row) {
+    String? secondary = row.readNullable<String>('item_secondary');
+    if (secondary == null && row.data.containsKey('on_readings')) {
+      final on = row.readNullable<String>('on_readings')?.trim();
+      final kun = row.readNullable<String>('kun_readings')?.trim();
+      final lines = <String>[];
+      if (on != null && on.isNotEmpty) {
+        lines.add('音読み: $on');
+      }
+      if (kun != null && kun.isNotEmpty) {
+        lines.add('訓読み: $kun');
+      }
+      secondary = lines.isNotEmpty ? lines.join('\n') : null;
+    }
+
+    return StudyItem(
+      id: row.read<int>('item_id'),
+      primary: row.read<String>('item_primary'),
+      secondary: secondary,
+      meaning: row.readNullable<String>('item_meaning'),
+      connection: row.readNullable<String>('item_connection'),
+      streak: row.read<int>('item_streak'),
+    );
+  }
 
   /// Watches the number of due review items (progress with nextReview <= now).
   Stream<int> watchDueReviewCount() {

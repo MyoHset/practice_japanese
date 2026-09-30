@@ -49,13 +49,60 @@ class StudyItemCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (item.secondary != null && item.secondary!.isNotEmpty) ...[
-                    Text(
-                      item.secondary!,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
+                    if (item.secondary!.contains('音読み:') ||
+                        item.secondary!.contains('訓読み:')) ...[
+                      for (final line in item.secondary!.split('\n'))
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 1.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: line.startsWith('音読み:')
+                                      ? AppColors.primarySoft
+                                      : const Color(0xFFE8F4F8),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  line.startsWith('音読み:') ? '音読み' : '訓読み',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: line.startsWith('音読み:')
+                                        ? AppColors.primary
+                                        : const Color(0xFF0077B6),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Flexible(
+                                child: Text(
+                                  line.substring(line.indexOf(':') + 1).trim(),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.text,
+                                      ),
+                                ),
+                              ),
+                            ],
                           ),
-                    ),
+                        ),
+                    ] else
+                      Text(
+                        item.secondary!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
                     const SizedBox(height: AppSpacing.xs),
                   ],
                   Text(

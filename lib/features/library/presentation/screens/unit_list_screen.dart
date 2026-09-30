@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:practice_janpanese/core/constants/app_radius.dart';
 import 'package:practice_janpanese/core/constants/app_spacing.dart';
 import 'package:practice_janpanese/core/constants/app_strings.dart';
+import 'package:practice_janpanese/core/database/app_database.dart' show Source;
 import 'package:practice_janpanese/core/router/app_routes.dart';
 import 'package:practice_janpanese/core/theme/app_colors.dart';
 import 'package:practice_janpanese/core/widgets/async_value_view.dart';
@@ -36,11 +37,29 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
   /// Currently selected chapter number. If null, displays all chapters/units.
   int? _selectedChapterNumber = 1;
 
+  /// Whether the user has toggled to compound words mode (語彙) for companion sources.
+  bool? _isCompoundMode;
+
   @override
   Widget build(BuildContext context) {
     final sourceAsync = ref.watch(sourceProvider(widget.sourceId));
+    final companionAsync = ref.watch(companionSourceProvider(widget.sourceId));
+    final companionSource = companionAsync.valueOrNull;
+
+    final isCompound = _isCompoundMode ?? (widget.kind == ContentKind.vocab);
+
+    final activeKind = companionSource == null
+        ? widget.kind
+        : (isCompound ? ContentKind.vocab : ContentKind.kanji);
+
+    final activeSourceId = companionSource == null
+        ? widget.sourceId
+        : (widget.kind == ContentKind.kanji
+            ? (isCompound ? companionSource.id : widget.sourceId)
+            : (isCompound ? widget.sourceId : companionSource.id));
+
     final unitsAsync = ref.watch(
-      unitListProvider((sourceId: widget.sourceId, kind: widget.kind)),
+      unitListProvider((sourceId: activeSourceId, kind: activeKind)),
     );
 
     final sourceTitle = sourceAsync.maybeWhen(
@@ -59,13 +78,26 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
         data: (units) {
           final chapterGroups = ChapterGroup.fromUnits(units);
 
-          // If source has chapters (e.g. Tango 2000), render Chapter-organized UI
+          // If source has chapters (e.g. Tango 2000 or Speed Master N3), render Chapter-organized UI
           if (chapterGroups.isNotEmpty) {
-            return _buildChapterOrganizedView(context, units, chapterGroups);
+            return _buildChapterOrganizedView(
+              context,
+              units,
+              chapterGroups,
+              activeKind: activeKind,
+              activeSourceId: activeSourceId,
+              companionSource: companionSource,
+              isCompound: isCompound,
+            );
           }
 
           // Otherwise fallback to standard flat unit list
-          return _buildFlatUnitList(context, units);
+          return _buildFlatUnitList(
+            context,
+            units,
+            activeKind: activeKind,
+            activeSourceId: activeSourceId,
+          );
         },
       ),
     );
@@ -75,8 +107,12 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
   Widget _buildChapterOrganizedView(
     BuildContext context,
     List<UnitProgress> allUnits,
-    List<ChapterGroup> chapterGroups,
-  ) {
+    List<ChapterGroup> chapterGroups, {
+    required ContentKind activeKind,
+    required int activeSourceId,
+    required Source? companionSource,
+    required bool isCompound,
+  }) {
     final totalAcrossUnits = allUnits.fold<int>(0, (sum, u) => sum + u.total);
     final masteredAcrossUnits =
         allUnits.fold<int>(0, (sum, u) => sum + u.mastered);
@@ -95,6 +131,42 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
 
     return CustomScrollView(
       slivers: [
+        // Companion Mode Switcher (e.g. ပင်မ Kanji vs Kanji တွဲလုံးများ)
+        if (companionSource != null)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenH,
+                AppSpacing.sm,
+                AppSpacing.screenH,
+                AppSpacing.xs,
+              ),
+              child: SegmentedButton<bool>(
+                segments: const [
+                  ButtonSegment<bool>(
+                    value: false,
+                    label: Text(
+                      'ပင်မ Kanji (၁၇၄)',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    icon: Icon(Icons.translate_rounded, size: 18),
+                  ),
+                  ButtonSegment<bool>(
+                    value: true,
+                    label: Text(
+                      'Kanji တွဲလုံးများ (၅၆၃)',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    icon: Icon(Icons.menu_book_rounded, size: 18),
+                  ),
+                ],
+                selected: {isCompound},
+                onSelectionChanged: (set) {
+                  setState(() => _isCompoundMode = set.first);
+                },
+              ),
+            ),
+          ),
         // Source Overview Summary Card
         SliverToBoxAdapter(
           child: Padding(
@@ -163,8 +235,8 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                 onFlashcardTap: () {
                   context.push(
                     AppRoutes.chapterStudy(
-                      widget.kind,
-                      widget.sourceId,
+                      activeKind,
+                      activeSourceId,
                       selectedChapter.chapterNumber,
                       StudyMode.flashcard,
                     ),
@@ -173,8 +245,8 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                 onQuickQuizTap: () {
                   context.push(
                     AppRoutes.chapterStudy(
-                      widget.kind,
-                      widget.sourceId,
+                      activeKind,
+                      activeSourceId,
                       selectedChapter.chapterNumber,
                       StudyMode.quick,
                     ),
@@ -226,15 +298,15 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                 displayName: sectionTitle,
                 onTap: () => StudyModeSheet.show(
                   context,
-                  kind: widget.kind,
-                  sourceId: widget.sourceId,
+                  kind: activeKind,
+                  sourceId: activeSourceId,
                   unit: section,
                 ),
                 onFlashcardTap: () {
                   context.push(
                     AppRoutes.study(
-                      widget.kind,
-                      widget.sourceId,
+                      activeKind,
+                      activeSourceId,
                       section.id,
                       StudyMode.flashcard,
                     ),
@@ -243,8 +315,8 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                 onQuickQuizTap: () {
                   context.push(
                     AppRoutes.study(
-                      widget.kind,
-                      widget.sourceId,
+                      activeKind,
+                      activeSourceId,
                       section.id,
                       StudyMode.quick,
                     ),
@@ -308,7 +380,12 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
   }
 
   /// Flat unit list for non-chaptered sources.
-  Widget _buildFlatUnitList(BuildContext context, List<UnitProgress> units) {
+  Widget _buildFlatUnitList(
+    BuildContext context,
+    List<UnitProgress> units, {
+    required ContentKind activeKind,
+    required int activeSourceId,
+  }) {
     final totalAcrossUnits = units.fold<int>(0, (sum, u) => sum + u.total);
     final masteredAcrossUnits =
         units.fold<int>(0, (sum, u) => sum + u.mastered);
@@ -332,15 +409,15 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
           unit: unit,
           onTap: () => StudyModeSheet.show(
             context,
-            kind: widget.kind,
-            sourceId: widget.sourceId,
+            kind: activeKind,
+            sourceId: activeSourceId,
             unit: unit,
           ),
           onFlashcardTap: () {
             context.push(
               AppRoutes.study(
-                widget.kind,
-                widget.sourceId,
+                activeKind,
+                activeSourceId,
                 unit.id,
                 StudyMode.flashcard,
               ),
@@ -349,8 +426,8 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
           onQuickQuizTap: () {
             context.push(
               AppRoutes.study(
-                widget.kind,
-                widget.sourceId,
+                activeKind,
+                activeSourceId,
                 unit.id,
                 StudyMode.quick,
               ),

@@ -76,10 +76,18 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
       return;
     }
 
-    final allMeanings = validItems.map((i) => i.meaning!.trim()).toSet().toList();
+    String getCoreMeaning(StudyItem item) {
+      final m = item.meaning?.trim() ?? '';
+      if (m.contains('\n')) {
+        return m.split('\n').first.trim();
+      }
+      return m;
+    }
+
+    final allMeanings = validItems.map(getCoreMeaning).where((m) => m.isNotEmpty).toSet().toList();
 
     _questions = validItems.map((item) {
-      final correctMeaning = item.meaning!.trim();
+      final correctMeaning = getCoreMeaning(item);
 
       // Pick 3 distractor meanings distinct from correctMeaning
       final distractors = allMeanings.where((m) => m != correctMeaning).toList()

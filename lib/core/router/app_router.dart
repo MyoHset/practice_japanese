@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:practice_janpanese/core/constants/app_strings.dart';
 import 'package:practice_janpanese/core/router/app_routes.dart';
 import 'package:practice_janpanese/core/widgets/coming_soon_screen.dart';
 import 'package:practice_janpanese/features/home/presentation/screens/home_screen.dart';
@@ -9,7 +8,10 @@ import 'package:practice_janpanese/features/library/presentation/screens/flashca
 import 'package:practice_janpanese/features/library/presentation/screens/quick_quiz_study_screen.dart';
 import 'package:practice_janpanese/features/library/presentation/screens/source_list_screen.dart';
 import 'package:practice_janpanese/features/library/presentation/screens/unit_list_mode_screen.dart';
+import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:practice_janpanese/features/library/presentation/screens/unit_list_screen.dart';
+import 'package:practice_janpanese/features/past_exam/presentation/screens/past_exam_list_screen.dart';
+import 'package:practice_janpanese/features/past_exam/presentation/screens/past_exam_practice_screen.dart';
 
 /// Top-level GoRouter instance configuring application routes per B3.
 final GoRouter appRouter = GoRouter(
@@ -162,9 +164,24 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.pastExam,
-      builder: (context, state) => const ComingSoonScreen(
-        title: AppStrings.pastExam,
-      ),
+      builder: (context, state) => const PastExamListScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.pastExamPracticePattern,
+      builder: (context, state) {
+        final sourceId = int.parse(state.pathParameters['sourceId']!);
+        final subjectStr = state.uri.queryParameters['subject'];
+        Subject? subject;
+        if (subjectStr != null) {
+          try {
+            subject = Subject.values.byName(subjectStr);
+          } catch (_) {}
+        }
+        return PastExamPracticeScreen(
+          sourceId: sourceId,
+          subject: subject,
+        );
+      },
     ),
   ],
 );

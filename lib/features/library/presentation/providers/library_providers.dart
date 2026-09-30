@@ -26,6 +26,20 @@ final sourceProvider = FutureProvider.family<Source?, int>((ref, id) {
   return repo.getSource(id);
 });
 
+/// Looks up a companion source for Speed Master N3 (e.g. Kanji <-> Vocab).
+final companionSourceProvider =
+    FutureProvider.family<Source?, int>((ref, sourceId) async {
+  final source = await ref.watch(sourceProvider(sourceId).future);
+  if (source == null) return null;
+  final repo = ref.watch(libraryRepositoryProvider);
+  if (source.name.contains('Speed Master N3 漢字')) {
+    return repo.getSourceByName('Speed Master N3 語彙 (Kanji တွဲလုံးများ)');
+  } else if (source.name.contains('Speed Master N3 語彙')) {
+    return repo.getSourceByName('Speed Master N3 漢字');
+  }
+  return null;
+});
+
 /// Parameter record for unitListProvider.
 typedef UnitListParams = ({int sourceId, ContentKind kind});
 

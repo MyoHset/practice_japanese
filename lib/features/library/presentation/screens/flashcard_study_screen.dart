@@ -417,23 +417,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
               children: [
                 if (item.secondary != null && item.secondary!.isNotEmpty) ...[
                   if (_showReadingHint)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primarySoft,
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                      ),
-                      child: Text(
-                        item.secondary!,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    )
+                    _buildReadingsDisplay(context, item.secondary!)
                   else
                     TextButton.icon(
                       style: TextButton.styleFrom(
@@ -548,63 +532,71 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
             ),
 
             // Word, Reading & Burmese Meaning
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  item.primary,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.text,
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        item.primary,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.text,
+                            ),
                       ),
-                ),
-                if (item.secondary != null && item.secondary!.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    item.secondary!,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                      if (item.secondary != null && item.secondary!.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        _buildReadingsDisplay(context, item.secondary!),
+                      ],
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                        child: Divider(color: AppColors.divider, height: 1),
+                      ),
+                      if (item.meaning != null && item.meaning!.isNotEmpty)
+                        Text(
+                          item.meaning!,
+                          textAlign: item.meaning!.contains('\n')
+                              ? TextAlign.start
+                              : TextAlign.center,
+                          style: item.meaning!.contains('\n')
+                              ? Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.text,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.5,
+                                  )
+                              : Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: AppColors.text,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.4,
+                                  ),
                         ),
-                  ),
-                ],
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                  child: Divider(color: AppColors.divider, height: 1),
-                ),
-                if (item.meaning != null && item.meaning!.isNotEmpty)
-                  Text(
-                    item.meaning!,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppColors.text,
-                          fontWeight: FontWeight.w700,
-                          height: 1.4,
-                        ),
-                  ),
-                if (item.connection != null && item.connection!.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
-                    ),
-                    child: Text(
-                      item.connection!,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSoft,
+                      if (item.connection != null && item.connection!.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.xs,
                           ),
-                    ),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                          ),
+                          child: Text(
+                            item.connection!,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.textSoft,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ],
-              ],
+                ),
+              ),
             ),
 
             // Tap to flip back hint
@@ -628,6 +620,91 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
           ],
         ),
       ),
+    );
+  }
+
+  /// Displays readings with line-by-line distinction for Onyomi and Kunyomi when available.
+  Widget _buildReadingsDisplay(BuildContext context, String secondary) {
+    if (!secondary.contains('音読み:') && !secondary.contains('訓読み:')) {
+      return Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.primarySoft,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+        ),
+        child: Text(
+          secondary,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+      );
+    }
+
+    final lines = secondary.split('\n');
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: lines.map((line) {
+        final isOnyomi = line.startsWith('音読み:');
+        final isKunyomi = line.startsWith('訓読み:');
+        final label = isOnyomi
+            ? '音読み'
+            : isKunyomi
+                ? '訓読み'
+                : '';
+        final value = line.contains(':')
+            ? line.substring(line.indexOf(':') + 1).trim()
+            : line;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (label.isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isOnyomi
+                        ? AppColors.primarySoft
+                        : const Color(0xFFE8F4F8),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: isOnyomi
+                          ? AppColors.primary
+                          : const Color(0xFF0077B6),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+              ],
+              Flexible(
+                child: Text(
+                  value,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 

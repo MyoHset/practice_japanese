@@ -1,3 +1,4 @@
+import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:practice_janpanese/features/library/domain/content_kind.dart';
 import 'package:practice_janpanese/features/library/domain/study_mode.dart';
 
@@ -13,6 +14,7 @@ class AppRoutes {
   static const String chapterStudyPattern =
       '/library/:kind/source/:sourceId/chapter/:chapterNumber/:mode';
   static const String pastExam = '/past-exam';
+  static const String pastExamPracticePattern = '/past-exam/:sourceId/practice';
 
   // ── Typed path helpers ─────────────────────────────────────────────────────
   static String sourceList(ContentKind kind) => '/library/${kind.slug}';
@@ -35,4 +37,11 @@ class AppRoutes {
     StudyMode mode,
   ) =>
       '/library/${kind.slug}/source/$sourceId/chapter/$chapterNumber/${mode.slug}';
+
+  static String pastExamPractice(int sourceId, [Subject? subject]) {
+    if (subject != null) {
+      return '/past-exam/$sourceId/practice?subject=${subject.name}';
+    }
+    return '/past-exam/$sourceId/practice';
+  }
 }

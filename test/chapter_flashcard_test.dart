@@ -127,5 +127,33 @@ void main() {
       );
       expect(path, equals('/library/vocab/source/3/unit/8/quick'));
     });
+
+    test('builds correct study routes for Speed Master N3 Kanji and compound words', () {
+      // Kanji mode study route
+      final kanjiChapterPath = AppRoutes.chapterStudy(
+        ContentKind.kanji,
+        2,
+        6,
+        StudyMode.flashcard,
+      );
+      expect(kanjiChapterPath, equals('/library/kanji/source/2/chapter/6/flashcard'));
+
+      // Compound words mode study route
+      final vocabChapterPath = AppRoutes.chapterStudy(
+        ContentKind.vocab,
+        5,
+        6,
+        StudyMode.flashcard,
+      );
+      expect(vocabChapterPath, equals('/library/vocab/source/5/chapter/6/flashcard'));
+
+      final vocabQuizPath = AppRoutes.chapterStudy(
+        ContentKind.vocab,
+        5,
+        6,
+        StudyMode.quick,
+      );
+      expect(vocabQuizPath, equals('/library/vocab/source/5/chapter/6/quick'));
+    });
   });
 }
