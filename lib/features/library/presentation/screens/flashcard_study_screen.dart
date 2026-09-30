@@ -1,0 +1,902 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:practice_janpanese/core/constants/app_radius.dart';
+import 'package:practice_janpanese/core/constants/app_spacing.dart';
+import 'package:practice_janpanese/core/constants/app_strings.dart';
+import 'package:practice_janpanese/core/theme/app_colors.dart';
+import 'package:practice_janpanese/core/widgets/app_card.dart';
+import 'package:practice_janpanese/core/widgets/app_pill.dart';
+import 'package:practice_janpanese/core/widgets/app_progress_bar.dart';
+import 'package:practice_janpanese/core/widgets/async_value_view.dart';
+import 'package:practice_janpanese/features/library/domain/content_kind.dart';
+import 'package:practice_janpanese/features/library/domain/study_item.dart';
+import 'package:practice_janpanese/features/library/presentation/providers/library_providers.dart';
+
+/// Interactive Flashcard study screen supporting Section-level and Chapter-level review.
+class FlashcardStudyScreen extends ConsumerStatefulWidget {
+  const FlashcardStudyScreen({
+    super.key,
+    required this.kind,
+    required this.sourceId,
+    this.unitId,
+    this.chapterNumber,
+  }) : assert(
+          unitId != null || chapterNumber != null,
+          'Either unitId or chapterNumber must be provided',
+        );
+
+  final ContentKind kind;
+  final int sourceId;
+  final int? unitId;
+  final int? chapterNumber;
+
+  @override
+  ConsumerState<FlashcardStudyScreen> createState() =>
+      _FlashcardStudyScreenState();
+}
+
+class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _flipController;
+  late final Animation<double> _flipAnimation;
+
+  int _currentIndex = 0;
+  bool _isFlipped = false;
+  bool _showReadingHint = false;
+  bool _isShuffled = false;
+  bool _isCompleted = false;
+
+  int _rememberedCount = 0;
+  int _needsReviewCount = 0;
+
+  List<StudyItem>? _activeDeck;
+  List<StudyItem>? _originalDeck;
+
+  @override
+  void initState() {
+    super.initState();
+    _flipController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _flipAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _flipController,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _flipController.dispose();
+    super.dispose();
+  }
+
+  void _syncDeck(List<StudyItem> items) {
+    if (_originalDeck == null || _originalDeck!.length != items.length) {
+      _originalDeck = List.of(items);
+      _activeDeck = _isShuffled
+          ? (List.of(items)..shuffle(math.Random()))
+          : List.of(items);
+      _currentIndex = 0;
+      _isFlipped = false;
+      _showReadingHint = false;
+      _isCompleted = items.isEmpty;
+      _rememberedCount = 0;
+      _needsReviewCount = 0;
+    }
+  }
+
+  void _toggleFlip() {
+    if (_isFlipped) {
+      _flipController.reverse();
+      setState(() => _isFlipped = false);
+    } else {
+      _flipController.forward();
+      setState(() => _isFlipped = true);
+    }
+  }
+
+  void _toggleShuffle() {
+    if (_originalDeck == null) return;
+    setState(() {
+      _isShuffled = !_isShuffled;
+      if (_isShuffled) {
+        _activeDeck = List.of(_originalDeck!)..shuffle(math.Random());
+      } else {
+        _activeDeck = List.of(_originalDeck!);
+      }
+      _currentIndex = 0;
+      _isFlipped = false;
+      _showReadingHint = false;
+      _isCompleted = false;
+      _rememberedCount = 0;
+      _needsReviewCount = 0;
+      _flipController.reset();
+    });
+  }
+
+  void _restartDeck() {
+    setState(() {
+      _currentIndex = 0;
+      _isFlipped = false;
+      _showReadingHint = false;
+      _isCompleted = false;
+      _rememberedCount = 0;
+      _needsReviewCount = 0;
+      _flipController.reset();
+    });
+  }
+
+  Future<void> _answerCard(bool remembered) async {
+    if (_activeDeck == null || _activeDeck!.isEmpty) return;
+    final currentItem = _activeDeck![_currentIndex];
+
+    // Record review in database
+    final repo = ref.read(libraryRepositoryProvider);
+    await repo.recordReview(
+      kind: widget.kind,
+      itemId: currentItem.id,
+      remembered: remembered,
+    );
+
+    if (remembered) {
+      _rememberedCount++;
+    } else {
+      _needsReviewCount++;
+    }
+
+    if (_currentIndex + 1 >= _activeDeck!.length) {
+      setState(() {
+        _isCompleted = true;
+      });
+    } else {
+      if (_isFlipped) {
+        await _flipController.reverse();
+      }
+      setState(() {
+        _currentIndex++;
+        _isFlipped = false;
+        _showReadingHint = false;
+      });
+    }
+  }
+
+  void _previousCard() {
+    if (_currentIndex > 0) {
+      if (_isFlipped) {
+        _flipController.reverse();
+      }
+      setState(() {
+        _currentIndex--;
+        _isFlipped = false;
+        _showReadingHint = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch items from appropriate provider
+    final AsyncValue<List<StudyItem>> itemsAsync = widget.unitId != null
+        ? ref.watch(
+            unitItemsProvider(
+              (
+                unitId: widget.unitId!,
+                kind: widget.kind,
+              ),
+            ),
+          )
+        : ref.watch(
+            chapterItemsProvider(
+              (
+                sourceId: widget.sourceId,
+                chapterNumber: widget.chapterNumber!,
+                kind: widget.kind,
+              ),
+            ),
+          );
+
+    // Watch source title or unit name for header
+    final sourceAsync = ref.watch(sourceProvider(widget.sourceId));
+    final unitAsync = widget.unitId != null
+        ? ref.watch(unitProvider(widget.unitId!))
+        : null;
+
+    final String screenTitle = widget.chapterNumber != null
+        ? '${sourceAsync.value?.name ?? ''} · Chapter ${widget.chapterNumber}'
+        : (unitAsync?.value?.name ?? widget.kind.label);
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: Text(
+          screenTitle,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+        actions: [
+          IconButton(
+            tooltip: _isShuffled
+                ? AppStrings.orderedDeck
+                : AppStrings.shuffleDeck,
+            icon: Icon(
+              Icons.shuffle_rounded,
+              color: _isShuffled ? AppColors.secondary : AppColors.textSoft,
+            ),
+            onPressed: _toggleShuffle,
+          ),
+          IconButton(
+            tooltip: AppStrings.restartDeck,
+            icon: const Icon(
+              Icons.refresh_rounded,
+              color: AppColors.textSoft,
+            ),
+            onPressed: _restartDeck,
+          ),
+        ],
+      ),
+      body: AsyncValueView<List<StudyItem>>(
+        value: itemsAsync,
+        isEmpty: (items) => items.isEmpty,
+        emptyMessage: AppStrings.itemsCount(0),
+        data: (items) {
+          _syncDeck(items);
+          final deck = _activeDeck ?? items;
+          if (deck.isEmpty) {
+            return Center(
+              child: Text(
+                AppStrings.itemsCount(0),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            );
+          }
+
+          if (_isCompleted) {
+            return _buildCompletionView(context, deck.length);
+          }
+
+          final currentItem = deck[_currentIndex];
+          final progressRatio = (_currentIndex + 1) / deck.length;
+
+          return SafeArea(
+            child: Column(
+              children: [
+                // Top Progress indicator
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.screenH,
+                    vertical: AppSpacing.sm,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Card ${_currentIndex + 1} of ${deck.length}',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.textSoft,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                          ),
+                          Text(
+                            '${(progressRatio * 100).toInt()}%',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      AppProgressBar(value: progressRatio),
+                    ],
+                  ),
+                ),
+
+                // Main Flashcard Area
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.screenH,
+                      vertical: AppSpacing.md,
+                    ),
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: _toggleFlip,
+                        onHorizontalDragEnd: (details) {
+                          if (details.primaryVelocity != null &&
+                              details.primaryVelocity! > 200) {
+                            _previousCard();
+                          }
+                        },
+                        child: AnimatedBuilder(
+                          animation: _flipAnimation,
+                          builder: (context, child) {
+                            final angle = _flipAnimation.value * math.pi;
+                            final isUnder = _flipAnimation.value >= 0.5;
+
+                            return Transform(
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.001)
+                                ..rotateY(angle),
+                              alignment: Alignment.center,
+                              child: isUnder
+                                  ? Transform(
+                                      transform: Matrix4.identity()
+                                        ..rotateY(math.pi),
+                                      alignment: Alignment.center,
+                                      child: _buildBackCard(
+                                        context,
+                                        currentItem,
+                                        _currentIndex + 1,
+                                        deck.length,
+                                      ),
+                                    )
+                                  : _buildFrontCard(
+                                      context,
+                                      currentItem,
+                                      _currentIndex + 1,
+                                      deck.length,
+                                    ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Action Controls
+                _buildActionControls(context),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Front face of the card showing the Japanese word/kanji with optional reading hint.
+  Widget _buildFrontCard(
+    BuildContext context,
+    StudyItem item,
+    int index,
+    int total,
+  ) {
+    return AppCard(
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(minHeight: 340),
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Top card header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AppPill(
+                  label: widget.kind.label,
+                  color: AppColors.levelSoft('N3'),
+                  textColor: AppColors.primary,
+                ),
+                if (item.isMastered)
+                  const AppPill(
+                    label: '✓ တတ်ပြီး',
+                    color: Color(0xFFD8F3DC),
+                    textColor: AppColors.secondary,
+                  )
+                else if (item.streak > 0)
+                  AppPill(
+                    label: '🔥 Streak ${item.streak}',
+                    color: const Color(0xFFFDE2E4),
+                    textColor: AppColors.accent,
+                  ),
+                Text(
+                  '$index / $total',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textSoft,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ],
+            ),
+
+            // Center Japanese Word & Reading Reveal
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (item.secondary != null && item.secondary!.isNotEmpty) ...[
+                  if (_showReadingHint)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySoft,
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                      child: Text(
+                        item.secondary!,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                    )
+                  else
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xs,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      onPressed: () {
+                        setState(() => _showReadingHint = true);
+                      },
+                      icon: const Icon(
+                        Icons.visibility_outlined,
+                        size: 16,
+                        color: AppColors.textSoft,
+                      ),
+                      label: Text(
+                        AppStrings.revealReading,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: AppColors.textSoft,
+                            ),
+                      ),
+                    ),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
+                Text(
+                  item.primary,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.text,
+                        fontSize: 40,
+                      ),
+                ),
+              ],
+            ),
+
+            // Bottom flip hint
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.touch_app_outlined,
+                    size: 14,
+                    color: AppColors.textSoft,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(
+                    AppStrings.flipCardHint,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.textSoft,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Back face of the card showing the meaning, reading, and usage.
+  Widget _buildBackCard(
+    BuildContext context,
+    StudyItem item,
+    int index,
+    int total,
+  ) {
+    return AppCard(
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(minHeight: 340),
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          border: Border.all(
+            color: AppColors.primaryLight.withAlpha(50),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Top card header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const AppPill(
+                  label: 'အဓိပ္ပာယ်',
+                  color: AppColors.primarySoft,
+                  textColor: AppColors.primary,
+                ),
+                Text(
+                  '$index / $total',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textSoft,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ],
+            ),
+
+            // Word, Reading & Burmese Meaning
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  item.primary,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.text,
+                      ),
+                ),
+                if (item.secondary != null && item.secondary!.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    item.secondary!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ],
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  child: Divider(color: AppColors.divider, height: 1),
+                ),
+                if (item.meaning != null && item.meaning!.isNotEmpty)
+                  Text(
+                    item.meaning!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppColors.text,
+                          fontWeight: FontWeight.w700,
+                          height: 1.4,
+                        ),
+                  ),
+                if (item.connection != null && item.connection!.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: Text(
+                      item.connection!,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSoft,
+                          ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+
+            // Tap to flip back hint
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.flip_to_front_rounded,
+                  size: 14,
+                  color: AppColors.textSoft,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  AppStrings.tapToFlipBack,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textSoft,
+                      ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Action buttons at the bottom: Don't Know, Flip, Know.
+  Widget _buildActionControls(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
+      child: Row(
+        children: [
+          if (_currentIndex > 0) ...[
+            IconButton(
+              tooltip: AppStrings.back,
+              style: IconButton.styleFrom(
+                backgroundColor: AppColors.surface,
+                foregroundColor: AppColors.textSoft,
+              ),
+              onPressed: _previousCard,
+              icon: const Icon(Icons.arrow_back_rounded),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+          ],
+          // Don't Know Button
+          Expanded(
+            child: SizedBox(
+              height: 52,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.error,
+                  side: const BorderSide(color: AppColors.error),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                ),
+                onPressed: () => _answerCard(false),
+                icon: const Icon(Icons.close_rounded),
+                label: const Text(
+                  AppStrings.dontKnow,
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+
+          // Flip Button
+          InkWell(
+            onTap: _toggleFlip,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            child: Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.divider),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x0C000000),
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.flip_rounded,
+                color: AppColors.primary,
+                size: 24,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+
+          // Know / Remembered Button
+          Expanded(
+            child: SizedBox(
+              height: 52,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: Colors.white,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                ),
+                onPressed: () => _answerCard(true),
+                icon: const Icon(Icons.check_rounded),
+                label: const Text(
+                  AppStrings.know,
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Completion summary view when user completes all cards in the deck.
+  Widget _buildCompletionView(BuildContext context, int totalCards) {
+    final masteryPercentage =
+        totalCards == 0 ? 0 : ((_rememberedCount / totalCards) * 100).toInt();
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.screenH),
+        child: AppCard(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.xl,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary.withAlpha(25),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      '🎉',
+                      style: TextStyle(fontSize: 36),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  AppStrings.completedDeckTitle,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.text,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  AppStrings.completedDeckSubtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSoft,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Statistics row
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.md,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatColumn(
+                        context,
+                        label: 'စုစုပေါင်း',
+                        value: '$totalCards',
+                        color: AppColors.primary,
+                      ),
+                      Container(
+                        height: 36,
+                        width: 1,
+                        color: AppColors.divider,
+                      ),
+                      _buildStatColumn(
+                        context,
+                        label: AppStrings.know,
+                        value: '$_rememberedCount',
+                        color: AppColors.secondary,
+                      ),
+                      Container(
+                        height: 36,
+                        width: 1,
+                        color: AppColors.divider,
+                      ),
+                      _buildStatColumn(
+                        context,
+                        label: AppStrings.dontKnow,
+                        value: '$_needsReviewCount',
+                        color: AppColors.error,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'တိကျမှု: $masteryPercentage%',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.secondary,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Action buttons
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                    ),
+                    onPressed: _restartDeck,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text(
+                      AppStrings.restartDeck,
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      AppStrings.backToUnits,
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatColumn(
+    BuildContext context, {
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: AppColors.textSoft,
+              ),
+        ),
+      ],
+    );
+  }
+}

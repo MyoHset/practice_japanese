@@ -42,6 +42,43 @@ class AppStrings {
   static const String modeQuickHint = 'ရွေးချယ်ခွင့် ၄ ခုဖြင့် ဖြေဆိုပါ';
   static const String modeFlashcardHint = 'ကတ်ပြားဖြင့် ကျက်မှတ်ပါ';
 
+  // ── Chapter & Section ──────────────────────────────────────────────────────
+  static const String chapter = 'အခန်း';
+  static const String section = 'အပိုင်း';
+  static const String allChapters = 'အားလုံး';
+  static String chapterLabel(int n) => 'Chapter $n';
+  static String chapterSummary(int sections, int words) =>
+      '$sections ပိုင်း · စုစုပေါင်း $words လုံး';
+  static const String chapterFlashcard = 'Chapter တစ်ခုလုံး Flashcard';
+  static const String sectionFlashcard = 'Flashcard လေ့လာမည်';
+
+  // ── Flashcard ─────────────────────────────────────────────────────────────
+  static const String flipCardHint = 'အဓိပ္ပာယ်ကြည့်ရန် ကတ်ကိုနှိပ်ပါ 👆';
+  static const String tapToFlipBack = 'ပြန်လှန်ရန် နှိပ်ပါ';
+  static const String revealReading = 'Reading ကြည့်မည်';
+  static const String hideReading = 'Reading ဝှက်မည်';
+  static const String know = 'သိတယ်';
+  static const String dontKnow = 'မသိသေးပါ';
+  static const String restartDeck = 'ပြန်လည်လေ့လာမည်';
+  static const String backToUnits = 'အခန်းများသို့ ပြန်သွားမည်';
+  static const String completedDeckTitle = 'ဂုဏ်ယူပါတယ် 🎉';
+  static const String completedDeckSubtitle = 'ကတ်ပြားအားလုံး လေ့လာပြီးပါပြီ';
+  static const String shuffleDeck = 'ရောမွှေမည်';
+  static const String orderedDeck = 'နဂိုစဉ်အတိုင်း';
+
+  // ── Quick Quiz ────────────────────────────────────────────────────────────
+  static const String chapterQuickQuiz = 'Chapter တစ်ခုလုံး Quick Quiz';
+  static const String nextQuestion = 'ရှေ့သို့';
+  static const String questionCount = 'မေးခွန်း';
+  static const String quizScore = 'ရမှတ်';
+  static const String correct = 'မှန်ပါသည်';
+  static const String wrong = 'မှားပါသည်';
+  static const String retryQuiz = 'ပြန်လည်ဖြေဆိုမည်';
+  static const String quizCompletedTitle = 'Quiz ပြီးဆုံးပါပြီ 🎉';
+  static const String excellentJob = 'ထူးချွန်ပါတယ် 🏆';
+  static const String goodJob = 'ကောင်းမွန်ပါတယ် 🌟';
+  static const String keepPracticing = 'ထပ်မံလေ့ကျင့်ပါ 💪';
+
   // ── General ───────────────────────────────────────────────────────────────
   static const String comingSoon = 'မကြာမီ လာမည်…';
   static const String comingSoonSubtitle =

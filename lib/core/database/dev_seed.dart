@@ -13,6 +13,7 @@ Future<void> seedDevData(AppDatabase db) async {
 
   final sourceCount = await db.sources.count().getSingle();
   if (sourceCount > 0) {
+    await _ensureTangoLevelN3(db);
     await _updateTangoIfCorrupted(db);
     return;
   }
@@ -424,12 +425,14 @@ Future<void> _seedTangoFromJson(AppDatabase db, DateTime now) async {
   if (jsonStr == null || jsonStr.isEmpty) return;
 
   final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+  final bookLevel = data['level'] as String? ?? 'N3';
   final sections = data['sections'] as List<dynamic>;
 
   final tango2000Id = await db.into(db.sources).insert(
         SourcesCompanion.insert(
           type: SourceType.vocabBook,
           name: 'Tango 2000',
+          jlptLevel: Value(bookLevel),
           sortOrder: const Value(3),
         ),
       );
@@ -553,6 +556,17 @@ Future<void> _updateTangoIfCorrupted(AppDatabase db) async {
       }
     }
   });
+}
+
+/// Ensures Tango 2000 has its jlptLevel set to N3 in an already seeded database.
+Future<void> _ensureTangoLevelN3(AppDatabase db) async {
+  await (db.update(db.sources)
+        ..where(
+          (s) =>
+              s.name.contains('Tango 2000') &
+              (s.jlptLevel.isNull() | s.jlptLevel.isNotValue('N3')),
+        ))
+      .write(const SourcesCompanion(jlptLevel: Value('N3')));
 }
 
 /// Backwards compatibility alias.

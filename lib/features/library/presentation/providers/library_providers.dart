@@ -45,11 +45,29 @@ final unitProvider = FutureProvider.family<Unit?, int>((ref, id) {
 /// Parameter record for unitItemsProvider.
 typedef UnitItemsParams = ({int unitId, ContentKind kind});
 
-/// Provides study items in a unit for List mode.
+/// Provides study items in a unit for List mode and Flashcard mode.
 final unitItemsProvider =
     StreamProvider.family<List<StudyItem>, UnitItemsParams>((ref, params) {
   final repo = ref.watch(libraryRepositoryProvider);
   return repo.watchUnitItems(params.unitId, params.kind);
+});
+
+/// Parameter record for chapterItemsProvider.
+typedef ChapterItemsParams = ({
+  int sourceId,
+  int chapterNumber,
+  ContentKind kind
+});
+
+/// Provides study items across all units in a chapter for Flashcard mode.
+final chapterItemsProvider =
+    StreamProvider.family<List<StudyItem>, ChapterItemsParams>((ref, params) {
+  final repo = ref.watch(libraryRepositoryProvider);
+  return repo.watchChapterItems(
+    params.sourceId,
+    params.chapterNumber,
+    params.kind,
+  );
 });
 
 /// Provides the count of due review items across the app.

@@ -10,6 +10,8 @@ class AppRoutes {
   static const String unitListPattern = '/library/:kind/source/:sourceId';
   static const String studyPattern =
       '/library/:kind/source/:sourceId/unit/:unitId/:mode';
+  static const String chapterStudyPattern =
+      '/library/:kind/source/:sourceId/chapter/:chapterNumber/:mode';
   static const String pastExam = '/past-exam';
 
   // ── Typed path helpers ─────────────────────────────────────────────────────
@@ -25,4 +27,12 @@ class AppRoutes {
     StudyMode mode,
   ) =>
       '/library/${kind.slug}/source/$sourceId/unit/$unitId/${mode.slug}';
+
+  static String chapterStudy(
+    ContentKind kind,
+    int sourceId,
+    int chapterNumber,
+    StudyMode mode,
+  ) =>
+      '/library/${kind.slug}/source/$sourceId/chapter/$chapterNumber/${mode.slug}';
 }

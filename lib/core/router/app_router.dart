@@ -5,6 +5,8 @@ import 'package:practice_janpanese/core/widgets/coming_soon_screen.dart';
 import 'package:practice_janpanese/features/home/presentation/screens/home_screen.dart';
 import 'package:practice_janpanese/features/library/domain/content_kind.dart';
 import 'package:practice_janpanese/features/library/domain/study_mode.dart';
+import 'package:practice_janpanese/features/library/presentation/screens/flashcard_study_screen.dart';
+import 'package:practice_janpanese/features/library/presentation/screens/quick_quiz_study_screen.dart';
 import 'package:practice_janpanese/features/library/presentation/screens/source_list_screen.dart';
 import 'package:practice_janpanese/features/library/presentation/screens/unit_list_mode_screen.dart';
 import 'package:practice_janpanese/features/library/presentation/screens/unit_list_screen.dart';
@@ -87,8 +89,74 @@ final GoRouter appRouter = GoRouter(
           );
         }
 
+        if (mode == StudyMode.flashcard) {
+          return FlashcardStudyScreen(
+            kind: kind,
+            sourceId: sourceId,
+            unitId: unitId,
+          );
+        }
+
+        if (mode == StudyMode.quick) {
+          return QuickQuizStudyScreen(
+            kind: kind,
+            sourceId: sourceId,
+            unitId: unitId,
+          );
+        }
+
         return ComingSoonScreen(
           title: '${kind.label} · ${mode.title}',
+        );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.chapterStudyPattern,
+      redirect: (context, state) {
+        final kindSlug = state.pathParameters['kind'];
+        final sourceIdStr = state.pathParameters['sourceId'];
+        final chapterNumberStr = state.pathParameters['chapterNumber'];
+        final modeSlug = state.pathParameters['mode'];
+
+        final kind =
+            kindSlug != null ? ContentKind.tryFromSlug(kindSlug) : null;
+        final sourceId = sourceIdStr != null ? int.tryParse(sourceIdStr) : null;
+        final chapterNumber =
+            chapterNumberStr != null ? int.tryParse(chapterNumberStr) : null;
+        final mode = modeSlug != null ? StudyMode.tryFromSlug(modeSlug) : null;
+
+        if (kind == null ||
+            sourceId == null ||
+            chapterNumber == null ||
+            mode == null) {
+          return AppRoutes.home;
+        }
+        return null;
+      },
+      builder: (context, state) {
+        final kind = ContentKind.fromSlug(state.pathParameters['kind']!);
+        final sourceId = int.parse(state.pathParameters['sourceId']!);
+        final chapterNumber = int.parse(state.pathParameters['chapterNumber']!);
+        final mode = StudyMode.fromSlug(state.pathParameters['mode']!);
+
+        if (mode == StudyMode.flashcard) {
+          return FlashcardStudyScreen(
+            kind: kind,
+            sourceId: sourceId,
+            chapterNumber: chapterNumber,
+          );
+        }
+
+        if (mode == StudyMode.quick) {
+          return QuickQuizStudyScreen(
+            kind: kind,
+            sourceId: sourceId,
+            chapterNumber: chapterNumber,
+          );
+        }
+
+        return ComingSoonScreen(
+          title: '${kind.label} · Chapter $chapterNumber · ${mode.title}',
         );
       },
     ),

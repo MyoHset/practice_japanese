@@ -14,10 +14,16 @@ class UnitTile extends StatelessWidget {
     super.key,
     required this.unit,
     required this.onTap,
+    this.displayName,
+    this.onFlashcardTap,
+    this.onQuickQuizTap,
   });
 
   final UnitProgress unit;
   final VoidCallback onTap;
+  final String? displayName;
+  final VoidCallback? onFlashcardTap;
+  final VoidCallback? onQuickQuizTap;
 
   @override
   Widget build(BuildContext context) => AppCard(
@@ -46,7 +52,7 @@ class UnitTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    unit.name,
+                    displayName ?? unit.name,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   const SizedBox(height: AppSpacing.xs),
@@ -64,12 +70,45 @@ class UnitTile extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.textSoft,
-              size: AppSizes.iconMd,
-            ),
+            if (onFlashcardTap != null || onQuickQuizTap != null) ...[
+              if (onFlashcardTap != null) ...[
+                const SizedBox(width: AppSpacing.xs),
+                IconButton(
+                  tooltip: AppStrings.modeFlashcard,
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.secondary.withAlpha(20),
+                    foregroundColor: AppColors.secondary,
+                  ),
+                  icon: const Icon(
+                    Icons.style_rounded,
+                    size: AppSizes.iconMd,
+                  ),
+                  onPressed: onFlashcardTap,
+                ),
+              ],
+              if (onQuickQuizTap != null) ...[
+                const SizedBox(width: AppSpacing.xs),
+                IconButton(
+                  tooltip: AppStrings.modeQuick,
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.accent.withAlpha(25),
+                    foregroundColor: AppColors.accent,
+                  ),
+                  icon: const Icon(
+                    Icons.quiz_rounded,
+                    size: AppSizes.iconMd,
+                  ),
+                  onPressed: onQuickQuizTap,
+                ),
+              ],
+            ] else ...[
+              const SizedBox(width: AppSpacing.sm),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textSoft,
+                size: AppSizes.iconMd,
+              ),
+            ],
           ],
         ),
       );

@@ -179,6 +179,182 @@ class LibraryRepository {
     }
   }
 
+  /// Watches all items across all units in a given chapter for a source.
+  Stream<List<StudyItem>> watchChapterItems(
+    int sourceId,
+    int chapterNumber,
+    ContentKind kind,
+  ) {
+    switch (kind) {
+      case ContentKind.vocab:
+        const query = '''
+          SELECT 
+            v.id AS item_id,
+            v.word AS item_primary,
+            v.reading AS item_secondary,
+            v.meaning_my AS item_meaning,
+            NULL AS item_connection,
+            COALESCE(p.streak, 0) AS item_streak
+          FROM vocab_source_items vsi
+          JOIN vocabularies v ON v.id = vsi.vocab_id
+          JOIN units u ON u.id = vsi.unit_id
+          LEFT JOIN progress p ON p.item_id = v.id AND p.item_type = 1
+          WHERE u.source_id = :sourceId 
+            AND (u.name LIKE 'Ch.' || :chapterNumber || ' %' OR u.name LIKE 'Ch.' || :chapterNumber || ':%')
+          ORDER BY u.order_no ASC, vsi.position ASC, v.id ASC
+        ''';
+        return _db
+            .customSelect(
+              query,
+              variables: [
+                Variable.withInt(sourceId),
+                Variable.withInt(chapterNumber),
+              ],
+              readsFrom: {
+                _db.vocabSourceItems,
+                _db.vocabularies,
+                _db.units,
+                _db.progress,
+              },
+            )
+            .watch()
+            .map((rows) => rows.map(_mapStudyItem).toList());
+
+      case ContentKind.kanji:
+        const query = '''
+          SELECT 
+            k.id AS item_id,
+            k.character AS item_primary,
+            (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id) AS item_secondary,
+            k.meaning_my AS item_meaning,
+            NULL AS item_connection,
+            COALESCE(p.streak, 0) AS item_streak
+          FROM kanji_source_items ksi
+          JOIN kanjis k ON k.id = ksi.kanji_id
+          JOIN units u ON u.id = ksi.unit_id
+          LEFT JOIN progress p ON p.item_id = k.id AND p.item_type = 0
+          WHERE u.source_id = :sourceId 
+            AND (u.name LIKE 'Ch.' || :chapterNumber || ' %' OR u.name LIKE 'Ch.' || :chapterNumber || ':%')
+          ORDER BY u.order_no ASC, ksi.position ASC, k.id ASC
+        ''';
+        return _db
+            .customSelect(
+              query,
+              variables: [
+                Variable.withInt(sourceId),
+                Variable.withInt(chapterNumber),
+              ],
+              readsFrom: {
+                _db.kanjiSourceItems,
+                _db.kanjis,
+                _db.kanjiReadings,
+                _db.units,
+                _db.progress,
+              },
+            )
+            .watch()
+            .map((rows) => rows.map(_mapStudyItem).toList());
+
+      case ContentKind.grammar:
+        const query = '''
+          SELECT 
+            g.id AS item_id,
+            g.pattern AS item_primary,
+            g.connection AS item_secondary,
+            g.meaning_my AS item_meaning,
+            g.connection AS item_connection,
+            COALESCE(p.streak, 0) AS item_streak
+          FROM grammar_source_items gsi
+          JOIN grammar_points g ON g.id = gsi.grammar_id
+          JOIN units u ON u.id = gsi.unit_id
+          LEFT JOIN progress p ON p.item_id = g.id AND p.item_type = 2
+          WHERE u.source_id = :sourceId 
+            AND (u.name LIKE 'Ch.' || :chapterNumber || ' %' OR u.name LIKE 'Ch.' || :chapterNumber || ':%')
+          ORDER BY u.order_no ASC, gsi.position ASC, g.id ASC
+        ''';
+        return _db
+            .customSelect(
+              query,
+              variables: [
+                Variable.withInt(sourceId),
+                Variable.withInt(chapterNumber),
+              ],
+              readsFrom: {
+                _db.grammarSourceItems,
+                _db.grammarPoints,
+                _db.units,
+                _db.progress,
+              },
+            )
+            .watch()
+            .map((rows) => rows.map(_mapStudyItem).toList());
+    }
+  }
+
+  /// Records a flashcard review for an item: increments streak if remembered,
+  /// resets streak if forgotten, updates lastReviewed and nextReview.
+  Future<void> recordReview({
+    required ContentKind kind,
+    required int itemId,
+    required bool remembered,
+  }) async {
+    final itemType = kind.itemType;
+    final now = DateTime.now();
+
+    final existing = await (_db.select(_db.progress)
+          ..where(
+            (p) =>
+                p.itemType.equalsValue(itemType) &
+                p.itemId.equals(itemId),
+          ))
+        .getSingleOrNull();
+
+    if (existing == null) {
+      final newStreak = remembered ? 1 : 0;
+      final intervalDays = remembered ? 1 : 0;
+      await _db.into(_db.progress).insert(
+            ProgressCompanion.insert(
+              itemType: itemType,
+              itemId: itemId,
+              direction: const Value(Direction.none),
+              streak: Value(newStreak),
+              correctCount: Value(remembered ? 1 : 0),
+              wrongCount: Value(remembered ? 0 : 1),
+              lastReviewed: Value(now),
+              nextReview: Value(now.add(Duration(days: intervalDays))),
+            ),
+          );
+    } else {
+      final newStreak = remembered ? existing.streak + 1 : 0;
+      final intervalDays = remembered
+          ? (newStreak == 1
+              ? 1
+              : newStreak == 2
+                  ? 3
+                  : newStreak * 3)
+          : 0;
+      await (_db.update(_db.progress)
+            ..where(
+              (p) =>
+                  p.itemType.equalsValue(itemType) &
+                  p.itemId.equals(itemId),
+            ))
+          .write(
+        ProgressCompanion(
+          streak: Value(newStreak),
+          correctCount: Value(
+            remembered ? existing.correctCount + 1 : existing.correctCount,
+          ),
+          wrongCount: Value(
+            !remembered ? existing.wrongCount + 1 : existing.wrongCount,
+          ),
+          lastReviewed: Value(now),
+          nextReview: Value(now.add(Duration(days: intervalDays))),
+        ),
+      );
+    }
+  }
+
   StudyItem _mapStudyItem(QueryRow row) => StudyItem(
         id: row.read<int>('item_id'),
         primary: row.read<String>('item_primary'),
