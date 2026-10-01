@@ -12,12 +12,17 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:practice_janpanese/features/library/presentation/screens/unit_list_screen.dart';
 import 'package:practice_janpanese/features/past_exam/presentation/screens/past_exam_list_screen.dart';
 import 'package:practice_janpanese/features/past_exam/presentation/screens/past_exam_practice_screen.dart';
+import 'package:practice_janpanese/features/splash/presentation/screens/splash_screen.dart';
 
 /// Top-level GoRouter instance configuring application routes per B3.
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.home,
+  initialLocation: AppRoutes.splash,
   errorBuilder: (context, state) => const HomeScreen(),
   routes: [
+    GoRoute(
+      path: AppRoutes.splash,
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: AppRoutes.home,
       builder: (context, state) => const HomeScreen(),
@@ -167,19 +172,33 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const PastExamListScreen(),
     ),
     GoRoute(
+      path: AppRoutes.pastExamFilteredPractice,
+      builder: (context, state) => const PastExamPracticeScreen(
+        useGlobalFilter: true,
+      ),
+    ),
+    GoRoute(
       path: AppRoutes.pastExamPracticePattern,
       builder: (context, state) {
         final sourceId = int.parse(state.pathParameters['sourceId']!);
         final subjectStr = state.uri.queryParameters['subject'];
+        final mondaiTypeStr = state.uri.queryParameters['mondaiType'];
         Subject? subject;
         if (subjectStr != null) {
           try {
             subject = Subject.values.byName(subjectStr);
           } catch (_) {}
         }
+        MondaiType? mondaiType;
+        if (mondaiTypeStr != null) {
+          try {
+            mondaiType = MondaiType.values.byName(mondaiTypeStr);
+          } catch (_) {}
+        }
         return PastExamPracticeScreen(
           sourceId: sourceId,
           subject: subject,
+          mondaiType: mondaiType,
         );
       },
     ),

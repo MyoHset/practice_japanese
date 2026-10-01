@@ -9,6 +9,7 @@ import 'package:practice_janpanese/core/widgets/app_card.dart';
 import 'package:practice_janpanese/core/widgets/app_pill.dart';
 import 'package:practice_janpanese/core/widgets/app_progress_bar.dart';
 import 'package:practice_janpanese/core/widgets/async_value_view.dart';
+import 'package:practice_janpanese/features/level/presentation/providers/selected_level_provider.dart';
 import 'package:practice_janpanese/features/past_exam/domain/past_exam_question.dart';
 import 'package:practice_janpanese/features/past_exam/presentation/providers/past_exam_providers.dart';
 
@@ -16,12 +17,16 @@ import 'package:practice_janpanese/features/past_exam/presentation/providers/pas
 class PastExamPracticeScreen extends ConsumerStatefulWidget {
   const PastExamPracticeScreen({
     super.key,
-    required this.sourceId,
+    this.sourceId,
     this.subject,
+    this.mondaiType,
+    this.useGlobalFilter = false,
   });
 
-  final int sourceId;
+  final int? sourceId;
   final Subject? subject;
+  final MondaiType? mondaiType;
+  final bool useGlobalFilter;
 
   @override
   ConsumerState<PastExamPracticeScreen> createState() =>
@@ -81,13 +86,13 @@ class _PastExamPracticeScreenState
   String _getSubjectLabel(Subject? subject) {
     switch (subject) {
       case Subject.vocab:
-        return '文字・語彙';
+        return '文字・語彙 (Vocabulary)';
       case Subject.grammar:
-        return '文法';
+        return '文法 (Grammar)';
       case Subject.reading:
-        return '読解';
+        return '読解 (Reading)';
       case Subject.listening:
-        return '聴解';
+        return '聴解 (Listening)';
       case null:
         return 'All Sections (မေးခွန်းအားလုံး)';
     }
@@ -95,12 +100,92 @@ class _PastExamPracticeScreenState
 
   @override
   Widget build(BuildContext context) {
-    final query = (sourceId: widget.sourceId, subject: widget.subject);
-    final questionsAsync = ref.watch(pastExamQuestionsProvider(query));
+    final PastExamPracticeArgs args;
+    final String title;
+    final String? subtitle;
+
+    if (widget.useGlobalFilter) {
+      final level = ref.watch(selectedLevelProvider);
+      final filter = ref.watch(pastExamFilterProvider);
+      args = PastExamPracticeArgs(
+        level: level,
+        years: filter.selectedYears,
+        mondaiTypes: filter.selectedMondaiTypes,
+      );
+      if (filter.selectedMondaiTypes.length == 1) {
+        final t = filter.selectedMondaiTypes.first;
+        title = mondaiTypeLabel(t);
+      } else if (filter.selectedMondaiTypes.length > 1) {
+        title =
+            'ရွေးချယ်ထားသော မေးခွန်းများ (${filter.selectedMondaiTypes.length} မျိုး)';
+      } else {
+        title = '$level စာမေးပွဲ မေးခွန်းအားလုံး';
+      }
+      subtitle = filter.selectedYears.isNotEmpty
+          ? '${filter.selectedYears.join(", ")} ခုနှစ်'
+          : '$level Past Exams';
+    } else if (widget.mondaiType != null) {
+      args = PastExamPracticeArgs(
+        sourceId: widget.sourceId,
+        mondaiTypes: {widget.mondaiType!},
+      );
+      title = mondaiTypeLabel(widget.mondaiType!);
+      subtitle = mondaiTypeBurmeseDescription(widget.mondaiType!);
+    } else if (widget.subject != null) {
+      args = PastExamPracticeArgs(
+        sourceId: widget.sourceId,
+        subject: widget.subject,
+      );
+      title = _getSubjectLabel(widget.subject);
+      subtitle = null;
+    } else {
+      final filter = ref.watch(pastExamFilterProvider);
+      if (filter.selectedMondaiTypes.isNotEmpty) {
+        args = PastExamPracticeArgs(
+          sourceId: widget.sourceId,
+          mondaiTypes: filter.selectedMondaiTypes,
+        );
+        title = filter.selectedMondaiTypes.length == 1
+            ? mondaiTypeLabel(filter.selectedMondaiTypes.first)
+            : 'ရွေးချယ်ထားသော မေးခွန်းများ (${filter.selectedMondaiTypes.length} မျိုး)';
+        subtitle = null;
+      } else {
+        args = PastExamPracticeArgs(
+          sourceId: widget.sourceId,
+        );
+        title = _getSubjectLabel(null);
+        subtitle = null;
+      }
+    }
+
+    final questionsAsync = ref.watch(pastExamPracticeQuestionsProvider(args));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_getSubjectLabel(widget.subject)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              questionsAsync.valueOrNull != null
+                  ? (subtitle != null
+                      ? '$subtitle · စုစုပေါင်း ${questionsAsync.valueOrNull!.length} ပုဒ်'
+                      : 'စုစုပေါင်း ${questionsAsync.valueOrNull!.length} ပုဒ်')
+                  : (subtitle ?? ''),
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.textSoft,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
         actions: [
           if (!_isCompleted)
             Padding(
@@ -133,7 +218,7 @@ class _PastExamPracticeScreenState
       body: AsyncValueView(
         value: questionsAsync,
         isEmpty: (questions) => questions.isEmpty,
-        emptyMessage: 'မေးခွန်းများ ရှာမတွေ့ပါ။',
+        emptyMessage: 'ရွေးချယ်ထားသော မေးခွန်းများ ရှာမတွေ့ပါ။',
         data: (questions) {
           if (_isCompleted) {
             return _buildCompletionScreen(context, questions.length);
@@ -168,8 +253,8 @@ class _PastExamPracticeScreenState
                   children: [
                     AppPill(
                       label:
-                          'Q ${question.questionNo ?? (_currentIndex + 1)} / $totalQuestions',
-                      color: AppColors.primary,
+                          'မေးခွန်း ${_currentIndex + 1} / စုစုပေါင်း $totalQuestions ပုဒ်',
+                      color: AppColors.primary.withValues(alpha: 0.1),
                     ),
                     if (question.mondaiNo != null)
                       Text(

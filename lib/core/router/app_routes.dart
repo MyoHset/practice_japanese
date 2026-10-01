@@ -6,6 +6,7 @@ import 'package:practice_janpanese/features/library/domain/study_mode.dart';
 /// Widgets never build path strings by hand.
 class AppRoutes {
   // ── Path patterns ──────────────────────────────────────────────────────────
+  static const String splash = '/splash';
   static const String home = '/';
   static const String sourceListPattern = '/library/:kind';
   static const String unitListPattern = '/library/:kind/source/:sourceId';
@@ -15,6 +16,7 @@ class AppRoutes {
       '/library/:kind/source/:sourceId/chapter/:chapterNumber/:mode';
   static const String pastExam = '/past-exam';
   static const String pastExamPracticePattern = '/past-exam/:sourceId/practice';
+  static const String pastExamFilteredPractice = '/past-exam/filtered-practice';
 
   // ── Typed path helpers ─────────────────────────────────────────────────────
   static String sourceList(ContentKind kind) => '/library/${kind.slug}';
@@ -38,9 +40,16 @@ class AppRoutes {
   ) =>
       '/library/${kind.slug}/source/$sourceId/chapter/$chapterNumber/${mode.slug}';
 
-  static String pastExamPractice(int sourceId, [Subject? subject]) {
-    if (subject != null) {
-      return '/past-exam/$sourceId/practice?subject=${subject.name}';
+  static String pastExamPractice(
+    int sourceId, {
+    Subject? subject,
+    MondaiType? mondaiType,
+  }) {
+    final params = <String>[];
+    if (subject != null) params.add('subject=${subject.name}');
+    if (mondaiType != null) params.add('mondaiType=${mondaiType.name}');
+    if (params.isNotEmpty) {
+      return '/past-exam/$sourceId/practice?${params.join('&')}';
     }
     return '/past-exam/$sourceId/practice';
   }

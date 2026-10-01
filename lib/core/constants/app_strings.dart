@@ -4,9 +4,10 @@
 /// Japanese terms remain Japanese. No literal strings in widgets.
 class AppStrings {
   // ── App ──────────────────────────────────────────────────────────────────
-  static const String appTitle = 'JLPT လေ့ကျင့်ရေး';
+  static const String appTitle = 'Pocket JLPT';
+  static const String appTitleBurmese = 'အိတ်ဆောင် JLPT';
   static const String homeGreeting = '今日もがんばろう 🎌';
-  static const String homeSubtitle = 'ဒီနေ့လည်း ဂပန်စာ လေ့ကျင့်ကြစို့';
+  static const String homeSubtitle = 'ဒီနေ့လည်း ဂျပန်စာ လေ့ကျင့်ကြစို့';
 
   // ── Level ─────────────────────────────────────────────────────────────────
   static const String selectLevel = 'Level ရွေးပါ';
