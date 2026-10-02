@@ -619,9 +619,11 @@ Future<void> _seedTangoFromJson(AppDatabase db, DateTime now) async {
   try {
     jsonStr = await rootBundle.loadString('assets/data/tango_2000_n3.json');
   } catch (_) {
-    final file = File('assets/data/tango_2000_n3.json');
-    if (file.existsSync()) {
-      jsonStr = await file.readAsString();
+    if (!kIsWeb) {
+      final file = File('assets/data/tango_2000_n3.json');
+      if (file.existsSync()) {
+        jsonStr = await file.readAsString();
+      }
     }
   }
 
@@ -726,9 +728,11 @@ Future<void> _updateTangoIfCorrupted(AppDatabase db) async {
   try {
     jsonStr = await rootBundle.loadString('assets/data/tango_2000_n3.json');
   } catch (_) {
-    final file = File('assets/data/tango_2000_n3.json');
-    if (file.existsSync()) {
-      jsonStr = await file.readAsString();
+    if (!kIsWeb) {
+      final file = File('assets/data/tango_2000_n3.json');
+      if (file.existsSync()) {
+        jsonStr = await file.readAsString();
+      }
     }
   }
   if (jsonStr == null || jsonStr.isEmpty) return;
@@ -805,9 +809,11 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
     jsonStr =
         await rootBundle.loadString('assets/data/kanji_speed_master_n3.json');
   } catch (_) {
-    final file = File('assets/data/kanji_speed_master_n3.json');
-    if (file.existsSync()) {
-      jsonStr = await file.readAsString();
+    if (!kIsWeb) {
+      final file = File('assets/data/kanji_speed_master_n3.json');
+      if (file.existsSync()) {
+        jsonStr = await file.readAsString();
+      }
     }
   }
 
@@ -1868,9 +1874,11 @@ Future<void> _seedPastExamFromJson(
   try {
     jsonStr = await rootBundle.loadString(assetPath);
   } catch (_) {
-    final file = File(assetPath);
-    if (file.existsSync()) {
-      jsonStr = await file.readAsString();
+    if (!kIsWeb) {
+      final file = File(assetPath);
+      if (file.existsSync()) {
+        jsonStr = await file.readAsString();
+      }
     }
   }
 

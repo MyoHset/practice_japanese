@@ -369,7 +369,25 @@ class SessionAnswers extends Table {
   SessionAnswers,
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(driftDatabase(name: 'jlpt_practice'));
+  AppDatabase()
+      : super(
+          driftDatabase(
+            name: 'jlpt_practice',
+            web: DriftWebOptions(
+              sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+              driftWorker: Uri.parse('drift_worker.js'),
+              onResult: (result) {
+                if (result.missingFeatures.isNotEmpty) {
+                  // ignore: avoid_print
+                  print(
+                    'Using ${result.chosenImplementation} due to missing browser '
+                    'features: ${result.missingFeatures}',
+                  );
+                }
+              },
+            ),
+          ),
+        );
 
   /// Test အတွက် (in-memory DB ထည့်နိုင်အောင်)
   AppDatabase.forTesting(super.e);
