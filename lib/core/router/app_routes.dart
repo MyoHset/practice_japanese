@@ -14,6 +14,8 @@ class AppRoutes {
       '/library/:kind/source/:sourceId/unit/:unitId/:mode';
   static const String chapterStudyPattern =
       '/library/:kind/source/:sourceId/chapter/:chapterNumber/:mode';
+  static const String practiceStudyPattern =
+      '/library/:kind/source/:sourceId/practice/:mode';
   static const String pastExam = '/past-exam';
   static const String pastExamPracticePattern = '/past-exam/:sourceId/practice';
   static const String pastExamFilteredPractice = '/past-exam/filtered-practice';
@@ -39,6 +41,24 @@ class AppRoutes {
     StudyMode mode,
   ) =>
       '/library/${kind.slug}/source/$sourceId/chapter/$chapterNumber/${mode.slug}';
+
+  static String practiceStudy(
+    ContentKind kind,
+    int sourceId,
+    StudyMode mode, {
+    List<int>? chapters,
+    int? limit,
+  }) {
+    final params = <String>[];
+    if (chapters != null && chapters.isNotEmpty) {
+      params.add('chapters=${chapters.join(',')}');
+    }
+    if (limit != null) {
+      params.add('limit=$limit');
+    }
+    final query = params.isNotEmpty ? '?${params.join('&')}' : '';
+    return '/library/${kind.slug}/source/$sourceId/practice/${mode.slug}$query';
+  }
 
   static String pastExamPractice(
     int sourceId, {

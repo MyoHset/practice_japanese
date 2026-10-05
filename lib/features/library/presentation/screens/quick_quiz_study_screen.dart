@@ -35,15 +35,19 @@ class QuickQuizStudyScreen extends ConsumerStatefulWidget {
     required this.sourceId,
     this.unitId,
     this.chapterNumber,
+    this.chapterNumbers,
+    this.questionLimit,
   }) : assert(
-          unitId != null || chapterNumber != null,
-          'Either unitId or chapterNumber must be provided',
+          unitId != null || chapterNumber != null || chapterNumbers != null,
+          'Either unitId, chapterNumber, or chapterNumbers must be provided',
         );
 
   final ContentKind kind;
   final int sourceId;
   final int? unitId;
   final int? chapterNumber;
+  final List<int>? chapterNumbers;
+  final int? questionLimit;
 
   @override
   ConsumerState<QuickQuizStudyScreen> createState() =>
@@ -63,10 +67,10 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
       _answerHistory = [];
 
   void _generateQuestions(List<StudyItem> items) {
-    if (_questions != null && _questions!.length == items.length) return;
+    if (_questions != null) return;
 
     final random = math.Random();
-    final validItems = items
+    var validItems = items
         .where((i) => i.meaning != null && i.meaning!.trim().isNotEmpty)
         .toList();
 
@@ -74,6 +78,16 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
       _questions = const [];
       _isCompleted = true;
       return;
+    }
+
+    // Always shuffle items for quiz so questions are presented in random order
+    validItems.shuffle(random);
+
+    // Apply random question limit if specified
+    if (widget.questionLimit != null &&
+        widget.questionLimit! > 0 &&
+        widget.questionLimit! < validItems.length) {
+      validItems = validItems.take(widget.questionLimit!).toList();
     }
 
     String getCoreMeaning(StudyItem item) {
@@ -181,6 +195,9 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveChapters = widget.chapterNumbers ??
+        (widget.chapterNumber != null ? [widget.chapterNumber!] : null);
+
     final AsyncValue<List<StudyItem>> itemsAsync = widget.unitId != null
         ? ref.watch(
             unitItemsProvider(
@@ -191,10 +208,10 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
             ),
           )
         : ref.watch(
-            chapterItemsProvider(
-              (
+            multiChapterItemsProvider(
+              MultiChapterItemsParams(
                 sourceId: widget.sourceId,
-                chapterNumber: widget.chapterNumber!,
+                chapterNumbers: effectiveChapters ?? const [],
                 kind: widget.kind,
               ),
             ),
@@ -205,9 +222,21 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
         ? ref.watch(unitProvider(widget.unitId!))
         : null;
 
-    final String screenTitle = widget.chapterNumber != null
-        ? '${sourceAsync.value?.name ?? ''} · Ch. ${widget.chapterNumber} Quiz'
-        : '${unitAsync?.value?.name ?? widget.kind.label} Quiz';
+    final String screenTitle;
+    if (widget.unitId != null) {
+      screenTitle = '${unitAsync?.value?.name ?? widget.kind.label} Quiz';
+    } else {
+      final chLabel = (effectiveChapters == null || effectiveChapters.isEmpty)
+          ? 'All Chapters'
+          : (effectiveChapters.length == 1
+              ? 'Ch. ${effectiveChapters.first}'
+              : 'Ch. ${effectiveChapters.join(", ")}');
+      final limitLabel = widget.questionLimit != null
+          ? ' (${widget.questionLimit} ပုဒ်)'
+          : '';
+      screenTitle =
+          '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel Quiz';
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,

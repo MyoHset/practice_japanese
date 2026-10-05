@@ -7,12 +7,15 @@ import 'package:practice_janpanese/core/constants/app_strings.dart';
 import 'package:practice_janpanese/core/database/app_database.dart' show Source;
 import 'package:practice_janpanese/core/router/app_routes.dart';
 import 'package:practice_janpanese/core/theme/app_colors.dart';
+import 'package:practice_janpanese/core/widgets/app_card.dart';
+import 'package:practice_janpanese/core/widgets/app_progress_bar.dart';
 import 'package:practice_janpanese/core/widgets/async_value_view.dart';
 import 'package:practice_janpanese/features/library/domain/chapter_group.dart';
 import 'package:practice_janpanese/features/library/domain/content_kind.dart';
 import 'package:practice_janpanese/features/library/domain/study_mode.dart';
 import 'package:practice_janpanese/features/library/domain/unit_progress.dart';
 import 'package:practice_janpanese/features/library/presentation/providers/library_providers.dart';
+import 'package:practice_janpanese/features/library/presentation/widgets/chapter_practice_sheet.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/chapter_summary_card.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/study_mode_sheet.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/unit_summary_card.dart';
@@ -34,8 +37,8 @@ class UnitListScreen extends ConsumerStatefulWidget {
 }
 
 class _UnitListScreenState extends ConsumerState<UnitListScreen> {
-  /// Currently selected chapter number. If null, displays all chapters/units.
-  int? _selectedChapterNumber = 1;
+  /// Currently selected chapter numbers. If empty, displays all chapters/units.
+  Set<int> _selectedChapterNumbers = {1};
 
   /// Whether the user has toggled to compound words mode (語彙) for companion sources.
   bool? _isCompoundMode;
@@ -71,6 +74,51 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
       appBar: AppBar(
         title: Text(sourceTitle),
       ),
+      floatingActionButton: unitsAsync.maybeWhen(
+        data: (units) {
+          final chapterGroups = ChapterGroup.fromUnits(units);
+          final totalAcrossUnits =
+              units.fold<int>(0, (sum, u) => sum + u.total);
+          final selectedTotal = _selectedChapterNumbers.isEmpty
+              ? totalAcrossUnits
+              : chapterGroups
+                  .where(
+                    (c) => _selectedChapterNumbers.contains(c.chapterNumber),
+                  )
+                  .fold<int>(0, (sum, c) => sum + c.total);
+
+          if (totalAcrossUnits == 0) return null;
+
+          return FloatingActionButton.extended(
+            backgroundColor: AppColors.primary,
+            elevation: 3,
+            icon: const Icon(
+              Icons.play_circle_fill_rounded,
+              color: Colors.white,
+            ),
+            label: Text(
+              _selectedChapterNumbers.isEmpty
+                  ? 'အားလုံး လေ့ကျင့်မည်'
+                  : 'လေ့ကျင့်မည် (${_selectedChapterNumbers.length} Ch.)',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            onPressed: () {
+              ChapterPracticeSheet.show(
+                context,
+                kind: activeKind,
+                sourceId: activeSourceId,
+                sourceName: sourceTitle,
+                selectedChapters: _selectedChapterNumbers,
+                totalItems: selectedTotal,
+              );
+            },
+          );
+        },
+        orElse: () => null,
+      ),
       body: AsyncValueView<List<UnitProgress>>(
         value: unitsAsync,
         isEmpty: (units) => units.isEmpty,
@@ -88,6 +136,7 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
               activeSourceId: activeSourceId,
               companionSource: companionSource,
               isCompound: isCompound,
+              sourceTitle: sourceTitle,
             );
           }
 
@@ -97,6 +146,7 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
             units,
             activeKind: activeKind,
             activeSourceId: activeSourceId,
+            sourceTitle: sourceTitle,
           );
         },
       ),
@@ -112,22 +162,27 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
     required int activeSourceId,
     required Source? companionSource,
     required bool isCompound,
+    required String sourceTitle,
   }) {
     final totalAcrossUnits = allUnits.fold<int>(0, (sum, u) => sum + u.total);
     final masteredAcrossUnits =
         allUnits.fold<int>(0, (sum, u) => sum + u.mastered);
 
-    // Selected chapter if any
-    final ChapterGroup? selectedChapter = _selectedChapterNumber == null
-        ? null
-        : chapterGroups.cast<ChapterGroup?>().firstWhere(
-              (c) => c?.chapterNumber == _selectedChapterNumber,
-              orElse: () => chapterGroups.first,
-            );
+    // Selected chapter if exactly 1 chapter is selected
+    final ChapterGroup? singleSelectedChapter =
+        _selectedChapterNumbers.length == 1
+            ? chapterGroups.cast<ChapterGroup?>().firstWhere(
+                  (c) => c?.chapterNumber == _selectedChapterNumbers.first,
+                  orElse: () => chapterGroups.first,
+                )
+            : null;
 
-    final displayedSections = selectedChapter != null
-        ? selectedChapter.sections
-        : allUnits;
+    final List<UnitProgress> displayedSections = _selectedChapterNumbers.isEmpty
+        ? allUnits
+        : chapterGroups
+            .where((c) => _selectedChapterNumbers.contains(c.chapterNumber))
+            .expand((c) => c.sections)
+            .toList();
 
     return CustomScrollView(
       slivers: [
@@ -198,23 +253,33 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                   const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  final isSelected = _selectedChapterNumber == null;
+                  final isSelected = _selectedChapterNumbers.isEmpty;
                   return _buildChapterFilterChip(
                     label: AppStrings.allChapters,
                     isSelected: isSelected,
                     onTap: () {
-                      setState(() => _selectedChapterNumber = null);
+                      setState(() => _selectedChapterNumbers = {});
                     },
                   );
                 }
 
                 final ch = chapterGroups[index - 1];
-                final isSelected = _selectedChapterNumber == ch.chapterNumber;
+                final isSelected =
+                    _selectedChapterNumbers.contains(ch.chapterNumber);
                 return _buildChapterFilterChip(
                   label: 'Ch. ${ch.chapterNumber}',
                   isSelected: isSelected,
                   onTap: () {
-                    setState(() => _selectedChapterNumber = ch.chapterNumber);
+                    setState(() {
+                      if (_selectedChapterNumbers.isEmpty) {
+                        _selectedChapterNumbers = {ch.chapterNumber};
+                      } else if (_selectedChapterNumbers
+                          .contains(ch.chapterNumber)) {
+                        _selectedChapterNumbers.remove(ch.chapterNumber);
+                      } else {
+                        _selectedChapterNumbers.add(ch.chapterNumber);
+                      }
+                    });
                   },
                 );
               },
@@ -222,8 +287,8 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
           ),
         ),
 
-        // If a specific Chapter is selected, show ChapterSummaryCard
-        if (selectedChapter != null)
+        // If a single chapter is selected, show ChapterSummaryCard with practice options
+        if (singleSelectedChapter != null)
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -231,27 +296,46 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                 vertical: AppSpacing.sm,
               ),
               child: ChapterSummaryCard(
-                chapter: selectedChapter,
+                chapter: singleSelectedChapter,
                 onFlashcardTap: () {
-                  context.push(
-                    AppRoutes.chapterStudy(
-                      activeKind,
-                      activeSourceId,
-                      selectedChapter.chapterNumber,
-                      StudyMode.flashcard,
-                    ),
+                  ChapterPracticeSheet.show(
+                    context,
+                    kind: activeKind,
+                    sourceId: activeSourceId,
+                    sourceName: sourceTitle,
+                    selectedChapters: {singleSelectedChapter.chapterNumber},
+                    totalItems: singleSelectedChapter.total,
                   );
                 },
                 onQuickQuizTap: () {
-                  context.push(
-                    AppRoutes.chapterStudy(
-                      activeKind,
-                      activeSourceId,
-                      selectedChapter.chapterNumber,
-                      StudyMode.quick,
-                    ),
+                  ChapterPracticeSheet.show(
+                    context,
+                    kind: activeKind,
+                    sourceId: activeSourceId,
+                    sourceName: sourceTitle,
+                    selectedChapters: {singleSelectedChapter.chapterNumber},
+                    totalItems: singleSelectedChapter.total,
                   );
                 },
+              ),
+            ),
+          ),
+
+        // If multiple chapters are selected (> 1), show MultiChapterCard
+        if (_selectedChapterNumbers.length > 1)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenH,
+                vertical: AppSpacing.sm,
+              ),
+              child: _buildMultiChapterCard(
+                context,
+                selectedChapters: _selectedChapterNumbers,
+                chapterGroups: chapterGroups,
+                activeKind: activeKind,
+                activeSourceId: activeSourceId,
+                sourceTitle: sourceTitle,
               ),
             ),
           ),
@@ -266,9 +350,11 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
               bottom: AppSpacing.xs,
             ),
             child: Text(
-              selectedChapter != null
-                  ? '${selectedChapter.title} — ${AppStrings.section}'
-                  : '${AppStrings.chapter} & ${AppStrings.section}',
+              _selectedChapterNumbers.length == 1
+                  ? '${singleSelectedChapter?.title} — ${AppStrings.section}'
+                  : (_selectedChapterNumbers.length > 1
+                      ? 'Sections (${displayedSections.length} ခု)'
+                      : '${AppStrings.chapter} & ${AppStrings.section}'),
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: AppColors.textSoft,
                     fontWeight: FontWeight.w700,
@@ -289,7 +375,7 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                 const SizedBox(height: AppSpacing.sm),
             itemBuilder: (context, index) {
               final section = displayedSections[index];
-              final sectionTitle = selectedChapter != null
+              final sectionTitle = _selectedChapterNumbers.length == 1
                   ? ChapterGroup.formatSectionName(section.name)
                   : section.name;
 
@@ -328,13 +414,155 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
         ),
 
         const SliverToBoxAdapter(
-          child: SizedBox(height: AppSpacing.xl),
+          child: SizedBox(height: AppSpacing.xxl),
         ),
       ],
     );
   }
 
-  /// Builds a filter pill chip for selecting chapters.
+  /// Builds summary card when multiple chapters (> 1) are selected.
+  Widget _buildMultiChapterCard(
+    BuildContext context, {
+    required Set<int> selectedChapters,
+    required List<ChapterGroup> chapterGroups,
+    required ContentKind activeKind,
+    required int activeSourceId,
+    required String sourceTitle,
+  }) {
+    final matchingGroups = chapterGroups
+        .where((c) => selectedChapters.contains(c.chapterNumber))
+        .toList();
+    final totalItems = matchingGroups.fold<int>(0, (sum, c) => sum + c.total);
+    final masteredItems =
+        matchingGroups.fold<int>(0, (sum, c) => sum + c.mastered);
+    final ratio =
+        totalItems == 0 ? 0.0 : (masteredItems / totalItems).clamp(0.0, 1.0);
+    final sortedNums = selectedChapters.toList()..sort();
+
+    return AppCard(
+      color: AppColors.surface,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ရွေးချယ်ထားသော Chapter (${selectedChapters.length}) ခု',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Ch. ${sortedNums.join(", ")} · စုစုပေါင်း $totalItems ခု',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSoft,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+                child: Text(
+                  '$masteredItems / $totalItems',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppProgressBar(
+            value: ratio,
+            color: AppColors.secondary,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 44,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                    ),
+                    onPressed: () {
+                      ChapterPracticeSheet.show(
+                        context,
+                        kind: activeKind,
+                        sourceId: activeSourceId,
+                        sourceName: sourceTitle,
+                        selectedChapters: selectedChapters,
+                        totalItems: totalItems,
+                      );
+                    },
+                    icon: const Icon(Icons.style_rounded, size: 18),
+                    label: const Text(
+                      AppStrings.modeFlashcard,
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: SizedBox(
+                  height: 44,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                    ),
+                    onPressed: () {
+                      ChapterPracticeSheet.show(
+                        context,
+                        kind: activeKind,
+                        sourceId: activeSourceId,
+                        sourceName: sourceTitle,
+                        selectedChapters: selectedChapters,
+                        totalItems: totalItems,
+                      );
+                    },
+                    icon: const Icon(Icons.quiz_rounded, size: 18),
+                    label: const Text(
+                      AppStrings.modeQuick,
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds a filter pill chip for selecting chapters with checkmark when selected.
   Widget _buildChapterFilterChip({
     required String label,
     required bool isSelected,
@@ -366,13 +594,22 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
               : null,
         ),
         child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : AppColors.text,
-              fontSize: 13,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isSelected) ...[
+                const Icon(Icons.check, size: 14, color: Colors.white),
+                const SizedBox(width: 4),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : AppColors.text,
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -385,6 +622,7 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
     List<UnitProgress> units, {
     required ContentKind activeKind,
     required int activeSourceId,
+    required String sourceTitle,
   }) {
     final totalAcrossUnits = units.fold<int>(0, (sum, u) => sum + u.total);
     final masteredAcrossUnits =

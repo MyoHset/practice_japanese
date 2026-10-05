@@ -168,6 +168,64 @@ final GoRouter appRouter = GoRouter(
       },
     ),
     GoRoute(
+      path: AppRoutes.practiceStudyPattern,
+      redirect: (context, state) {
+        final kindSlug = state.pathParameters['kind'];
+        final sourceIdStr = state.pathParameters['sourceId'];
+        final modeSlug = state.pathParameters['mode'];
+
+        final kind =
+            kindSlug != null ? ContentKind.tryFromSlug(kindSlug) : null;
+        final sourceId = sourceIdStr != null ? int.tryParse(sourceIdStr) : null;
+        final mode = modeSlug != null ? StudyMode.tryFromSlug(modeSlug) : null;
+
+        if (kind == null || sourceId == null || mode == null) {
+          return AppRoutes.home;
+        }
+        return null;
+      },
+      builder: (context, state) {
+        final kind = ContentKind.fromSlug(state.pathParameters['kind']!);
+        final sourceId = int.parse(state.pathParameters['sourceId']!);
+        final mode = StudyMode.fromSlug(state.pathParameters['mode']!);
+
+        final chaptersParam = state.uri.queryParameters['chapters'];
+        final limitParam = state.uri.queryParameters['limit'];
+
+        final chapterNumbers = chaptersParam != null && chaptersParam.isNotEmpty
+            ? chaptersParam
+                .split(',')
+                .map((s) => int.tryParse(s.trim()))
+                .whereType<int>()
+                .toList()
+            : <int>[];
+        final questionLimit =
+            limitParam != null ? int.tryParse(limitParam) : null;
+
+        if (mode == StudyMode.flashcard) {
+          return FlashcardStudyScreen(
+            kind: kind,
+            sourceId: sourceId,
+            chapterNumbers: chapterNumbers,
+            questionLimit: questionLimit,
+          );
+        }
+
+        if (mode == StudyMode.quick) {
+          return QuickQuizStudyScreen(
+            kind: kind,
+            sourceId: sourceId,
+            chapterNumbers: chapterNumbers,
+            questionLimit: questionLimit,
+          );
+        }
+
+        return ComingSoonScreen(
+          title: '${kind.label} · ${mode.title}',
+        );
+      },
+    ),
+    GoRoute(
       path: AppRoutes.pastExam,
       builder: (context, state) => const PastExamListScreen(),
     ),

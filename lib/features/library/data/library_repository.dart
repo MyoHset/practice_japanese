@@ -185,15 +185,25 @@ class LibraryRepository {
     }
   }
 
-  /// Watches all items across all units in a given chapter for a source.
-  Stream<List<StudyItem>> watchChapterItems(
+  /// Watches all items across multiple chapters (or all chapters if [chapterNumbers] is empty) for a source.
+  Stream<List<StudyItem>> watchMultiChapterItems(
     int sourceId,
-    int chapterNumber,
+    List<int> chapterNumbers,
     ContentKind kind,
   ) {
+    final String chapterClause;
+    if (chapterNumbers.isEmpty) {
+      chapterClause = '';
+    } else {
+      final conditions = chapterNumbers
+          .map((c) => "(u.name LIKE 'Ch.$c %' OR u.name LIKE 'Ch.$c:%')")
+          .join(' OR ');
+      chapterClause = 'AND ($conditions)';
+    }
+
     switch (kind) {
       case ContentKind.vocab:
-        const query = '''
+        final query = '''
           SELECT 
             v.id AS item_id,
             v.word AS item_primary,
@@ -205,8 +215,7 @@ class LibraryRepository {
           JOIN vocabularies v ON v.id = vsi.vocab_id
           JOIN units u ON u.id = vsi.unit_id
           LEFT JOIN progress p ON p.item_id = v.id AND p.item_type = 1
-          WHERE u.source_id = :sourceId 
-            AND (u.name LIKE 'Ch.' || :chapterNumber || ' %' OR u.name LIKE 'Ch.' || :chapterNumber || ':%')
+          WHERE u.source_id = :sourceId $chapterClause
           ORDER BY u.order_no ASC, vsi.position ASC, v.id ASC
         ''';
         return _db
@@ -214,7 +223,6 @@ class LibraryRepository {
               query,
               variables: [
                 Variable.withInt(sourceId),
-                Variable.withInt(chapterNumber),
               ],
               readsFrom: {
                 _db.vocabSourceItems,
@@ -227,7 +235,7 @@ class LibraryRepository {
             .map((rows) => rows.map(_mapStudyItem).toList());
 
       case ContentKind.kanji:
-        const query = '''
+        final query = '''
           SELECT 
             k.id AS item_id,
             k.character AS item_primary,
@@ -240,8 +248,7 @@ class LibraryRepository {
           JOIN kanjis k ON k.id = ksi.kanji_id
           JOIN units u ON u.id = ksi.unit_id
           LEFT JOIN progress p ON p.item_id = k.id AND p.item_type = 0
-          WHERE u.source_id = :sourceId 
-            AND (u.name LIKE 'Ch.' || :chapterNumber || ' %' OR u.name LIKE 'Ch.' || :chapterNumber || ':%')
+          WHERE u.source_id = :sourceId $chapterClause
           ORDER BY u.order_no ASC, ksi.position ASC, k.id ASC
         ''';
         return _db
@@ -249,7 +256,6 @@ class LibraryRepository {
               query,
               variables: [
                 Variable.withInt(sourceId),
-                Variable.withInt(chapterNumber),
               ],
               readsFrom: {
                 _db.kanjiSourceItems,
@@ -263,7 +269,7 @@ class LibraryRepository {
             .map((rows) => rows.map(_mapStudyItem).toList());
 
       case ContentKind.grammar:
-        const query = '''
+        final query = '''
           SELECT 
             g.id AS item_id,
             g.pattern AS item_primary,
@@ -275,8 +281,7 @@ class LibraryRepository {
           JOIN grammar_points g ON g.id = gsi.grammar_id
           JOIN units u ON u.id = gsi.unit_id
           LEFT JOIN progress p ON p.item_id = g.id AND p.item_type = 2
-          WHERE u.source_id = :sourceId 
-            AND (u.name LIKE 'Ch.' || :chapterNumber || ' %' OR u.name LIKE 'Ch.' || :chapterNumber || ':%')
+          WHERE u.source_id = :sourceId $chapterClause
           ORDER BY u.order_no ASC, gsi.position ASC, g.id ASC
         ''';
         return _db
@@ -284,7 +289,6 @@ class LibraryRepository {
               query,
               variables: [
                 Variable.withInt(sourceId),
-                Variable.withInt(chapterNumber),
               ],
               readsFrom: {
                 _db.grammarSourceItems,
@@ -296,6 +300,15 @@ class LibraryRepository {
             .watch()
             .map((rows) => rows.map(_mapStudyItem).toList());
     }
+  }
+
+  /// Watches all items across all units in a given chapter for a source.
+  Stream<List<StudyItem>> watchChapterItems(
+    int sourceId,
+    int chapterNumber,
+    ContentKind kind,
+  ) {
+    return watchMultiChapterItems(sourceId, [chapterNumber], kind);
   }
 
   /// Records a flashcard review for an item: increments streak if remembered,

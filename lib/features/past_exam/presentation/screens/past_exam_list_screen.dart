@@ -179,7 +179,8 @@ class PastExamListScreen extends ConsumerWidget {
                       context.push(AppRoutes.pastExamFilteredPractice),
                   icon: const Icon(Icons.play_circle_fill_rounded),
                   label: Text(
-                      'ရွေးချယ်ထားသော မေးခွန်းများ စတင်ဖြေဆိုမည် ($count ပုဒ်)'),
+                    'ရွေးချယ်ထားသော မေးခွန်းများ စတင်ဖြေဆိုမည် ($count ပုဒ်)',
+                  ),
                 ),
               ),
               loading: () => const SizedBox.shrink(),

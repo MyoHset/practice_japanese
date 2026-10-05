@@ -66,11 +66,50 @@ final unitItemsProvider =
   return repo.watchUnitItems(params.unitId, params.kind);
 });
 
+/// Parameter class for multiChapterItemsProvider with proper list equality.
+class MultiChapterItemsParams {
+  const MultiChapterItemsParams({
+    required this.sourceId,
+    required this.chapterNumbers,
+    required this.kind,
+  });
+
+  final int sourceId;
+  final List<int> chapterNumbers;
+  final ContentKind kind;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MultiChapterItemsParams) return false;
+    if (sourceId != other.sourceId || kind != other.kind) return false;
+    if (chapterNumbers.length != other.chapterNumbers.length) return false;
+    for (var i = 0; i < chapterNumbers.length; i++) {
+      if (chapterNumbers[i] != other.chapterNumbers[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode => Object.hash(sourceId, kind, Object.hashAll(chapterNumbers));
+}
+
+/// Provides study items across multiple chapters (or all) for Flashcard and Quiz.
+final multiChapterItemsProvider =
+    StreamProvider.family<List<StudyItem>, MultiChapterItemsParams>((ref, params) {
+  final repo = ref.watch(libraryRepositoryProvider);
+  return repo.watchMultiChapterItems(
+    params.sourceId,
+    params.chapterNumbers,
+    params.kind,
+  );
+});
+
 /// Parameter record for chapterItemsProvider.
 typedef ChapterItemsParams = ({
   int sourceId,
   int chapterNumber,
-  ContentKind kind
+  ContentKind kind,
 });
 
 /// Provides study items across all units in a chapter for Flashcard mode.

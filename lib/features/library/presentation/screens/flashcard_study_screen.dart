@@ -22,15 +22,19 @@ class FlashcardStudyScreen extends ConsumerStatefulWidget {
     required this.sourceId,
     this.unitId,
     this.chapterNumber,
+    this.chapterNumbers,
+    this.questionLimit,
   }) : assert(
-          unitId != null || chapterNumber != null,
-          'Either unitId or chapterNumber must be provided',
+          unitId != null || chapterNumber != null || chapterNumbers != null,
+          'Either unitId, chapterNumber, or chapterNumbers must be provided',
         );
 
   final ContentKind kind;
   final int sourceId;
   final int? unitId;
   final int? chapterNumber;
+  final List<int>? chapterNumbers;
+  final int? questionLimit;
 
   @override
   ConsumerState<FlashcardStudyScreen> createState() =>
@@ -76,15 +80,22 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   }
 
   void _syncDeck(List<StudyItem> items) {
-    if (_originalDeck == null || _originalDeck!.length != items.length) {
-      _originalDeck = List.of(items);
+    if (_originalDeck == null) {
+      var deck = List.of(items);
+      if (widget.questionLimit != null &&
+          widget.questionLimit! > 0 &&
+          widget.questionLimit! < deck.length) {
+        deck.shuffle(math.Random());
+        deck = deck.take(widget.questionLimit!).toList();
+      }
+      _originalDeck = deck;
       _activeDeck = _isShuffled
-          ? (List.of(items)..shuffle(math.Random()))
-          : List.of(items);
+          ? (List.of(deck)..shuffle(math.Random()))
+          : List.of(deck);
       _currentIndex = 0;
       _isFlipped = false;
       _showReadingHint = false;
-      _isCompleted = items.isEmpty;
+      _isCompleted = deck.isEmpty;
       _rememberedCount = 0;
       _needsReviewCount = 0;
     }
@@ -127,12 +138,15 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
       _isCompleted = false;
       _rememberedCount = 0;
       _needsReviewCount = 0;
+      _originalDeck = null;
+      _activeDeck = null;
       _flipController.reset();
     });
   }
 
   Future<void> _answerCard(bool remembered) async {
     if (_activeDeck == null || _activeDeck!.isEmpty) return;
+
     final currentItem = _activeDeck![_currentIndex];
 
     // Record review in database
@@ -180,6 +194,9 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
 
   @override
   Widget build(BuildContext context) {
+    final effectiveChapters = widget.chapterNumbers ??
+        (widget.chapterNumber != null ? [widget.chapterNumber!] : null);
+
     // Watch items from appropriate provider
     final AsyncValue<List<StudyItem>> itemsAsync = widget.unitId != null
         ? ref.watch(
@@ -191,10 +208,10 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
             ),
           )
         : ref.watch(
-            chapterItemsProvider(
-              (
+            multiChapterItemsProvider(
+              MultiChapterItemsParams(
                 sourceId: widget.sourceId,
-                chapterNumber: widget.chapterNumber!,
+                chapterNumbers: effectiveChapters ?? const [],
                 kind: widget.kind,
               ),
             ),
@@ -206,9 +223,20 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
         ? ref.watch(unitProvider(widget.unitId!))
         : null;
 
-    final String screenTitle = widget.chapterNumber != null
-        ? '${sourceAsync.value?.name ?? ''} · Chapter ${widget.chapterNumber}'
-        : (unitAsync?.value?.name ?? widget.kind.label);
+    final String screenTitle;
+    if (widget.unitId != null) {
+      screenTitle = unitAsync?.value?.name ?? widget.kind.label;
+    } else {
+      final chLabel = (effectiveChapters == null || effectiveChapters.isEmpty)
+          ? 'All Chapters'
+          : (effectiveChapters.length == 1
+              ? 'Chapter ${effectiveChapters.first}'
+              : 'Chapters ${effectiveChapters.join(", ")}');
+      final limitLabel = widget.questionLimit != null
+          ? ' (${widget.questionLimit} ခု)'
+          : '';
+      screenTitle = '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel';
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,

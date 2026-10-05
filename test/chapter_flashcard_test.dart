@@ -155,5 +155,31 @@ void main() {
       );
       expect(vocabQuizPath, equals('/library/vocab/source/5/chapter/6/quick'));
     });
+
+    test('builds correct practice study path with multiple chapters and limit', () {
+      final path = AppRoutes.practiceStudy(
+        ContentKind.vocab,
+        3,
+        StudyMode.quick,
+        chapters: [1, 2, 4],
+        limit: 20,
+      );
+      expect(
+        path,
+        equals('/library/vocab/source/3/practice/quick?chapters=1,2,4&limit=20'),
+      );
+    });
+
+    test('builds correct practice study path for all chapters with no limit', () {
+      final path = AppRoutes.practiceStudy(
+        ContentKind.kanji,
+        2,
+        StudyMode.flashcard,
+      );
+      expect(
+        path,
+        equals('/library/kanji/source/2/practice/flashcard'),
+      );
+    });
   });
 }
