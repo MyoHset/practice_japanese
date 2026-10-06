@@ -12,6 +12,7 @@ import 'package:practice_janpanese/core/widgets/app_pill.dart';
 import 'package:practice_janpanese/core/widgets/async_value_view.dart';
 import 'package:practice_janpanese/core/widgets/level_chip.dart';
 import 'package:practice_janpanese/core/widgets/level_picker_button.dart';
+import 'package:practice_janpanese/core/extensions/build_context_x.dart';
 import 'package:practice_janpanese/features/level/presentation/providers/selected_level_provider.dart';
 import 'package:practice_janpanese/features/past_exam/domain/past_exam_filter.dart';
 import 'package:practice_janpanese/features/past_exam/domain/past_exam_question.dart';
@@ -28,6 +29,23 @@ class PastExamListScreen extends ConsumerWidget {
     final filter = ref.watch(pastExamFilterProvider);
 
     return Scaffold(
+      endDrawer: context.isMobile
+          ? null
+          : Drawer(
+              width: MediaQuery.sizeOf(context).width * 0.4,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              child: SafeArea(
+                child: _FilterPanel(
+                  ref: ref,
+                  onClose: () {
+                    // Drawers are closed via Navigator.pop
+                    if (Scaffold.of(context).isEndDrawerOpen) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ),
+            ),
       appBar: AppBar(
         title: const Text('Past Exam (真題)'),
         actions: [
@@ -35,10 +53,18 @@ class PastExamListScreen extends ConsumerWidget {
           Stack(
             alignment: Alignment.center,
             children: [
-              IconButton(
-                icon: const Icon(Icons.tune_rounded),
-                tooltip: 'Filter',
-                onPressed: () => _showFilterSheet(context, ref),
+              Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.tune_rounded),
+                  tooltip: 'Filter',
+                  onPressed: () {
+                    if (context.isMobile) {
+                      _showFilterSheet(context, ref);
+                    } else {
+                      Scaffold.of(context).openEndDrawer();
+                    }
+                  },
+                ),
               ),
               if (filter.hasAnyFilter)
                 Positioned(
@@ -362,16 +388,45 @@ const List<_MondaiSectionSpec> _mondaiSections = [
 
 // ── Filter Bottom Sheet ───────────────────────────────────────────────────────
 
-class _FilterBottomSheet extends ConsumerStatefulWidget {
+class _FilterBottomSheet extends StatelessWidget {
   const _FilterBottomSheet({required this.ref});
-
   final WidgetRef ref;
 
   @override
-  ConsumerState<_FilterBottomSheet> createState() => _FilterBottomSheetState();
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.45,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) {
+        return _FilterPanel(
+          ref: ref,
+          scrollController: scrollController,
+          onClose: () => Navigator.of(context).pop(),
+        );
+      },
+    );
+  }
 }
 
-class _FilterBottomSheetState extends ConsumerState<_FilterBottomSheet> {
+class _FilterPanel extends ConsumerStatefulWidget {
+  const _FilterPanel({
+    super.key,
+    required this.ref,
+    this.scrollController,
+    this.onClose,
+  });
+
+  final WidgetRef ref;
+  final ScrollController? scrollController;
+  final VoidCallback? onClose;
+
+  @override
+  ConsumerState<_FilterPanel> createState() => _FilterPanelState();
+}
+
+class _FilterPanelState extends ConsumerState<_FilterPanel> {
   late PastExamFilter _draft;
 
   @override
@@ -439,12 +494,12 @@ class _FilterBottomSheetState extends ConsumerState<_FilterBottomSheet> {
 
   void _apply() {
     ref.read(pastExamFilterProvider.notifier).state = _draft;
-    Navigator.of(context).pop();
+    widget.onClose?.call();
   }
 
   void _startPracticeNow() {
     ref.read(pastExamFilterProvider.notifier).state = _draft;
-    Navigator.of(context).pop();
+    widget.onClose?.call();
     context.push(AppRoutes.pastExamFilteredPractice);
   }
 
@@ -457,491 +512,464 @@ class _FilterBottomSheetState extends ConsumerState<_FilterBottomSheet> {
     final yearsAsync = ref.watch(pastExamAvailableYearsProvider);
     final mondaiAsync = ref.watch(pastExamAvailableMondaiTypesProvider);
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.85,
-      minChildSize: 0.45,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(AppRadius.xl),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppRadius.xl),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.divider,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ),
-          child: Column(
-            children: [
-              // Handle bar
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+          // Header row
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenH,
+              vertical: AppSpacing.xs,
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.tune_rounded,
+                  color: AppColors.primary,
+                  size: 22,
                 ),
-              ),
-              // Header row
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.screenH,
-                  vertical: AppSpacing.xs,
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  'Filter မေးခွန်းများ',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.tune_rounded,
+                if (_draft.hasAnyFilter) ...[
+                  const SizedBox(width: AppSpacing.xs),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
                       color: AppColors.primary,
-                      size: 22,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      'Filter မေးခွန်းများ',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                    child: Text(
+                      '${_draft.totalActiveFilters}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    if (_draft.hasAnyFilter) ...[
-                      const SizedBox(width: AppSpacing.xs),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                        ),
-                        child: Text(
-                          '${_draft.totalActiveFilters}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                    const Spacer(),
-                    if (_draft.hasAnyFilter)
-                      TextButton(
-                        onPressed: _clearAll,
-                        child: const Text(
-                          'Clear All',
-                          style: TextStyle(
-                            color: AppColors.error,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              // Scrollable content
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.screenH,
-                    vertical: AppSpacing.md,
                   ),
-                  children: [
-                    // ── 1. Year filter ───────────────────────────────────────
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildSectionHeader(
-                          context,
-                          icon: Icons.calendar_month_rounded,
-                          label: 'စာမေးပွဲ နှစ် (Exam Year)',
-                          count: _draft.selectedYears.length,
-                        ),
-                        yearsAsync.when(
-                          data: (years) {
-                            if (years.isEmpty) return const SizedBox.shrink();
-                            final allSelected =
-                                years.every(_draft.selectedYears.contains);
-                            return TextButton(
-                              onPressed: () => _toggleAllYears(years),
-                              style: TextButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                                padding: EdgeInsets.zero,
-                              ),
-                              child: Text(
-                                allSelected ? 'အားလုံးပယ်' : 'အားလုံးရွေး',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            );
-                          },
-                          loading: () => const SizedBox.shrink(),
-                          error: (_, __) => const SizedBox.shrink(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    yearsAsync.when(
-                      data: (years) => years.isEmpty
-                          ? const Padding(
-                              padding: EdgeInsets.all(AppSpacing.md),
-                              child: Text(
-                                'နှစ်အချက်အလက် မရှိသေးပါ',
-                                style: TextStyle(color: AppColors.textSoft),
-                              ),
-                            )
-                          : Wrap(
-                              spacing: AppSpacing.sm,
-                              runSpacing: AppSpacing.sm,
-                              children: years.map((year) {
-                                final selected =
-                                    _draft.selectedYears.contains(year);
-                                return _buildToggleChip(
-                                  label: '$year',
-                                  selected: selected,
-                                  color: AppColors.primary,
-                                  onTap: () => _toggleYear(year),
-                                );
-                              }).toList(),
-                            ),
-                      loading: () => const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(AppSpacing.md),
-                          child: CircularProgressIndicator(),
-                        ),
+                ],
+                const Spacer(),
+                if (_draft.hasAnyFilter)
+                  TextButton(
+                    onPressed: _clearAll,
+                    child: const Text(
+                      'Clear All',
+                      style: TextStyle(
+                        color: AppColors.error,
+                        fontWeight: FontWeight.bold,
                       ),
-                      error: (_, __) => const SizedBox.shrink(),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    const Divider(height: 1),
-                    const SizedBox(height: AppSpacing.md),
-
-                    // ── 2. Mondai Types (Grouped by Category) ────────────────
+                  ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          // Scrollable content
+          Expanded(
+            child: ListView(
+              controller: widget.scrollController,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenH,
+                vertical: AppSpacing.md,
+              ),
+              children: [
+                // ── 1. Year filter ───────────────────────────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     _buildSectionHeader(
                       context,
-                      icon: Icons.category_rounded,
-                      label: 'မေးခွန်း အမျိုးအစားများ (Question Types)',
-                      count: _draft.selectedMondaiTypes.length,
+                      icon: Icons.calendar_month_rounded,
+                      label: 'စာမေးပွဲ နှစ် (Exam Year)',
+                      count: _draft.selectedYears.length,
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'လိုချင်သော မေးခွန်း အမျိုးအစား (Mondai Type) များကို ရွေးချယ်ပါ:',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSoft,
+                    yearsAsync.when(
+                      data: (years) {
+                        if (years.isEmpty) return const SizedBox.shrink();
+                        final allSelected =
+                            years.every(_draft.selectedYears.contains);
+                        return TextButton(
+                          onPressed: () => _toggleAllYears(years),
+                          style: TextButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.zero,
                           ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-
-                    // Mondai Types (Grouped by Category)
-                    Builder(
-                      builder: (context) {
-                        final effectiveTypes =
-                            mondaiAsync.valueOrNull?.toSet() ?? {};
-                        final availableSet = effectiveTypes.isNotEmpty
-                            ? effectiveTypes
-                            : MondaiType.values.toSet();
-
-                        return Column(
-                          children: _mondaiSections.map((section) {
-                            final sectionTypes = section.types
-                                .where(availableSet.contains)
-                                .toList();
-                            if (sectionTypes.isEmpty) {
-                              return const SizedBox.shrink();
-                            }
-
-                            final allSelected = sectionTypes
-                                .every(_draft.selectedMondaiTypes.contains);
-                            final selectedCount = sectionTypes
-                                .where(_draft.selectedMondaiTypes.contains)
-                                .length;
-
-                            return Container(
-                              margin:
-                                  const EdgeInsets.only(bottom: AppSpacing.md),
-                              decoration: BoxDecoration(
-                                color: section.color.withValues(alpha: 0.05),
-                                borderRadius:
-                                    BorderRadius.circular(AppRadius.card),
-                                border: Border.all(
-                                  color: selectedCount > 0
-                                      ? section.color.withValues(alpha: 0.4)
-                                      : AppColors.divider,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Category title row
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.md,
-                                      vertical: AppSpacing.sm,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 8,
-                                          height: 8,
-                                          decoration: BoxDecoration(
-                                            color: section.color,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        const SizedBox(width: AppSpacing.sm),
-                                        Expanded(
-                                          child: Text(
-                                            section.titleMy,
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                              color: section.color,
-                                            ),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () =>
-                                              _toggleSectionTypes(sectionTypes),
-                                          style: TextButton.styleFrom(
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            padding: EdgeInsets.zero,
-                                          ),
-                                          child: Text(
-                                            allSelected
-                                                ? 'အားလုံးပယ်'
-                                                : 'အားလုံးရွေး',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: section.color,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Divider(height: 1),
-                                  // Types list
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.all(AppSpacing.sm),
-                                    child: Column(
-                                      children: sectionTypes.map((type) {
-                                        final selected = _draft
-                                            .selectedMondaiTypes
-                                            .contains(type);
-                                        return Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: AppSpacing.xs,
-                                          ),
-                                          child: InkWell(
-                                            onTap: () =>
-                                                _toggleMondaiType(type),
-                                            borderRadius: BorderRadius.circular(
-                                              AppRadius.card,
-                                            ),
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: AppSpacing.sm + 2,
-                                                vertical: AppSpacing.xs + 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: selected
-                                                    ? section.color
-                                                        .withValues(alpha: 0.12)
-                                                    : Colors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  AppRadius.card,
-                                                ),
-                                                border: Border.all(
-                                                  color: selected
-                                                      ? section.color
-                                                      : Colors.transparent,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    selected
-                                                        ? Icons
-                                                            .check_box_rounded
-                                                        : Icons
-                                                            .check_box_outline_blank_rounded,
-                                                    size: 18,
-                                                    color: selected
-                                                        ? section.color
-                                                        : AppColors.textSoft,
-                                                  ),
-                                                  const SizedBox(
-                                                    width: AppSpacing.sm,
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          mondaiTypeLabel(type),
-                                                          style: TextStyle(
-                                                            fontSize: 13,
-                                                            fontWeight: selected
-                                                                ? FontWeight
-                                                                    .bold
-                                                                : FontWeight
-                                                                    .w600,
-                                                            color: selected
-                                                                ? section.color
-                                                                : AppColors
-                                                                    .text,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          mondaiTypeBurmeseDescription(
-                                                            type,
-                                                          ),
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 11,
-                                                            color: AppColors
-                                                                .textSoft,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
+                          child: Text(
+                            allSelected ? 'အားလုံးပယ်' : 'အားလုံးရွေး',
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         );
                       },
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
                     ),
                   ],
                 ),
-              ),
-              // Footer Action buttons with live question count
-              SafeArea(
-                child: FutureBuilder<int>(
-                  future: ref
-                      .read(pastExamRepositoryProvider)
-                      .countFilteredQuestions(
-                        level: ref.read(selectedLevelProvider),
-                        filter: _draft,
-                      ),
-                  builder: (context, snapshot) {
-                    final count = snapshot.data;
-                    final hasCount = count != null;
-                    final countStr = hasCount ? '$count ပုဒ်' : '...';
+                const SizedBox(height: AppSpacing.xs),
+                yearsAsync.when(
+                  data: (years) => years.isEmpty
+                      ? const Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Text(
+                            'နှစ်အချက်အလက် မရှိသေးပါ',
+                            style: TextStyle(color: AppColors.textSoft),
+                          ),
+                        )
+                      : Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
+                          children: years.map((year) {
+                            final selected =
+                                _draft.selectedYears.contains(year);
+                            return _buildToggleChip(
+                              label: '$year',
+                              selected: selected,
+                              color: AppColors.primary,
+                              onTap: () => _toggleYear(year),
+                            );
+                          }).toList(),
+                        ),
+                  loading: () => const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(AppSpacing.md),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                const Divider(height: 1),
+                const SizedBox(height: AppSpacing.md),
 
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.screenH,
-                        AppSpacing.xs,
-                        AppSpacing.screenH,
-                        AppSpacing.md,
+                // ── 2. Mondai Types (Grouped by Category) ────────────────
+                _buildSectionHeader(
+                  context,
+                  icon: Icons.category_rounded,
+                  label: 'မေးခွန်း အမျိုးအစားများ (Question Types)',
+                  count: _draft.selectedMondaiTypes.length,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'လိုချင်သော မေးခွန်း အမျိုးအစား (Mondai Type) များကို ရွေးချယ်ပါ:',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSoft,
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Total count summary banner
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.xs + 2,
+                ),
+                const SizedBox(height: AppSpacing.md),
+
+                // Mondai Types (Grouped by Category)
+                Builder(
+                  builder: (context) {
+                    final effectiveTypes =
+                        mondaiAsync.valueOrNull?.toSet() ?? {};
+                    final availableSet = effectiveTypes.isNotEmpty
+                        ? effectiveTypes
+                        : MondaiType.values.toSet();
+
+                    return Column(
+                      children: _mondaiSections.map((section) {
+                        final sectionTypes =
+                            section.types.where(availableSet.contains).toList();
+                        if (sectionTypes.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+
+                        final allSelected = sectionTypes
+                            .every(_draft.selectedMondaiTypes.contains);
+                        final selectedCount = sectionTypes
+                            .where(_draft.selectedMondaiTypes.contains)
+                            .length;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: section.color.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(AppRadius.card),
+                            border: Border.all(
+                              color: selectedCount > 0
+                                  ? section.color.withValues(alpha: 0.4)
+                                  : AppColors.divider,
                             ),
-                            margin:
-                                const EdgeInsets.only(bottom: AppSpacing.sm),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.08),
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.card),
-                              border: Border.all(
-                                color:
-                                    AppColors.primary.withValues(alpha: 0.25),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Category title row
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: AppSpacing.sm,
+                                ),
+                                child: Row(
                                   children: [
-                                    const Icon(
-                                      Icons.format_list_numbered_rounded,
-                                      size: 16,
-                                      color: AppColors.primary,
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: section.color,
+                                        shape: BoxShape.circle,
+                                      ),
                                     ),
-                                    const SizedBox(width: AppSpacing.xs),
-                                    Text(
-                                      _draft.hasAnyFilter
-                                          ? 'ရွေးချယ်ထားသော မေးခွန်း စုစုပေါင်း:'
-                                          : 'စာမေးပွဲ မေးခွန်း စုစုပေါင်း:',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                    const SizedBox(width: AppSpacing.sm),
+                                    Expanded(
+                                      child: Text(
+                                        section.titleMy,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: section.color,
+                                        ),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          _toggleSectionTypes(sectionTypes),
+                                      style: TextButton.styleFrom(
+                                        visualDensity: VisualDensity.compact,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      child: Text(
+                                        allSelected
+                                            ? 'အားလုံးပယ်'
+                                            : 'အားလုံးရွေး',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: section.color,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                Text(
-                                  countStr,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: _apply,
-                                  child: const Text('Cancel'),
-                                ),
                               ),
-                              const SizedBox(width: AppSpacing.sm),
-                              Expanded(
-                                flex: 2,
-                                child: FilledButton.icon(
-                                  onPressed: (hasCount && count == 0)
-                                      ? null
-                                      : _startPracticeNow,
-                                  icon: const Icon(Icons.play_arrow_rounded),
-                                  label: Text(
-                                    _draft.hasAnyFilter
-                                        ? 'တိုက်ရိုက်ဖြေဆိုမည်'
-                                        : 'အားလုံး ဖြေဆိုမည်',
-                                  ),
+                              const Divider(height: 1),
+                              // Types list
+                              Padding(
+                                padding: const EdgeInsets.all(AppSpacing.sm),
+                                child: Column(
+                                  children: sectionTypes.map((type) {
+                                    final selected = _draft.selectedMondaiTypes
+                                        .contains(type);
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: AppSpacing.xs,
+                                      ),
+                                      child: InkWell(
+                                        onTap: () => _toggleMondaiType(type),
+                                        borderRadius: BorderRadius.circular(
+                                          AppRadius.card,
+                                        ),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: AppSpacing.sm + 2,
+                                            vertical: AppSpacing.xs + 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: selected
+                                                ? section.color
+                                                    .withValues(alpha: 0.12)
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(
+                                              AppRadius.card,
+                                            ),
+                                            border: Border.all(
+                                              color: selected
+                                                  ? section.color
+                                                  : Colors.transparent,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                selected
+                                                    ? Icons.check_box_rounded
+                                                    : Icons
+                                                        .check_box_outline_blank_rounded,
+                                                size: 18,
+                                                color: selected
+                                                    ? section.color
+                                                    : AppColors.textSoft,
+                                              ),
+                                              const SizedBox(
+                                                width: AppSpacing.sm,
+                                              ),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      mondaiTypeLabel(type),
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight: selected
+                                                            ? FontWeight.bold
+                                                            : FontWeight.w600,
+                                                        color: selected
+                                                            ? section.color
+                                                            : AppColors.text,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      mondaiTypeBurmeseDescription(
+                                                        type,
+                                                      ),
+                                                      style: const TextStyle(
+                                                        fontSize: 11,
+                                                        color:
+                                                            AppColors.textSoft,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        );
+                      }).toList(),
                     );
                   },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        );
-      },
+          // Footer Action buttons with live question count
+          SafeArea(
+            child: FutureBuilder<int>(
+              future:
+                  ref.read(pastExamRepositoryProvider).countFilteredQuestions(
+                        level: ref.read(selectedLevelProvider),
+                        filter: _draft,
+                      ),
+              builder: (context, snapshot) {
+                final count = snapshot.data;
+                final hasCount = count != null;
+                final countStr = hasCount ? '$count ပုဒ်' : '...';
+
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.screenH,
+                    AppSpacing.xs,
+                    AppSpacing.screenH,
+                    AppSpacing.md,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Total count summary banner
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.xs + 2,
+                        ),
+                        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(AppRadius.card),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.25),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.format_list_numbered_rounded,
+                                  size: 16,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: AppSpacing.xs),
+                                Text(
+                                  _draft.hasAnyFilter
+                                      ? 'ရွေးချယ်ထားသော မေးခွန်း စုစုပေါင်း:'
+                                      : 'စာမေးပွဲ မေးခွန်း စုစုပေါင်း:',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              countStr,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _apply,
+                              child: const Text('Cancel'),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            flex: 2,
+                            child: FilledButton.icon(
+                              onPressed: (hasCount && count == 0)
+                                  ? null
+                                  : _startPracticeNow,
+                              icon: const Icon(Icons.play_arrow_rounded),
+                              label: Text(
+                                _draft.hasAnyFilter
+                                    ? 'တိုက်ရိုက်ဖြေဆိုမည်'
+                                    : 'အားလုံး ဖြေဆိုမည်',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
