@@ -35,14 +35,13 @@ class PastExamListScreen extends ConsumerWidget {
               width: MediaQuery.sizeOf(context).width * 0.4,
               backgroundColor: Theme.of(context).colorScheme.surface,
               child: SafeArea(
-                child: _FilterPanel(
-                  ref: ref,
-                  onClose: () {
-                    // Drawers are closed via Navigator.pop
-                    if (Scaffold.of(context).isEndDrawerOpen) {
-                      Navigator.of(context).pop();
-                    }
-                  },
+                child: Builder(
+                  builder: (drawerContext) => _FilterPanel(
+                    ref: ref,
+                    onClose: () {
+                      Navigator.of(drawerContext).pop();
+                    },
+                  ),
                 ),
               ),
             ),
@@ -499,8 +498,9 @@ class _FilterPanelState extends ConsumerState<_FilterPanel> {
 
   void _startPracticeNow() {
     ref.read(pastExamFilterProvider.notifier).state = _draft;
+    final router = GoRouter.of(context);
     widget.onClose?.call();
-    context.push(AppRoutes.pastExamFilteredPractice);
+    router.push(AppRoutes.pastExamFilteredPractice);
   }
 
   void _clearAll() {
