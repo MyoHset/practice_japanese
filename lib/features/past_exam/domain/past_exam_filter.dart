@@ -1,31 +1,66 @@
 import 'package:practice_janpanese/core/database/app_database.dart';
 
+class ExamSession {
+  const ExamSession(this.year, this.month);
+  final int year;
+  final int month;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExamSession && year == other.year && month == other.month;
+
+  @override
+  int get hashCode => Object.hash(year, month);
+
+  @override
+  String toString() => '$year ${month}လပိုင်း';
+}
+
 /// Immutable filter state for Past Exam List screen.
 class PastExamFilter {
   const PastExamFilter({
-    this.selectedYears = const {},
+    this.selectedSessions = const {},
     this.selectedMondaiTypes = const {},
+    this.questionFrom,
+    this.questionTo,
   });
 
-  /// Selected exam years, e.g. {2019, 2022}. Empty = all years.
-  final Set<int> selectedYears;
+  /// Selected exam sessions. Empty = all sessions.
+  final Set<ExamSession> selectedSessions;
 
-  /// Selected mondai types, e.g. {MondaiType.kanjiReading}. Empty = all types.
+  /// Selected mondai types. Empty = all types.
   final Set<MondaiType> selectedMondaiTypes;
 
+  /// Start question index (1-based)
+  final int? questionFrom;
+
+  /// End question index (1-based)
+  final int? questionTo;
+
   bool get hasAnyFilter =>
-      selectedYears.isNotEmpty || selectedMondaiTypes.isNotEmpty;
+      selectedSessions.isNotEmpty ||
+      selectedMondaiTypes.isNotEmpty ||
+      questionFrom != null ||
+      questionTo != null;
 
   int get totalActiveFilters =>
-      selectedYears.length + selectedMondaiTypes.length;
+      selectedSessions.length +
+      selectedMondaiTypes.length +
+      (questionFrom != null || questionTo != null ? 1 : 0);
 
   PastExamFilter copyWith({
-    Set<int>? selectedYears,
+    Set<ExamSession>? selectedSessions,
     Set<MondaiType>? selectedMondaiTypes,
+    int? questionFrom,
+    int? questionTo,
+    bool clearFromTo = false,
   }) {
     return PastExamFilter(
-      selectedYears: selectedYears ?? this.selectedYears,
+      selectedSessions: selectedSessions ?? this.selectedSessions,
       selectedMondaiTypes: selectedMondaiTypes ?? this.selectedMondaiTypes,
+      questionFrom: clearFromTo ? null : (questionFrom ?? this.questionFrom),
+      questionTo: clearFromTo ? null : (questionTo ?? this.questionTo),
     );
   }
 
@@ -35,12 +70,18 @@ class PastExamFilter {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is PastExamFilter &&
-          _setEquals(selectedYears, other.selectedYears) &&
-          _setEquals(selectedMondaiTypes, other.selectedMondaiTypes);
+          _setEquals(selectedSessions, other.selectedSessions) &&
+          _setEquals(selectedMondaiTypes, other.selectedMondaiTypes) &&
+          questionFrom == other.questionFrom &&
+          questionTo == other.questionTo;
 
   @override
-  int get hashCode =>
-      Object.hash(selectedYears.toString(), selectedMondaiTypes.toString());
+  int get hashCode => Object.hash(
+        selectedSessions.toString(),
+        selectedMondaiTypes.toString(),
+        questionFrom,
+        questionTo,
+      );
 
   static bool _setEquals<T>(Set<T> a, Set<T> b) =>
       a.length == b.length && a.containsAll(b);

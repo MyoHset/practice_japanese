@@ -91,12 +91,14 @@ class MultiChapterItemsParams {
   }
 
   @override
-  int get hashCode => Object.hash(sourceId, kind, Object.hashAll(chapterNumbers));
+  int get hashCode =>
+      Object.hash(sourceId, kind, Object.hashAll(chapterNumbers));
 }
 
 /// Provides study items across multiple chapters (or all) for Flashcard and Quiz.
 final multiChapterItemsProvider =
-    StreamProvider.family<List<StudyItem>, MultiChapterItemsParams>((ref, params) {
+    StreamProvider.family<List<StudyItem>, MultiChapterItemsParams>(
+        (ref, params) {
   final repo = ref.watch(libraryRepositoryProvider);
   return repo.watchMultiChapterItems(
     params.sourceId,

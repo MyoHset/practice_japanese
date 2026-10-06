@@ -820,8 +820,9 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
   if (jsonStr == null || jsonStr.isEmpty) return;
 
   final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-  final bookTitle =
-      data['book'] as String? ?? data['title'] as String? ?? 'Speed Master N3 漢字';
+  final bookTitle = data['book'] as String? ??
+      data['title'] as String? ??
+      'Speed Master N3 漢字';
   final bookLevel = data['level'] as String? ?? 'N3';
   final chapters = data['chapters'] as List<dynamic>;
 
@@ -875,8 +876,7 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
     // Kanji Unit
     final kanjiUnit = await (db.units.select()
           ..where(
-            (u) =>
-                u.sourceId.equals(kanjiSourceId) & u.orderNo.equals(chNum),
+            (u) => u.sourceId.equals(kanjiSourceId) & u.orderNo.equals(chNum),
           ))
         .getSingleOrNull();
     int kanjiUnitId;
@@ -895,8 +895,7 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
     // Vocab Unit
     final vocabUnit = await (db.units.select()
           ..where(
-            (u) =>
-                u.sourceId.equals(vocabSourceId) & u.orderNo.equals(chNum),
+            (u) => u.sourceId.equals(vocabSourceId) & u.orderNo.equals(chNum),
           ))
         .getSingleOrNull();
     int vocabUnitId;
@@ -931,8 +930,7 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
         kanjiId = existingKanji.id;
         if (existingKanji.meaningMy == null ||
             existingKanji.meaningMy!.isEmpty) {
-          await (db.update(db.kanjis)
-                ..where((item) => item.id.equals(kanjiId)))
+          await (db.update(db.kanjis)..where((item) => item.id.equals(kanjiId)))
               .write(KanjisCompanion(meaningMy: Value(my)));
         }
       } else {
@@ -1092,7 +1090,9 @@ Future<void> _ensurePastExam201007(AppDatabase db, DateTime now) async {
 
   if (existingSource != null) {
     final count = await (db.questions.select()
-          ..where((q) => q.sourceId.equals(existingSource.id),))
+          ..where(
+            (q) => q.sourceId.equals(existingSource.id),
+          ))
         .get()
         .then((l) => l.length);
     if (count >= 80) {
@@ -1152,7 +1152,9 @@ Future<void> _ensurePastExam201107(AppDatabase db, DateTime now) async {
 
   if (existingSource != null) {
     final count = await (db.questions.select()
-          ..where((q) => q.sourceId.equals(existingSource.id),))
+          ..where(
+            (q) => q.sourceId.equals(existingSource.id),
+          ))
         .get()
         .then((l) => l.length);
     if (count >= 80) {
@@ -1182,7 +1184,9 @@ Future<void> _ensurePastExam201112(AppDatabase db, DateTime now) async {
 
   if (existingSource != null) {
     final count = await (db.questions.select()
-          ..where((q) => q.sourceId.equals(existingSource.id),))
+          ..where(
+            (q) => q.sourceId.equals(existingSource.id),
+          ))
         .get()
         .then((l) => l.length);
     if (count >= 80) {
@@ -1212,7 +1216,9 @@ Future<void> _ensurePastExam201207(AppDatabase db, DateTime now) async {
 
   if (existingSource != null) {
     final count = await (db.questions.select()
-          ..where((q) => q.sourceId.equals(existingSource.id),))
+          ..where(
+            (q) => q.sourceId.equals(existingSource.id),
+          ))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
@@ -1242,7 +1248,9 @@ Future<void> _ensurePastExam201212(AppDatabase db, DateTime now) async {
 
   if (existingSource != null) {
     final count = await (db.questions.select()
-          ..where((q) => q.sourceId.equals(existingSource.id),))
+          ..where(
+            (q) => q.sourceId.equals(existingSource.id),
+          ))
         .get()
         .then((l) => l.length);
     if (count >= 80) {
@@ -1828,8 +1836,6 @@ Future<void> _ensurePastExam201612(AppDatabase db, DateTime now) async {
   );
 }
 
-
-
 Future<int> _getOrCreateMondaiType(
   AppDatabase db,
   MondaiType type,
@@ -1916,12 +1922,19 @@ Future<void> _seedPastExamFromJson(
   } else {
     sourceId = source.id;
     // Clear old questions/choices/groups if re-seeding
-    final oldQuestions = await (db.questions.select()..where((q) => q.sourceId.equals(sourceId))).get();
+    final oldQuestions = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(sourceId)))
+        .get();
     for (final q in oldQuestions) {
-      await (db.questionChoices.delete()..where((c) => c.questionId.equals(q.id))).go();
+      await (db.questionChoices.delete()
+            ..where((c) => c.questionId.equals(q.id)))
+          .go();
     }
-    await (db.questions.delete()..where((q) => q.sourceId.equals(sourceId))).go();
-    await (db.questionGroups.delete()..where((g) => g.sourceId.equals(sourceId))).go();
+    await (db.questions.delete()..where((q) => q.sourceId.equals(sourceId)))
+        .go();
+    await (db.questionGroups.delete()
+          ..where((g) => g.sourceId.equals(sourceId)))
+        .go();
   }
 
   for (final sectionData in sections) {
@@ -1988,7 +2001,8 @@ Future<void> _seedPastExamFromJson(
         final targetWord = q['targetWord'] as String?;
         final starPosition = q['starPosition'] as int?;
         final correctOrderList = q['correctOrder'] as List<dynamic>?;
-        final correctOrder = correctOrderList != null ? jsonEncode(correctOrderList) : null;
+        final correctOrder =
+            correctOrderList != null ? jsonEncode(correctOrderList) : null;
         final explanation = q['explanation'] as String?;
         final questionPassage = q['passage'] as String?;
 
@@ -2044,5 +2058,3 @@ Future<void> _seedPastExamFromJson(
 
 /// Backwards compatibility alias.
 Future<void> devSeed(AppDatabase db) => seedDevData(db);
-
-

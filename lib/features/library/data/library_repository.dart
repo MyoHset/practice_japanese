@@ -323,9 +323,7 @@ class LibraryRepository {
 
     final existing = await (_db.select(_db.progress)
           ..where(
-            (p) =>
-                p.itemType.equalsValue(itemType) &
-                p.itemId.equals(itemId),
+            (p) => p.itemType.equalsValue(itemType) & p.itemId.equals(itemId),
           ))
         .getSingleOrNull();
 
@@ -355,9 +353,7 @@ class LibraryRepository {
           : 0;
       await (_db.update(_db.progress)
             ..where(
-              (p) =>
-                  p.itemType.equalsValue(itemType) &
-                  p.itemId.equals(itemId),
+              (p) => p.itemType.equalsValue(itemType) & p.itemId.equals(itemId),
             ))
           .write(
         ProgressCompanion(

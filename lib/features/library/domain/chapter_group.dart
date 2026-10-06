@@ -74,5 +74,6 @@ class ChapterGroup {
           listEquals(sections, other.sections);
 
   @override
-  int get hashCode => Object.hash(chapterNumber, title, Object.hashAll(sections));
+  int get hashCode =>
+      Object.hash(chapterNumber, title, Object.hashAll(sections));
 }

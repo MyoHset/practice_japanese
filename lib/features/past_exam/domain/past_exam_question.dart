@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:practice_janpanese/core/database/app_database.dart';
+import 'package:practice_janpanese/features/past_exam/domain/past_exam_filter.dart';
 
 /// Single multiple-choice option for a past exam question.
 class PastExamChoice {
@@ -84,19 +85,23 @@ class PastExamPracticeArgs {
     this.sourceId,
     this.sourceIds = const [],
     this.level,
-    this.years = const {},
+    this.sessions = const {},
     this.subject,
     this.mondaiTypes = const {},
     this.title,
+    this.questionFrom,
+    this.questionTo,
   });
 
   final int? sourceId;
   final List<int> sourceIds;
   final String? level;
-  final Set<int> years;
+  final Set<ExamSession> sessions;
   final Subject? subject;
   final Set<MondaiType> mondaiTypes;
   final String? title;
+  final int? questionFrom;
+  final int? questionTo;
 
   @override
   bool operator ==(Object other) =>
@@ -106,8 +111,10 @@ class PastExamPracticeArgs {
           level == other.level &&
           subject == other.subject &&
           title == other.title &&
+          questionFrom == other.questionFrom &&
+          questionTo == other.questionTo &&
           _listEquals(sourceIds, other.sourceIds) &&
-          _setEquals(years, other.years) &&
+          _setEquals(sessions, other.sessions) &&
           _setEquals(mondaiTypes, other.mondaiTypes);
 
   @override
@@ -116,8 +123,10 @@ class PastExamPracticeArgs {
         level,
         subject,
         title,
+        questionFrom,
+        questionTo,
         Object.hashAll(sourceIds),
-        Object.hashAll(years),
+        Object.hashAll(sessions),
         Object.hashAll(mondaiTypes),
       );
 

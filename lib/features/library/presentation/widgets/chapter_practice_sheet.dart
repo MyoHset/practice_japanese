@@ -151,7 +151,8 @@ class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
                     subtitle: '၄ ခုရွေး အမေးအဖြေ',
                     icon: Icons.quiz_outlined,
                     isSelected: _selectedMode == StudyMode.quick,
-                    onTap: () => setState(() => _selectedMode = StudyMode.quick),
+                    onTap: () =>
+                        setState(() => _selectedMode = StudyMode.quick),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),

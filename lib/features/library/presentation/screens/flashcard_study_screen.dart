@@ -89,9 +89,8 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
         deck = deck.take(widget.questionLimit!).toList();
       }
       _originalDeck = deck;
-      _activeDeck = _isShuffled
-          ? (List.of(deck)..shuffle(math.Random()))
-          : List.of(deck);
+      _activeDeck =
+          _isShuffled ? (List.of(deck)..shuffle(math.Random())) : List.of(deck);
       _currentIndex = 0;
       _isFlipped = false;
       _showReadingHint = false;
@@ -219,9 +218,8 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
 
     // Watch source title or unit name for header
     final sourceAsync = ref.watch(sourceProvider(widget.sourceId));
-    final unitAsync = widget.unitId != null
-        ? ref.watch(unitProvider(widget.unitId!))
-        : null;
+    final unitAsync =
+        widget.unitId != null ? ref.watch(unitProvider(widget.unitId!)) : null;
 
     final String screenTitle;
     if (widget.unitId != null) {
@@ -232,9 +230,8 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
           : (effectiveChapters.length == 1
               ? 'Chapter ${effectiveChapters.first}'
               : 'Chapters ${effectiveChapters.join(", ")}');
-      final limitLabel = widget.questionLimit != null
-          ? ' (${widget.questionLimit} ခု)'
-          : '';
+      final limitLabel =
+          widget.questionLimit != null ? ' (${widget.questionLimit} ခု)' : '';
       screenTitle = '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel';
     }
 
@@ -249,9 +246,8 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
         ),
         actions: [
           IconButton(
-            tooltip: _isShuffled
-                ? AppStrings.orderedDeck
-                : AppStrings.shuffleDeck,
+            tooltip:
+                _isShuffled ? AppStrings.orderedDeck : AppStrings.shuffleDeck,
             icon: Icon(
               Icons.shuffle_rounded,
               color: _isShuffled ? AppColors.secondary : AppColors.textSoft,
@@ -570,12 +566,16 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                       Text(
                         item.primary,
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: AppColors.text,
                             ),
                       ),
-                      if (item.secondary != null && item.secondary!.isNotEmpty) ...[
+                      if (item.secondary != null &&
+                          item.secondary!.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.xs),
                         _buildReadingsDisplay(context, item.secondary!),
                       ],
@@ -590,18 +590,25 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                               ? TextAlign.start
                               : TextAlign.center,
                           style: item.meaning!.contains('\n')
-                              ? Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              ? Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     color: AppColors.text,
                                     fontWeight: FontWeight.w600,
                                     height: 1.5,
                                   )
-                              : Theme.of(context).textTheme.titleLarge?.copyWith(
+                              : Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
                                     color: AppColors.text,
                                     fontWeight: FontWeight.w700,
                                     height: 1.4,
                                   ),
                         ),
-                      if (item.connection != null && item.connection!.isNotEmpty) ...[
+                      if (item.connection != null &&
+                          item.connection!.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.sm),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -615,9 +622,10 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                           child: Text(
                             item.connection!,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textSoft,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.textSoft,
+                                    ),
                           ),
                         ),
                       ],

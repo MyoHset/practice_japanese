@@ -98,7 +98,11 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
       return m;
     }
 
-    final allMeanings = validItems.map(getCoreMeaning).where((m) => m.isNotEmpty).toSet().toList();
+    final allMeanings = validItems
+        .map(getCoreMeaning)
+        .where((m) => m.isNotEmpty)
+        .toSet()
+        .toList();
 
     _questions = validItems.map((item) {
       final correctMeaning = getCoreMeaning(item);
@@ -218,9 +222,8 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
           );
 
     final sourceAsync = ref.watch(sourceProvider(widget.sourceId));
-    final unitAsync = widget.unitId != null
-        ? ref.watch(unitProvider(widget.unitId!))
-        : null;
+    final unitAsync =
+        widget.unitId != null ? ref.watch(unitProvider(widget.unitId!)) : null;
 
     final String screenTitle;
     if (widget.unitId != null) {
@@ -231,9 +234,8 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
           : (effectiveChapters.length == 1
               ? 'Ch. ${effectiveChapters.first}'
               : 'Ch. ${effectiveChapters.join(", ")}');
-      final limitLabel = widget.questionLimit != null
-          ? ' (${widget.questionLimit} ပုဒ်)'
-          : '';
+      final limitLabel =
+          widget.questionLimit != null ? ' (${widget.questionLimit} ပုဒ်)' : '';
       screenTitle =
           '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel Quiz';
     }

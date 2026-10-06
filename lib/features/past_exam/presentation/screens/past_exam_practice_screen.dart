@@ -10,6 +10,7 @@ import 'package:practice_janpanese/core/widgets/app_pill.dart';
 import 'package:practice_janpanese/core/widgets/app_progress_bar.dart';
 import 'package:practice_janpanese/core/widgets/async_value_view.dart';
 import 'package:practice_janpanese/features/level/presentation/providers/selected_level_provider.dart';
+import 'package:practice_janpanese/core/extensions/build_context_x.dart';
 import 'package:practice_janpanese/features/past_exam/domain/past_exam_question.dart';
 import 'package:practice_janpanese/features/past_exam/presentation/providers/past_exam_providers.dart';
 
@@ -36,25 +37,28 @@ class PastExamPracticeScreen extends ConsumerStatefulWidget {
 class _PastExamPracticeScreenState
     extends ConsumerState<PastExamPracticeScreen> {
   int _currentIndex = 0;
-  int? _selectedPosition;
-  bool _hasAnswered = false;
-  int _correctCount = 0;
-  int _wrongCount = 0;
+  final Map<int, int> _answers = {};
+  final Map<int, bool> _correctness = {};
   bool _isCompleted = false;
   bool _isPassageExpanded = true;
 
+  int get _correctCount => _correctness.values.where((c) => c).length;
+  int get _wrongCount => _correctness.values.where((c) => !c).length;
+
   void _onOptionSelected(PastExamQuestion question, int position) {
-    if (_hasAnswered) return;
+    if (_answers.containsKey(_currentIndex)) return;
 
     final isCorrect = position == question.correctPosition;
     setState(() {
-      _selectedPosition = position;
-      _hasAnswered = true;
-      if (isCorrect) {
-        _correctCount++;
-      } else {
-        _wrongCount++;
-      }
+      _answers[_currentIndex] = position;
+      _correctness[_currentIndex] = isCorrect;
+    });
+  }
+
+  void _jumpToQuestion(int index) {
+    setState(() {
+      _currentIndex = index;
+      _isPassageExpanded = true;
     });
   }
 
@@ -64,20 +68,130 @@ class _PastExamPracticeScreenState
     } else {
       setState(() {
         _currentIndex++;
-        _selectedPosition = null;
-        _hasAnswered = false;
         _isPassageExpanded = true;
       });
     }
   }
 
+  Widget _buildQuestionGrid(BuildContext context, int totalQuestions,
+      {bool isDrawer = false}) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        alignment: WrapAlignment.start,
+        children: List.generate(totalQuestions, (index) {
+          final hasAnswered = _answers.containsKey(index);
+          final isCurrent = index == _currentIndex;
+          final isCorrect = _correctness[index] ?? false;
+
+          Color bgColor = AppColors.surface;
+          Color textColor = AppColors.text;
+          Color borderColor = Colors.transparent;
+
+          if (isCurrent) {
+            bgColor = AppColors.primary;
+            textColor = Colors.white;
+          } else if (hasAnswered) {
+            bgColor = isCorrect
+                ? AppColors.secondary.withValues(alpha: 0.15)
+                : AppColors.error.withValues(alpha: 0.15);
+            textColor = isCorrect ? AppColors.secondary : AppColors.error;
+            borderColor = isCorrect
+                ? AppColors.secondary.withValues(alpha: 0.3)
+                : AppColors.error.withValues(alpha: 0.3);
+          } else {
+            borderColor = AppColors.divider;
+          }
+
+          return InkWell(
+            onTap: () {
+              if (isDrawer) {
+                Scaffold.of(context).closeEndDrawer();
+              } else {
+                Navigator.of(context).pop();
+              }
+              _jumpToQuestion(index);
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: bgColor,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isCurrent ? AppColors.primary : borderColor,
+                  width: 1.5,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 13,
+                  fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  void _showQuestionNavigationSheet(BuildContext context, int totalQuestions) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+      ),
+      builder: (sheetContext) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'မေးခွန်းရွေးချယ်ရန်',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(sheetContext).pop(),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.6,
+              ),
+              child: _buildQuestionGrid(sheetContext, totalQuestions,
+                  isDrawer: false),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _restartQuiz() {
     setState(() {
       _currentIndex = 0;
-      _selectedPosition = null;
-      _hasAnswered = false;
-      _correctCount = 0;
-      _wrongCount = 0;
+      _answers.clear();
+      _correctness.clear();
       _isCompleted = false;
       _isPassageExpanded = true;
     });
@@ -109,7 +223,9 @@ class _PastExamPracticeScreenState
       final filter = ref.watch(pastExamFilterProvider);
       args = PastExamPracticeArgs(
         level: level,
-        years: filter.selectedYears,
+        sessions: filter.selectedSessions,
+        questionFrom: filter.questionFrom,
+        questionTo: filter.questionTo,
         mondaiTypes: filter.selectedMondaiTypes,
       );
       if (filter.selectedMondaiTypes.length == 1) {
@@ -121,8 +237,8 @@ class _PastExamPracticeScreenState
       } else {
         title = '$level စာမေးပွဲ မေးခွန်းအားလုံး';
       }
-      subtitle = filter.selectedYears.isNotEmpty
-          ? '${filter.selectedYears.join(", ")} ခုနှစ်'
+      subtitle = filter.selectedSessions.isNotEmpty
+          ? '${filter.selectedSessions.join(", ")} ခုနှစ်'
           : '$level Past Exams';
     } else if (widget.mondaiType != null) {
       args = PastExamPracticeArgs(
@@ -161,6 +277,34 @@ class _PastExamPracticeScreenState
     final questionsAsync = ref.watch(pastExamPracticeQuestionsProvider(args));
 
     return Scaffold(
+      endDrawer: !context.isMobile && questionsAsync.valueOrNull != null
+          ? Drawer(
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(AppSpacing.md),
+                      child: Text(
+                        'မေးခွန်းရွေးချယ်ရန်',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: Builder(
+                        builder: (drawerContext) => _buildQuestionGrid(
+                            drawerContext, questionsAsync.valueOrNull!.length,
+                            isDrawer: true),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : null,
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +331,22 @@ class _PastExamPracticeScreenState
           ],
         ),
         actions: [
-          if (!_isCompleted)
+          if (!_isCompleted) ...[
+            Builder(
+              builder: (buttonContext) => IconButton(
+                icon: const Icon(Icons.grid_view_rounded),
+                onPressed: () {
+                  if (questionsAsync.valueOrNull != null) {
+                    if (context.isMobile) {
+                      _showQuestionNavigationSheet(
+                          context, questionsAsync.valueOrNull!.length);
+                    } else {
+                      Scaffold.of(buttonContext).openEndDrawer();
+                    }
+                  }
+                },
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.md),
               child: Center(
@@ -213,6 +372,7 @@ class _PastExamPracticeScreenState
                 ),
               ),
             ),
+          ]
         ],
       ),
       body: AsyncValueView(
@@ -298,7 +458,7 @@ class _PastExamPracticeScreenState
                 ),
 
                 // Explanation & Next Button
-                if (_hasAnswered) ...[
+                if (_answers.containsKey(_currentIndex)) ...[
                   const SizedBox(height: AppSpacing.md),
                   _buildExplanationCard(context, question, totalQuestions),
                 ],
@@ -580,7 +740,7 @@ class _PastExamPracticeScreenState
     PastExamQuestion question,
     PastExamChoice choice,
   ) {
-    final isSelected = _selectedPosition == choice.position;
+    final isSelected = _answers[_currentIndex] == choice.position;
     final isCorrect = choice.isCorrect;
 
     Color bgColor = AppColors.surface;
@@ -588,7 +748,7 @@ class _PastExamPracticeScreenState
     Color textColor = AppColors.text;
     IconData? statusIcon;
 
-    if (_hasAnswered) {
+    if (_answers.containsKey(_currentIndex)) {
       if (isCorrect) {
         bgColor = AppColors.secondary.withValues(alpha: 0.12);
         borderColor = AppColors.secondary;
@@ -605,7 +765,7 @@ class _PastExamPracticeScreenState
     }
 
     return InkWell(
-      onTap: _hasAnswered
+      onTap: _answers.containsKey(_currentIndex)
           ? null
           : () => _onOptionSelected(question, choice.position),
       borderRadius: BorderRadius.circular(AppRadius.card),
@@ -620,7 +780,10 @@ class _PastExamPracticeScreenState
           borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(
             color: borderColor,
-            width: isSelected || (_hasAnswered && isCorrect) ? 2 : 1,
+            width:
+                isSelected || (_answers.containsKey(_currentIndex) && isCorrect)
+                    ? 2
+                    : 1,
           ),
         ),
         child: Row(
@@ -648,7 +811,8 @@ class _PastExamPracticeScreenState
                 choice.text,
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight: isSelected || (_hasAnswered && isCorrect)
+                  fontWeight: isSelected ||
+                          (_answers.containsKey(_currentIndex) && isCorrect)
                       ? FontWeight.bold
                       : FontWeight.normal,
                   color: textColor,
@@ -670,7 +834,7 @@ class _PastExamPracticeScreenState
     PastExamQuestion question,
     int totalQuestions,
   ) {
-    final isCorrect = _selectedPosition == question.correctPosition;
+    final isCorrect = _answers[_currentIndex] == question.correctPosition;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),

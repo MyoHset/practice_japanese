@@ -249,8 +249,7 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                 vertical: AppSpacing.xs,
               ),
               itemCount: chapterGroups.length + 1,
-              separatorBuilder: (_, __) =>
-                  const SizedBox(width: AppSpacing.sm),
+              separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 if (index == 0) {
                   final isSelected = _selectedChapterNumbers.isEmpty;
@@ -371,8 +370,7 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
           ),
           sliver: SliverList.separated(
             itemCount: displayedSections.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: AppSpacing.sm),
+            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
             itemBuilder: (context, index) {
               final section = displayedSections[index];
               final sectionTitle = _selectedChapterNumbers.length == 1

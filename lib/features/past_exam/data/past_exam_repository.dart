@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:practice_janpanese/features/past_exam/domain/past_exam_filter.dart';
 import 'package:practice_janpanese/features/past_exam/domain/past_exam_question.dart';
+import 'package:practice_janpanese/features/past_exam/domain/past_exam_filter.dart';
 
 /// Repository for retrieving JLPT past exam data and questions from Drift.
 class PastExamRepository {
@@ -21,7 +22,8 @@ class PastExamRepository {
       )
       ..orderBy([
         (tbl) => OrderingTerm(expression: tbl.examYear, mode: OrderingMode.asc),
-        (tbl) => OrderingTerm(expression: tbl.examMonth, mode: OrderingMode.asc),
+        (tbl) =>
+            OrderingTerm(expression: tbl.examMonth, mode: OrderingMode.asc),
         (tbl) =>
             OrderingTerm(expression: tbl.sortOrder, mode: OrderingMode.asc),
         (tbl) => OrderingTerm(expression: tbl.id, mode: OrderingMode.asc),
@@ -30,9 +32,9 @@ class PastExamRepository {
   }
 
   /// Watches distinct exam years available for [level].
-  Stream<List<int>> watchAvailableYears(String level) {
+  Stream<List<ExamSession>> watchAvailableSessions(String level) {
     final q = _db.selectOnly(_db.sources, distinct: true)
-      ..addColumns([_db.sources.examYear])
+      ..addColumns([_db.sources.examYear, _db.sources.examMonth])
       ..where(
         _db.sources.type.equalsValue(SourceType.pastExam) &
             (_db.sources.jlptLevel.equals(level) |
@@ -44,13 +46,24 @@ class PastExamRepository {
           expression: _db.sources.examYear,
           mode: OrderingMode.asc,
         ),
+        OrderingTerm(
+          expression: _db.sources.examMonth,
+          mode: OrderingMode.asc,
+        ),
       ]);
     return q.watch().map(
-          (rows) => rows
-              .map((r) => r.read(_db.sources.examYear))
-              .whereType<int>()
-              .toList(),
-        );
+      (rows) {
+        final sessions = <ExamSession>{};
+        for (final r in rows) {
+          final year = r.read(_db.sources.examYear);
+          final month = r.read(_db.sources.examMonth);
+          if (year != null && month != null) {
+            sessions.add(ExamSession(year, month));
+          }
+        }
+        return sessions.toList();
+      },
+    );
   }
 
   /// Watches distinct mondai types available for [level].
@@ -90,20 +103,26 @@ class PastExamRepository {
         Expression<bool> cond = tbl.type.equalsValue(SourceType.pastExam) &
             (tbl.jlptLevel.equals(level) | tbl.jlptLevel.isNull());
 
-        if (filter.selectedYears.isNotEmpty) {
-          cond = cond & tbl.examYear.isIn(filter.selectedYears.toList());
+        if (filter.selectedSessions.isNotEmpty) {
+          Expression<bool> sessionCond = const Constant(false);
+          for (final session in filter.selectedSessions) {
+            final matchesSession = tbl.examYear.equals(session.year) &
+                tbl.examMonth.equals(session.month);
+            sessionCond = sessionCond | matchesSession;
+          }
+          cond = cond & sessionCond;
         }
 
         if (filter.selectedMondaiTypes.isNotEmpty) {
-          final sub = _db.selectOnly(_db.questions)
-            .join([
-              innerJoin(
-                _db.mondaiTypes,
-                _db.mondaiTypes.id.equalsExp(_db.questions.mondaiTypeId),
-              ),
-            ])
+          final sub = _db.selectOnly(_db.questions).join([
+            innerJoin(
+              _db.mondaiTypes,
+              _db.mondaiTypes.id.equalsExp(_db.questions.mondaiTypeId),
+            ),
+          ])
             ..addColumns([_db.questions.sourceId])
-            ..where(_db.mondaiTypes.type.isInValues(filter.selectedMondaiTypes));
+            ..where(
+                _db.mondaiTypes.type.isInValues(filter.selectedMondaiTypes));
           cond = cond & tbl.id.isInQuery(sub);
         }
 
@@ -142,8 +161,14 @@ class PastExamRepository {
                 _db.sources.jlptLevel.isNull()),
       );
 
-    if (filter.selectedYears.isNotEmpty) {
-      query.where(_db.sources.examYear.isIn(filter.selectedYears.toList()));
+    if (filter.selectedSessions.isNotEmpty) {
+      Expression<bool> sessionCond = const Constant(false);
+      for (final session in filter.selectedSessions) {
+        final matchesSession = _db.sources.examYear.equals(session.year) &
+            _db.sources.examMonth.equals(session.month);
+        sessionCond = sessionCond | matchesSession;
+      }
+      query.where(sessionCond);
     }
 
     if (filter.selectedMondaiTypes.isNotEmpty) {
@@ -169,7 +194,8 @@ class PastExamRepository {
         _db.mondaiTypes,
         _db.mondaiTypes.id.equalsExp(_db.questions.mondaiTypeId),
       ),
-    ])..where(_db.questions.sourceId.equals(sourceId));
+    ])
+      ..where(_db.questions.sourceId.equals(sourceId));
 
     final rows = await query.get();
 
@@ -193,11 +219,14 @@ class PastExamRepository {
   /// Retrieves questions for practice based on flexible criteria.
   Future<List<PastExamQuestion>> getQuestions({
     int? sourceId,
-    List<int>? sourceIds,
+    List<int> sourceIds = const [],
     String? level,
-    Set<int>? years,
+    Set<ExamSession>? sessions,
     Subject? subject,
-    Set<MondaiType>? mondaiTypes,
+    Set<MondaiType> mondaiTypes = const {},
+    String? title,
+    int? questionFrom,
+    int? questionTo,
   }) async {
     final query = _db.select(_db.questions).join([
       innerJoin(
@@ -228,15 +257,21 @@ class PastExamRepository {
       );
     }
 
-    if (years != null && years.isNotEmpty) {
-      query.where(_db.sources.examYear.isIn(years.toList()));
+    if (sessions != null && sessions.isNotEmpty) {
+      Expression<bool> sessionCond = const Constant(false);
+      for (final session in sessions) {
+        final matchesSession = _db.sources.examYear.equals(session.year) &
+            _db.sources.examMonth.equals(session.month);
+        sessionCond = sessionCond | matchesSession;
+      }
+      query.where(sessionCond);
     }
 
     if (subject != null) {
       query.where(_db.questions.subject.equalsValue(subject));
     }
 
-    if (mondaiTypes != null && mondaiTypes.isNotEmpty) {
+    if (mondaiTypes.isNotEmpty) {
       query.where(_db.mondaiTypes.type.isInValues(mondaiTypes));
     }
 
@@ -244,9 +279,20 @@ class PastExamRepository {
       OrderingTerm(expression: _db.sources.examYear, mode: OrderingMode.asc),
       OrderingTerm(expression: _db.sources.examMonth, mode: OrderingMode.asc),
       OrderingTerm(expression: _db.questions.mondaiNo, mode: OrderingMode.asc),
-      OrderingTerm(expression: _db.questions.questionNo, mode: OrderingMode.asc),
+      OrderingTerm(
+          expression: _db.questions.questionNo, mode: OrderingMode.asc),
       OrderingTerm(expression: _db.questions.id, mode: OrderingMode.asc),
     ]);
+
+    if (questionFrom != null || questionTo != null) {
+      final offset = (questionFrom ?? 1) - 1;
+      final limit = (questionTo != null) ? (questionTo - offset) : null;
+      if (limit != null) {
+        query.limit(limit, offset: offset);
+      } else {
+        query.limit(1000000, offset: offset);
+      }
+    }
 
     final rows = await query.get();
     if (rows.isEmpty) return const [];

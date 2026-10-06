@@ -24,11 +24,11 @@ final currentLevelPastExamsProvider = StreamProvider<List<Source>>((ref) {
 final pastExamFilterProvider =
     StateProvider<PastExamFilter>((ref) => const PastExamFilter());
 
-/// Provides available exam years for the current level.
-final pastExamAvailableYearsProvider = StreamProvider<List<int>>((ref) {
+/// Provides available exam sessions for the current level.
+final pastExamAvailableYearsProvider = StreamProvider<List<ExamSession>>((ref) {
   final level = ref.watch(selectedLevelProvider);
   final repo = ref.watch(pastExamRepositoryProvider);
-  return repo.watchAvailableYears(level);
+  return repo.watchAvailableSessions(level);
 });
 
 /// Provides available mondai types for the current level.
@@ -81,11 +81,13 @@ final pastExamPracticeQuestionsProvider =
     final repo = ref.watch(pastExamRepositoryProvider);
     return repo.getQuestions(
       sourceId: args.sourceId,
-      sourceIds: args.sourceIds.isNotEmpty ? args.sourceIds : null,
+      sourceIds: args.sourceIds,
       level: args.level,
-      years: args.years.isNotEmpty ? args.years : null,
+      sessions: args.sessions.isNotEmpty ? args.sessions : null,
       subject: args.subject,
-      mondaiTypes: args.mondaiTypes.isNotEmpty ? args.mondaiTypes : null,
+      questionFrom: args.questionFrom,
+      questionTo: args.questionTo,
+      mondaiTypes: args.mondaiTypes,
     );
   },
 );

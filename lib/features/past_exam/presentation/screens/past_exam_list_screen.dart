@@ -226,14 +226,14 @@ class PastExamListScreen extends ConsumerWidget {
       spacing: AppSpacing.xs,
       runSpacing: AppSpacing.xs,
       children: [
-        ...filter.selectedYears.map(
+        ...filter.selectedSessions.map(
           (y) => _SmallFilterChip(
             label: '$y ခုနှစ်',
             color: AppColors.primary,
             onRemove: () {
               final cur = ref.read(pastExamFilterProvider);
               ref.read(pastExamFilterProvider.notifier).state = cur.copyWith(
-                selectedYears: {...cur.selectedYears}..remove(y),
+                selectedSessions: {...cur.selectedSessions}..remove(y),
               );
             },
           ),
@@ -434,28 +434,31 @@ class _FilterPanelState extends ConsumerState<_FilterPanel> {
     _draft = ref.read(pastExamFilterProvider);
   }
 
-  void _toggleYear(int year) {
+  void _toggleSession(ExamSession session) {
     setState(() {
-      final set = {..._draft.selectedYears};
-      if (set.contains(year)) {
-        set.remove(year);
+      final set = {..._draft.selectedSessions};
+      if (set.contains(session)) {
+        set.remove(session);
       } else {
-        set.add(year);
+        set.add(session);
       }
-      _draft = _draft.copyWith(selectedYears: set);
+      _draft = _draft.copyWith(selectedSessions: set);
     });
   }
 
-  void _toggleAllYears(List<int> availableYears) {
+  void _toggleAllSessions(List<ExamSession> availableSessions) {
     setState(() {
-      final allSelected = availableYears.every(_draft.selectedYears.contains);
+      final allSelected =
+          availableSessions.every(_draft.selectedSessions.contains);
       if (allSelected) {
         _draft = _draft.copyWith(
-          selectedYears: {..._draft.selectedYears}..removeAll(availableYears),
+          selectedSessions: {..._draft.selectedSessions}
+            ..removeAll(availableSessions),
         );
       } else {
         _draft = _draft.copyWith(
-          selectedYears: {..._draft.selectedYears}..addAll(availableYears),
+          selectedSessions: {..._draft.selectedSessions}
+            ..addAll(availableSessions),
         );
       }
     });
@@ -509,7 +512,7 @@ class _FilterPanelState extends ConsumerState<_FilterPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final yearsAsync = ref.watch(pastExamAvailableYearsProvider);
+    final sessionsAsync = ref.watch(pastExamAvailableYearsProvider);
     final mondaiAsync = ref.watch(pastExamAvailableMondaiTypesProvider);
 
     return Container(
@@ -607,15 +610,15 @@ class _FilterPanelState extends ConsumerState<_FilterPanel> {
                       context,
                       icon: Icons.calendar_month_rounded,
                       label: 'စာမေးပွဲ နှစ် (Exam Year)',
-                      count: _draft.selectedYears.length,
+                      count: _draft.selectedSessions.length,
                     ),
-                    yearsAsync.when(
-                      data: (years) {
-                        if (years.isEmpty) return const SizedBox.shrink();
+                    sessionsAsync.when(
+                      data: (sessions) {
+                        if (sessions.isEmpty) return const SizedBox.shrink();
                         final allSelected =
-                            years.every(_draft.selectedYears.contains);
+                            sessions.every(_draft.selectedSessions.contains);
                         return TextButton(
-                          onPressed: () => _toggleAllYears(years),
+                          onPressed: () => _toggleAllSessions(sessions),
                           style: TextButton.styleFrom(
                             visualDensity: VisualDensity.compact,
                             padding: EdgeInsets.zero,
@@ -632,8 +635,8 @@ class _FilterPanelState extends ConsumerState<_FilterPanel> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                yearsAsync.when(
-                  data: (years) => years.isEmpty
+                sessionsAsync.when(
+                  data: (sessions) => sessions.isEmpty
                       ? const Padding(
                           padding: EdgeInsets.all(AppSpacing.md),
                           child: Text(
@@ -644,14 +647,14 @@ class _FilterPanelState extends ConsumerState<_FilterPanel> {
                       : Wrap(
                           spacing: AppSpacing.sm,
                           runSpacing: AppSpacing.sm,
-                          children: years.map((year) {
+                          children: sessions.map((session) {
                             final selected =
-                                _draft.selectedYears.contains(year);
+                                _draft.selectedSessions.contains(session);
                             return _buildToggleChip(
-                              label: '$year',
+                              label: session.toString(),
                               selected: selected,
                               color: AppColors.primary,
-                              onTap: () => _toggleYear(year),
+                              onTap: () => _toggleSession(session),
                             );
                           }).toList(),
                         ),
