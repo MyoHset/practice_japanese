@@ -106,7 +106,7 @@ class KanjiSourceItems extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {kanjiId, sourceId},
+        {kanjiId, sourceId, unitId},
       ];
 }
 
@@ -142,7 +142,7 @@ class VocabSourceItems extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {vocabId, sourceId},
+        {vocabId, sourceId, unitId},
       ];
 }
 
@@ -393,14 +393,19 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) => m.createAll(),
         onUpgrade: (m, from, to) async {
-          // schemaVersion မြှင့်တဲ့အခါ ဒီမှာ step-by-step migration ရေး
-          // if (from < 2) { await m.addColumn(...); }
+          if (from < 2) {
+            // Recreate tables to apply the new unique constraint for kanjiId/sourceId/unitId
+            await m.drop(kanjiSourceItems);
+            await m.createTable(kanjiSourceItems);
+            await m.drop(vocabSourceItems);
+            await m.createTable(vocabSourceItems);
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');

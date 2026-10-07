@@ -13,7 +13,7 @@ import 'package:practice_janpanese/features/library/presentation/widgets/study_m
 
 /// Modal bottom sheet allowing the user to pick a study mode for a unit.
 /// Must only be opened via [StudyModeSheet.show] per rule A4.1.
-class StudyModeSheet extends StatelessWidget {
+class StudyModeSheet extends StatefulWidget {
   const StudyModeSheet({
     super.key,
     required this.kind,
@@ -48,9 +48,32 @@ class StudyModeSheet extends StatelessWidget {
         ),
       );
 
+  @override
+  State<StudyModeSheet> createState() => _StudyModeSheetState();
+}
+
+class _StudyModeSheetState extends State<StudyModeSheet> {
+  int? _selectedLimit = 20;
+  bool _isRandom = true;
+
+  static const List<({int? limit, String label})> _limitOptions = [
+    (limit: 10, label: '၁၀ ပုဒ်'),
+    (limit: 20, label: '၂၀ ပုဒ်'),
+    (limit: 50, label: '၅၀ ပုဒ်'),
+    (limit: null, label: 'အားလုံး'),
+  ];
+
   void _onSelectMode(BuildContext context, StudyMode mode) {
     Navigator.of(context).pop();
-    context.push(AppRoutes.study(kind, sourceId, unit.id, mode));
+    final int? passedLimit = (mode == StudyMode.list) ? null : _selectedLimit;
+    context.push(AppRoutes.study(
+      widget.kind,
+      widget.sourceId,
+      widget.unit.id,
+      mode,
+      limit: passedLimit,
+      isRandom: _isRandom,
+    ));
   }
 
   @override
@@ -76,19 +99,73 @@ class StudyModeSheet extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                unit.name,
+                widget.unit.name,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                AppStrings.itemsCount(unit.total),
+                AppStrings.itemsCount(widget.unit.total),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppColors.textSoft,
                     ),
               ),
               const SizedBox(height: AppSpacing.lg),
+              
+              // Limit Options
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'မေးခွန်း အရေအတွက်',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSoft,
+                        ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Random',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: _isRandom ? AppColors.primary : AppColors.textSoft,
+                              fontWeight: _isRandom ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                      ),
+                      Switch(
+                        value: _isRandom,
+                        onChanged: (v) => setState(() => _isRandom = v),
+                        activeColor: AppColors.primary,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.xs,
+                children: _limitOptions.map((opt) {
+                  final isSelected = _selectedLimit == opt.limit;
+                  return ChoiceChip(
+                    label: Text(opt.label),
+                    selected: isSelected,
+                    selectedColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : AppColors.text,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                    onSelected: (_) {
+                      setState(() => _selectedLimit = opt.limit);
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
               StudyModeOptionTile(
                 mode: StudyMode.list,
                 onTap: () => _onSelectMode(context, StudyMode.list),

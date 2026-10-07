@@ -60,6 +60,7 @@ class ChapterPracticeSheet extends StatefulWidget {
 class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
   StudyMode _selectedMode = StudyMode.quick;
   int? _selectedLimit = 20;
+  bool _isRandom = true;
 
   static const List<({int? limit, String label})> _limitOptions = [
     (limit: 10, label: '၁၀ ပုဒ်'),
@@ -82,6 +83,7 @@ class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
         _selectedMode,
         chapters: sortedChapters,
         limit: _selectedLimit,
+        isRandom: _isRandom,
       ),
     );
   }
@@ -173,18 +175,29 @@ class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'မေးခွန်းအရေအတွက်',
+                  'မေးခွန်း အရေအတွက်',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.textSoft,
                       ),
                 ),
-                Text(
-                  'Random ရောနှောမေးပါမည်',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.secondary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Random',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: _isRandom ? AppColors.primary : AppColors.textSoft,
+                            fontWeight: _isRandom ? FontWeight.w700 : FontWeight.w500,
+                          ),
+                    ),
+                    Switch(
+                      value: _isRandom,
+                      onChanged: (v) => setState(() => _isRandom = v),
+                      activeColor: AppColors.primary,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -223,7 +236,7 @@ class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
                 icon: const Icon(Icons.play_arrow_rounded),
                 label: Text(
                   _selectedLimit != null
-                      ? 'Random $_selectedLimit ပုဒ် စတင်ဖြေဆိုမည်'
+                      ? '${_isRandom ? "Random " : "စဉ်တိုင်း "}$_selectedLimit ပုဒ် စတင်ဖြေဆိုမည်'
                       : 'အားလုံး စတင်ဖြေဆိုမည်',
                   style: const TextStyle(
                     fontSize: 15,

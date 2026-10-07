@@ -1334,7 +1334,7 @@ class $KanjiSourceItemsTable extends KanjiSourceItems
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {kanjiId, sourceId},
+        {kanjiId, sourceId, unitId},
       ];
   @override
   KanjiSourceItem map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -2104,7 +2104,7 @@ class $VocabSourceItemsTable extends VocabSourceItems
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {vocabId, sourceId},
+        {vocabId, sourceId, unitId},
       ];
   @override
   VocabSourceItem map(Map<String, dynamic> data, {String? tablePrefix}) {

@@ -37,6 +37,7 @@ class QuickQuizStudyScreen extends ConsumerStatefulWidget {
     this.chapterNumber,
     this.chapterNumbers,
     this.questionLimit,
+    this.isRandom = true,
   }) : assert(
           unitId != null || chapterNumber != null || chapterNumbers != null,
           'Either unitId, chapterNumber, or chapterNumbers must be provided',
@@ -48,6 +49,7 @@ class QuickQuizStudyScreen extends ConsumerStatefulWidget {
   final int? chapterNumber;
   final List<int>? chapterNumbers;
   final int? questionLimit;
+  final bool isRandom;
 
   @override
   ConsumerState<QuickQuizStudyScreen> createState() =>
@@ -55,16 +57,30 @@ class QuickQuizStudyScreen extends ConsumerStatefulWidget {
 }
 
 class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
-  int? _selectedOptionIndex;
-  bool _hasAnswered = false;
-  int _correctCount = 0;
-  int _wrongCount = 0;
   bool _isCompleted = false;
 
+  final Map<int, int> _selectedAnswers = {}; // _currentIndex -> selectedOptionIndex
+
+  bool get _hasAnswered => _selectedAnswers.containsKey(_currentIndex);
+  int? get _selectedOptionIndex => _selectedAnswers[_currentIndex];
+  int get _correctCount => _selectedAnswers.entries.where((e) => _questions![e.key].correctIndex == e.value).length;
+  int get _wrongCount => _selectedAnswers.length - _correctCount;
+
   List<QuizQuestion>? _questions;
-  final List<({StudyItem item, bool isCorrect, String selectedAnswer})>
-      _answerHistory = [];
+
+  List<({StudyItem item, bool isCorrect, String selectedAnswer})> get _answerHistory {
+    if (_questions == null) return [];
+    return _selectedAnswers.entries.map((e) {
+      final q = _questions![e.key];
+      return (
+        item: q.item,
+        isCorrect: q.correctIndex == e.value,
+        selectedAnswer: q.options[e.value],
+      );
+    }).toList();
+  }
 
   void _generateQuestions(List<StudyItem> items) {
     if (_questions != null) return;
@@ -80,8 +96,10 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
       return;
     }
 
-    // Always shuffle items for quiz so questions are presented in random order
-    validItems.shuffle(random);
+    // Shuffle items for quiz if random is requested
+    if (widget.isRandom) {
+      validItems.shuffle(random);
+    }
 
     // Apply random question limit if specified
     if (widget.questionLimit != null &&
@@ -131,12 +149,8 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
     }).toList();
 
     _currentIndex = 0;
-    _selectedOptionIndex = null;
-    _hasAnswered = false;
-    _correctCount = 0;
-    _wrongCount = 0;
+    _selectedAnswers.clear();
     _isCompleted = false;
-    _answerHistory.clear();
   }
 
   Future<void> _handleOptionSelected(int index) async {
@@ -146,20 +160,7 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
     final isCorrect = index == question.correctIndex;
 
     setState(() {
-      _selectedOptionIndex = index;
-      _hasAnswered = true;
-      if (isCorrect) {
-        _correctCount++;
-      } else {
-        _wrongCount++;
-      }
-      _answerHistory.add(
-        (
-          item: question.item,
-          isCorrect: isCorrect,
-          selectedAnswer: question.options[index],
-        ),
-      );
+      _selectedAnswers[_currentIndex] = index;
     });
 
     // Record review in database
@@ -173,13 +174,20 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
 
   void _nextQuestion() {
     if (_questions == null) return;
-    if (_currentIndex + 1 >= _questions!.length) {
+    
+    int nextUnanswered = -1;
+    for (int i = 0; i < _questions!.length; i++) {
+      if (!_selectedAnswers.containsKey(i)) {
+        nextUnanswered = i;
+        break;
+      }
+    }
+
+    if (nextUnanswered == -1) {
       setState(() => _isCompleted = true);
     } else {
       setState(() {
-        _currentIndex++;
-        _selectedOptionIndex = null;
-        _hasAnswered = false;
+        _currentIndex = nextUnanswered;
       });
     }
   }
@@ -187,14 +195,138 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
   void _restartQuiz() {
     setState(() {
       _currentIndex = 0;
-      _selectedOptionIndex = null;
-      _hasAnswered = false;
-      _correctCount = 0;
-      _wrongCount = 0;
+      _selectedAnswers.clear();
       _isCompleted = false;
-      _answerHistory.clear();
       _questions = null;
     });
+  }
+
+  Widget _buildQuestionGrid(BuildContext context, {bool isDrawer = false}) {
+    if (_questions == null) return const SizedBox.shrink();
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: List.generate(_questions!.length, (index) {
+          final isAnswered = _selectedAnswers.containsKey(index);
+          final isCurrent = index == _currentIndex;
+          return GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              setState(() => _currentIndex = index);
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isCurrent
+                    ? AppColors.primary
+                    : (isAnswered
+                        ? AppColors.primary.withValues(alpha: 0.1)
+                        : AppColors.surface),
+                border: Border.all(
+                  color: isCurrent
+                      ? AppColors.primary
+                      : (isAnswered
+                          ? AppColors.primary
+                          : AppColors.divider),
+                  width: isCurrent ? 2 : 1,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  color: isCurrent
+                      ? Colors.white
+                      : (isAnswered
+                          ? AppColors.primary
+                          : AppColors.text),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  void _showQuestionSelector(BuildContext context) {
+    if (_questions == null || _questions!.isEmpty) return;
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.divider,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Text(
+                'မေးခွန်းရွေးရန်',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              const Divider(height: 1),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.6,
+                ),
+                child: _buildQuestionGrid(sheetContext),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEndDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: AppColors.surface,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Text(
+                'မေးခွန်းရွေးရန်',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: Builder(
+                builder: (drawerContext) => _buildQuestionGrid(drawerContext, isDrawer: true),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -241,7 +373,9 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
     }
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      endDrawer: _buildEndDrawer(context),
       appBar: AppBar(
         title: Text(
           screenTitle,
@@ -250,6 +384,18 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
               ),
         ),
         actions: [
+          IconButton(
+            tooltip: 'မေးခွန်းရွေးရန်',
+            icon: const Icon(Icons.grid_view_rounded, color: AppColors.textSoft),
+            onPressed: () {
+              final isDesktop = MediaQuery.sizeOf(context).width >= 600;
+              if (isDesktop) {
+                _scaffoldKey.currentState?.openEndDrawer();
+              } else {
+                _showQuestionSelector(context);
+              }
+            },
+          ),
           IconButton(
             tooltip: AppStrings.retryQuiz,
             icon: const Icon(Icons.refresh_rounded, color: AppColors.textSoft),

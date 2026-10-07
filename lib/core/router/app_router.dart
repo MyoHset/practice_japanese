@@ -87,6 +87,10 @@ final GoRouter appRouter = GoRouter(
         final sourceId = int.parse(state.pathParameters['sourceId']!);
         final unitId = int.parse(state.pathParameters['unitId']!);
         final mode = StudyMode.fromSlug(state.pathParameters['mode']!);
+        final limitStr = state.uri.queryParameters['limit'];
+        final limit = limitStr != null ? int.tryParse(limitStr) : null;
+        final isRandomStr = state.uri.queryParameters['isRandom'];
+        final isRandom = isRandomStr == null || isRandomStr != 'false';
 
         if (mode == StudyMode.list) {
           return UnitListModeScreen(
@@ -101,6 +105,8 @@ final GoRouter appRouter = GoRouter(
             kind: kind,
             sourceId: sourceId,
             unitId: unitId,
+            questionLimit: limit,
+            isRandom: isRandom,
           );
         }
 
@@ -109,6 +115,8 @@ final GoRouter appRouter = GoRouter(
             kind: kind,
             sourceId: sourceId,
             unitId: unitId,
+            questionLimit: limit,
+            isRandom: isRandom,
           );
         }
 
@@ -191,6 +199,7 @@ final GoRouter appRouter = GoRouter(
 
         final chaptersParam = state.uri.queryParameters['chapters'];
         final limitParam = state.uri.queryParameters['limit'];
+        final isRandomStr = state.uri.queryParameters['isRandom'];
 
         final chapterNumbers = chaptersParam != null && chaptersParam.isNotEmpty
             ? chaptersParam
@@ -201,6 +210,7 @@ final GoRouter appRouter = GoRouter(
             : <int>[];
         final questionLimit =
             limitParam != null ? int.tryParse(limitParam) : null;
+        final isRandom = isRandomStr == null || isRandomStr != 'false';
 
         if (mode == StudyMode.flashcard) {
           return FlashcardStudyScreen(
@@ -208,6 +218,7 @@ final GoRouter appRouter = GoRouter(
             sourceId: sourceId,
             chapterNumbers: chapterNumbers,
             questionLimit: questionLimit,
+            isRandom: isRandom,
           );
         }
 
@@ -217,6 +228,7 @@ final GoRouter appRouter = GoRouter(
             sourceId: sourceId,
             chapterNumbers: chapterNumbers,
             questionLimit: questionLimit,
+            isRandom: isRandom,
           );
         }
 

@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 25;
+const int _kCurrentDevSeedVersion = 33;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -787,16 +787,21 @@ Future<void> _ensureSpeedMasterN3Kanji(AppDatabase db, DateTime now) async {
       .getSingleOrNull();
 
   if (existingKanjiSource != null && existingVocabSource != null) {
-    final unitCount = await (db.units.select()
-          ..where((u) => u.sourceId.equals(existingKanjiSource.id)))
-        .get()
-        .then((l) => l.length);
-    if (unitCount >= 25) return;
+    // Force clean and re-seed to pick up any kanji/vocab replacement in the JSON asset
+    // Deleting the source will cascade and delete units, sourceItems, compounds automatically.
+    await db.transaction(() async {
+      await (db.delete(db.sources)..where((tbl) => tbl.id.equals(existingKanjiSource.id))).go();
+      await (db.delete(db.sources)..where((tbl) => tbl.id.equals(existingVocabSource.id))).go();
+    });
   }
 
-  await db.transaction(() async {
-    await _seedSpeedMasterN3KanjiFromJson(db, now);
-  });
+  try {
+    await db.transaction(() async {
+      await _seedSpeedMasterN3KanjiFromJson(db, now);
+    });
+  } catch (e, stack) {
+    debugPrint('Error in _seedSpeedMasterN3KanjiFromJson: $e\n$stack');
+  }
 }
 
 /// Seeds Speed Master N3 Kanji and its companion Vocab source from assets/data/kanji_speed_master_n3.json.
@@ -928,11 +933,9 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
       int kanjiId;
       if (existingKanji != null) {
         kanjiId = existingKanji.id;
-        if (existingKanji.meaningMy == null ||
-            existingKanji.meaningMy!.isEmpty) {
-          await (db.update(db.kanjis)..where((item) => item.id.equals(kanjiId)))
-              .write(KanjisCompanion(meaningMy: Value(my)));
-        }
+        // Always update meaning to reflect any changes in the JSON file
+        await (db.update(db.kanjis)..where((item) => item.id.equals(kanjiId)))
+            .write(KanjisCompanion(meaningMy: Value(my)));
       } else {
         kanjiId = await db.into(db.kanjis).insert(
               KanjisCompanion.insert(
@@ -971,7 +974,8 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
             ..where(
               (ksi) =>
                   ksi.kanjiId.equals(kanjiId) &
-                  ksi.sourceId.equals(kanjiSourceId),
+                  ksi.sourceId.equals(kanjiSourceId) &
+                  ksi.unitId.equals(kanjiUnitId),
             ))
           .getSingleOrNull();
 
@@ -1023,14 +1027,14 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
               ..where(
                 (item) =>
                     item.word.equals(wordStr) & item.reading.equals(readingStr),
-              ))
+              )
+              ..limit(1))
             .getSingleOrNull();
 
         int vocabId;
         if (existingVocab != null) {
           vocabId = existingVocab.id;
-          if ((existingVocab.meaningMy?.isEmpty ?? true) &&
-              meaningStr.isNotEmpty) {
+          if (meaningStr.isNotEmpty) {
             await (db.update(db.vocabularies)
                   ..where((item) => item.id.equals(vocabId)))
                 .write(VocabulariesCompanion(meaningMy: Value(meaningStr)));
@@ -1045,20 +1049,38 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
               );
         }
 
-        // Link into KanjiCompounds
-        await db.into(db.kanjiCompounds).insert(
-              KanjiCompoundsCompanion.insert(
-                kanjiId: kanjiId,
-                vocabId: vocabId,
-                sourceId: kanjiSourceId,
-                position: Value(vIdx + 1),
-              ),
-              mode: InsertMode.insertOrIgnore,
-            );
+        final existingKc = await (db.kanjiCompounds.select()
+              ..where(
+                (kc) =>
+                    kc.kanjiId.equals(kanjiId) &
+                    kc.vocabId.equals(vocabId) &
+                    kc.sourceId.equals(kanjiSourceId),
+              ))
+            .getSingleOrNull();
+
+        if (existingKc == null) {
+          await db.into(db.kanjiCompounds).insert(
+                KanjiCompoundsCompanion.insert(
+                  kanjiId: kanjiId,
+                  vocabId: vocabId,
+                  sourceId: kanjiSourceId,
+                  position: Value(vIdx + 1),
+                ),
+                mode: InsertMode.insertOrIgnore,
+              );
+        }
 
         // Link into VocabSourceItems for the companion vocab source
-        if (!seenVocabInSource.contains(vocabId)) {
-          seenVocabInSource.add(vocabId);
+        final existingVsi = await (db.vocabSourceItems.select()
+              ..where(
+                (vsi) =>
+                    vsi.vocabId.equals(vocabId) &
+                    vsi.sourceId.equals(vocabSourceId) &
+                    vsi.unitId.equals(vocabUnitId),
+              ))
+            .getSingleOrNull();
+
+        if (existingVsi == null) {
           await db.into(db.vocabSourceItems).insert(
                 VocabSourceItemsCompanion.insert(
                   vocabId: vocabId,

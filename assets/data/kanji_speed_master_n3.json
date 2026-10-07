@@ -4113,307 +4113,188 @@
     },
     {
       "chapter": 10,
-      "title": "Ch.10: 学校 (ကျောင်း)",
+      "title": "Ch.10: 学校 (ကျောင်း / ကလေးနှင့် စာသင်ခန်း)",
       "kanjis": [
         {
-          "character": "職",
-          "onyomi": "ショク",
+          "character": "幼",
+          "onyomi": "ヨウ",
+          "kunyomi": "おさな・い",
+          "meaning": "ငယ်ရွယ်သော",
+          "vocab": [
+            {
+              "word": "幼い",
+              "reading": "おさない",
+              "meaning": "ငယ်ရွယ်သော"
+            },
+            {
+              "word": "幼稚園",
+              "reading": "ようちえん",
+              "meaning": "မူကြိုကျောင်း"
+            },
+            {
+              "word": "幼友達",
+              "reading": "おさなともだち",
+              "meaning": "ငယ်သူငယ်ချင်း"
+            },
+            {
+              "word": "幼少期",
+              "reading": "ようしょうき",
+              "meaning": "ကလေးဘဝအချိန်များ"
+            }
+          ]
+        },
+        {
+          "character": "児",
+          "onyomi": "ジ / ニ",
           "kunyomi": "",
-          "meaning": "အလုပ်အကိုင်",
+          "meaning": "ကလေးငယ်",
           "vocab": [
             {
-              "word": "職業",
-              "reading": "しょくぎょう",
-              "meaning": "အလုပ်အကိုင်"
+              "word": "児",
+              "reading": "じ",
+              "meaning": "ကလေးငယ်"
             },
             {
-              "word": "職人",
-              "reading": "しょくにん",
-              "meaning": "လက်မှုပညာရှင်"
+              "word": "小児科",
+              "reading": "しょうにか",
+              "meaning": "ကလေးအထူးကုဆေးပညာ"
             },
             {
-              "word": "職場",
-              "reading": "しょくば",
-              "meaning": "လုပ်ငန်းခွင်"
+              "word": "育児",
+              "reading": "いくじ",
+              "meaning": "ကလေးပြုစုပျိုးထောင်ခြင်း"
             },
             {
-              "word": "退職",
-              "reading": "たいしょく",
-              "meaning": "အလုပ်မှအနားယူခြင်း"
+              "word": "幼児",
+              "reading": "ようじ",
+              "meaning": "ကလေးငယ် / Toddler"
+            },
+            {
+              "word": "乳児",
+              "reading": "にゅうじ",
+              "meaning": "နှို့စို့ကလေး"
             }
           ]
         },
         {
-          "character": "勉",
-          "onyomi": "ベン",
+          "character": "童",
+          "onyomi": "ドウ",
+          "kunyomi": "わらべ",
+          "meaning": "ကလေး",
+          "vocab": [
+            {
+              "word": "童",
+              "reading": "わらべ",
+              "meaning": "ကလေး"
+            },
+            {
+              "word": "童歌",
+              "reading": "わらべうた",
+              "meaning": "ကလေးချော့သီချင်း"
+            },
+            {
+              "word": "童話",
+              "reading": "どうわ",
+              "meaning": "ကလေးပုံပြင်"
+            },
+            {
+              "word": "児童",
+              "reading": "じどう",
+              "meaning": "ကလေးများ"
+            },
+            {
+              "word": "児童会長",
+              "reading": "じどうかいちょう",
+              "meaning": "ကလေးဥက္ကဋ္ဌ"
+            },
+            {
+              "word": "童心",
+              "reading": "どうしん",
+              "meaning": "ကလေးစိတ်"
+            }
+          ]
+        },
+        {
+          "character": "徒",
+          "onyomi": "ト",
           "kunyomi": "",
-          "meaning": "ကြိုးစားအားထုတ်သည်",
+          "meaning": "တပည့် / ဂျူနီယာ",
           "vocab": [
             {
-              "word": "勉強",
-              "reading": "べんきょう",
-              "meaning": "စာလေ့လာခြင်း"
+              "word": "生徒",
+              "reading": "せいと",
+              "meaning": "တပည့် / ကျောင်းသား"
             },
             {
-              "word": "勤勉な",
-              "reading": "きんべんな",
-              "meaning": "ကြိုးစားအားထုတ်သော"
+              "word": "教徒",
+              "reading": "きょうと",
+              "meaning": "ယုံကြည်ဆည်းကပ်သူများ"
+            },
+            {
+              "word": "徒労",
+              "reading": "とろう",
+              "meaning": "အလဟဿ အားထုတ်မှု"
+            },
+            {
+              "word": "徒歩で",
+              "reading": "とほで",
+              "meaning": "ခြေလျင်လမ်းလျှောက်၍"
             }
           ]
         },
         {
-          "character": "習",
-          "onyomi": "シュウ",
-          "kunyomi": "なら・う",
-          "meaning": "သင်ယူသည်၊ အလေ့အထ",
+          "character": "担",
+          "onyomi": "タン",
+          "kunyomi": "かつ・ぐ、にな・う",
+          "meaning": "ထမ်းဆောင် / တာဝန်ယူခြင်း",
           "vocab": [
             {
-              "word": "習う",
-              "reading": "ならう",
-              "meaning": "သင်ယူသည်"
+              "word": "担当",
+              "reading": "たんとう",
+              "meaning": "တာဝန်ယူခြင်း"
             },
             {
-              "word": "練習",
-              "reading": "れんしゅう",
-              "meaning": "လေ့ကျင့်ခြင်း"
+              "word": "担ぐ",
+              "reading": "かつぐ",
+              "meaning": "ထမ်းသည်"
             },
             {
-              "word": "習慣",
-              "reading": "しゅうかん",
-              "meaning": "အလေ့အထ"
+              "word": "担う",
+              "reading": "になう",
+              "meaning": "ထမ်းဆောင်သည်"
             },
             {
-              "word": "学習",
-              "reading": "がくしゅう",
-              "meaning": "သင်ယူလေ့လာခြင်း"
+              "word": "負担",
+              "reading": "ふたん",
+              "meaning": "ဝန်ထုပ်ဝန်ပိုး"
             }
           ]
         },
         {
-          "character": "業",
-          "onyomi": "ギョウ",
-          "kunyomi": "",
-          "meaning": "လုပ်ငန်း၊ စာသင်ချိန်",
+          "character": "任",
+          "onyomi": "ニン",
+          "kunyomi": "まか・せる",
+          "meaning": "တာဝန်လွှဲအပ်ခြင်း",
           "vocab": [
             {
-              "word": "授業",
-              "reading": "じゅぎょう",
-              "meaning": "စာသင်ချိန်"
+              "word": "任せる",
+              "reading": "まかせる",
+              "meaning": "တာဝန်လွှဲအပ်သည်"
             },
             {
-              "word": "卒業",
-              "reading": "そつぎょう",
-              "meaning": "ကျောင်းဆင်းခြင်း"
+              "word": "責任",
+              "reading": "せきにん",
+              "meaning": "တာဝန်ယူမှု"
             },
             {
-              "word": "産業",
-              "reading": "さんぎょう",
-              "meaning": "စက်မှုလက်မှု"
+              "word": "任命する",
+              "reading": "にんめいする",
+              "meaning": "ခန့်အပ်သည်"
             },
             {
-              "word": "商業",
-              "reading": "しょうぎょう",
-              "meaning": "ကုန်သွယ်ရေး"
-            }
-          ]
-        },
-        {
-          "character": "授",
-          "onyomi": "ジュ",
-          "kunyomi": "さず・ける",
-          "meaning": "သင်ကြားသည်၊ ချီးမြှင့်သည်",
-          "vocab": [
-            {
-              "word": "授業",
-              "reading": "じゅぎょう",
-              "meaning": "စာသင်ချိန်"
-            },
-            {
-              "word": "教授",
-              "reading": "きょうじゅ",
-              "meaning": "ပါမောက္ခ"
-            },
-            {
-              "word": "授与する",
-              "reading": "じゅよする",
-              "meaning": "ပေးအပ်ချီးမြှင့်သည်"
-            }
-          ]
-        },
-        {
-          "character": "書",
-          "onyomi": "ショ",
-          "kunyomi": "か・く",
-          "meaning": "စာရေးသည်၊ စာအုပ်",
-          "vocab": [
-            {
-              "word": "書く",
-              "reading": "かく",
-              "meaning": "စာရေးသည်"
-            },
-            {
-              "word": "書道",
-              "reading": "しょどう",
-              "meaning": "လက်ရေးလှ / ကယ်လီဂရပ်ဖီ"
-            },
-            {
-              "word": "図書館",
-              "reading": "としょかん",
-              "meaning": "စာကြည့်တိုက်"
-            },
-            {
-              "word": "辞書",
-              "reading": "じしょ",
-              "meaning": "အဘိဓာန်"
-            }
-          ]
-        },
-        {
-          "character": "読",
-          "onyomi": "ドク、トウ",
-          "kunyomi": "よ・む",
-          "meaning": "စာဖတ်သည်",
-          "vocab": [
-            {
-              "word": "読む",
-              "reading": "よむ",
-              "meaning": "စာဖတ်သည်"
-            },
-            {
-              "word": "読書",
-              "reading": "どくしょ",
-              "meaning": "စာဖတ်ခြင်း"
-            },
-            {
-              "word": "句読点",
-              "reading": "くとうてん",
-              "meaning": "ပုဒ်ဖြတ်ပုဒ်ရပ်"
-            }
-          ]
-        },
-        {
-          "character": "文",
-          "onyomi": "ブン、モン",
-          "kunyomi": "ふみ",
-          "meaning": "စာပေ၊ ယဉ်ကျေးမှု",
-          "vocab": [
-            {
-              "word": "文化",
-              "reading": "ぶんか",
-              "meaning": "ယဉ်ကျေးမှု"
-            },
-            {
-              "word": "文学",
-              "reading": "ぶんがく",
-              "meaning": "စာပေ"
-            },
-            {
-              "word": "注文",
-              "reading": "ちゅうもん",
-              "meaning": "မှာယူခြင်း"
-            },
-            {
-              "word": "文言",
-              "reading": "ぶんげん",
-              "meaning": "စာသား"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "chapter": 11,
-      "title": "Ch.11: 授業 (စာသင်ကြားခြင်း)",
-      "kanjis": [
-        {
-          "character": "授",
-          "onyomi": "ジュ",
-          "kunyomi": "さず・かる",
-          "meaning": "ပေးအပ်သည်၊ ချီးမြှင့်သည်",
-          "vocab": [
-            {
-              "word": "授業",
-              "reading": "じゅぎょう",
-              "meaning": "စာသင်ချိန်"
-            },
-            {
-              "word": "教授",
-              "reading": "きょうじゅ",
-              "meaning": "ပါမောက္ခ"
-            },
-            {
-              "word": "授かる",
-              "reading": "さずかる",
-              "meaning": "ဆုပေးအပ်ခြင်းခံရသည်"
-            }
-          ]
-        },
-        {
-          "character": "業",
-          "onyomi": "ギョウ、ゴウ",
-          "kunyomi": "わざ",
-          "meaning": "လုပ်ငန်း၊ အလုပ်အကိုင်",
-          "vocab": [
-            {
-              "word": "卒業",
-              "reading": "そつぎょう",
-              "meaning": "ကျောင်းဆင်းခြင်း"
-            },
-            {
-              "word": "産業",
-              "reading": "さんぎょう",
-              "meaning": "စက်မှုလက်မှုလုပ်ငန်း"
-            },
-            {
-              "word": "作業",
-              "reading": "さぎょう",
-              "meaning": "အလုပ်လုပ်ဆောင်ခြင်း"
-            }
-          ]
-        },
-        {
-          "character": "術",
-          "onyomi": "ジュツ",
-          "kunyomi": "",
-          "meaning": "အတတ်ပညာ၊ နည်းပညာ",
-          "vocab": [
-            {
-              "word": "技術",
-              "reading": "ぎじゅつ",
-              "meaning": "နည်းပညာ"
-            },
-            {
-              "word": "手術",
-              "reading": "しゅじゅつ",
-              "meaning": "ခွဲစိတ်ကုသခြင်း"
-            },
-            {
-              "word": "美術",
-              "reading": "びじゅつ",
-              "meaning": "အနုပညာ"
-            }
-          ]
-        },
-        {
-          "character": "医",
-          "onyomi": "イ",
-          "kunyomi": "",
-          "meaning": "ဆေးပညာ၊ ဆရာဝန်",
-          "vocab": [
-            {
-              "word": "医師",
-              "reading": "いし",
-              "meaning": "ဆရာဝန်"
-            },
-            {
-              "word": "医学",
-              "reading": "いがく",
-              "meaning": "ဆေးပညာ"
-            },
-            {
-              "word": "医院",
-              "reading": "いいん",
-              "meaning": "ဆေးခန်း"
+              "word": "辞任する",
+              "reading": "じにんする",
+              "meaning": "နှုတ်ထွက်သည်"
             }
           ]
         },
@@ -4421,357 +4302,847 @@
           "character": "師",
           "onyomi": "シ",
           "kunyomi": "",
-          "meaning": "ဆရာ၊ ကျွမ်းကျင်သူ",
+          "meaning": "ဆရာ / အထူးကု",
           "vocab": [
             {
-              "word": "看護師",
-              "reading": "かんごし",
-              "meaning": "သူနာပြု"
+              "word": "教師",
+              "reading": "きょうし",
+              "meaning": "ကျောင်းဆရာ / နည်းပြ"
             },
             {
-              "word": "講師",
-              "reading": "こうし",
-              "meaning": "နည်းပြကထိက"
+              "word": "医師",
+              "reading": "いし",
+              "meaning": "ဆရာဝန်"
             },
             {
-              "word": "師匠",
-              "reading": "ししょう",
-              "meaning": "ဆရာကြီး"
+              "word": "恩師",
+              "reading": "おんし",
+              "meaning": "ကျေးဇူးရှင်ဆရာ"
+            },
+            {
+              "word": "調理師",
+              "reading": "ちょうりし",
+              "meaning": "လိုင်စင်ရစားဖိုမှူး"
+            },
+            {
+              "word": "師走",
+              "reading": "しわす",
+              "meaning": "၁၂ လပိုင်း (ဒီဇင်ဘာလ)"
             }
           ]
         },
         {
-          "character": "練",
-          "onyomi": "レン",
-          "kunyomi": "ね・る",
-          "meaning": "လေ့ကျင့်သည်၊ နယ်သည်",
+          "character": "組",
+          "onyomi": "ソ",
+          "kunyomi": "くみ、く・む",
+          "meaning": "အဖွဲ့ / စုစည်းခြင်း",
           "vocab": [
             {
-              "word": "練習",
-              "reading": "れんしゅう",
-              "meaning": "လေ့ကျင့်ခြင်း"
+              "word": "組",
+              "reading": "くみ",
+              "meaning": "အတန်း / အဖွဲ့"
             },
             {
-              "word": "訓練",
-              "reading": "くんれん",
-              "meaning": "လေ့ကျင့်သင်ကြားခြင်း"
+              "word": "番組",
+              "reading": "ばんぐみ",
+              "meaning": "တီဗီအစီအစဉ်"
             },
             {
-              "word": "練る",
-              "reading": "ねる",
-              "meaning": "နယ်သည်ကြံစည်သည်"
+              "word": "組み合わせる",
+              "reading": "くみあわせる",
+              "meaning": "ပေါင်းစပ်သည်"
+            },
+            {
+              "word": "組織",
+              "reading": "そしき",
+              "meaning": "အဖွဲ့အစည်း"
             }
           ]
         },
         {
-          "character": "習",
-          "onyomi": "シュウ",
-          "kunyomi": "なら・う",
-          "meaning": "သင်ယူသည်၊ အလေ့အကျင့်",
+          "character": "机",
+          "onyomi": "キ",
+          "kunyomi": "つくえ",
+          "meaning": "စာရေးစားပွဲ",
           "vocab": [
             {
-              "word": "習う",
-              "reading": "ならう",
-              "meaning": "သင်ယူသည်"
+              "word": "机",
+              "reading": "つくえ",
+              "meaning": "စားပွဲခုံ"
             },
             {
-              "word": "習慣",
-              "reading": "しゅうかん",
-              "meaning": "အလေ့အကျင့်"
+              "word": "学習机",
+              "reading": "がくしゅうづくえ",
+              "meaning": "စာရေးစားပွဲ"
             },
             {
-              "word": "予習",
-              "reading": "よしゅう",
-              "meaning": "ကြိုတင်လေ့လာခြင်း"
+              "word": "机上",
+              "reading": "きじょう",
+              "meaning": "စားပွဲပေါ်တွင် / လက်တွေ့မပါသေးသော"
             }
           ]
         },
         {
-          "character": "復",
-          "onyomi": "フク",
+          "character": "座",
+          "onyomi": "ザ",
+          "kunyomi": "すわ・る",
+          "meaning": "ထိုင်ခြင်း / ထိုင်ခုံ",
+          "vocab": [
+            {
+              "word": "座る",
+              "reading": "すわる",
+              "meaning": "ထိုင်သည်"
+            },
+            {
+              "word": "正座",
+              "reading": "せいざ",
+              "meaning": "ဒူးတုပ်ထိုင်ခြင်း"
+            },
+            {
+              "word": "星座",
+              "reading": "せいざ",
+              "meaning": "ရာသီခွင်"
+            },
+            {
+              "word": "座席",
+              "reading": "ざせき",
+              "meaning": "ထိုင်ခုံ"
+            }
+          ]
+        },
+        {
+          "character": "板",
+          "onyomi": "ハン / バン",
+          "kunyomi": "いた",
+          "meaning": "ပျဉ်ပြား / သင်ပုန်း",
+          "vocab": [
+            {
+              "word": "板",
+              "reading": "いた",
+              "meaning": "ပျဉ်ပြား"
+            },
+            {
+              "word": "黒板",
+              "reading": "こくばん",
+              "meaning": "ကျောက်သင်ပုန်း"
+            },
+            {
+              "word": "まな板",
+              "reading": "まないた",
+              "meaning": "စဉ်းတီတုံး"
+            },
+            {
+              "word": "板前",
+              "reading": "いたまえ",
+              "meaning": "ဂျပန်စားဖိုမှူး"
+            },
+            {
+              "word": "板書",
+              "reading": "ばんしょ",
+              "meaning": "သင်ပုန်းပေါ်ရေးသားချက်"
+            }
+          ]
+        },
+        {
+          "character": "筆",
+          "onyomi": "ヒツ",
+          "kunyomi": "ふで",
+          "meaning": "ရေးသားခြင်း / စုတ်တံ",
+          "vocab": [
+            {
+              "word": "筆",
+              "reading": "ふで",
+              "meaning": "စုတ်တံ"
+            },
+            {
+              "word": "鉛筆",
+              "reading": "えんぴつ",
+              "meaning": "ခဲတံ"
+            },
+            {
+              "word": "万年筆",
+              "reading": "まんねんひつ",
+              "meaning": "ဖောင်တိန်"
+            },
+            {
+              "word": "筆者",
+              "reading": "ひっしゃ",
+              "meaning": "စာရေးသူ"
+            },
+            {
+              "word": "筆記試験",
+              "reading": "ひっきしけん",
+              "meaning": "ရေးဖြေစာမေးပွဲ"
+            }
+          ]
+        },
+        {
+          "character": "貸",
+          "onyomi": "タイ",
+          "kunyomi": "か・す",
+          "meaning": "ငှားပေးခြင်း",
+          "vocab": [
+            {
+              "word": "貸す",
+              "reading": "かす",
+              "meaning": "ငှားပေးသည်"
+            },
+            {
+              "word": "貸会議室",
+              "reading": "しかいぎしつ",
+              "meaning": "အငှားအစည်းအဝေးခန်း"
+            },
+            {
+              "word": "貸借",
+              "reading": "たいしゃく",
+              "meaning": "ချေးငှားခြင်း"
+            },
+            {
+              "word": "貸切る",
+              "reading": "かしきる",
+              "meaning": "အပြတ်ငှားသည်"
+            }
+          ]
+        },
+        {
+          "character": "借",
+          "onyomi": "シャク",
+          "kunyomi": "か・りる",
+          "meaning": "ငှားယူခြင်း",
+          "vocab": [
+            {
+              "word": "借りる",
+              "reading": "かりる",
+              "meaning": "ငှားယူသည်"
+            },
+            {
+              "word": "借金",
+              "reading": "しゃっきん",
+              "meaning": "ချေးငွေ / ကြွေးမြီ"
+            },
+            {
+              "word": "借地",
+              "reading": "しゃくち",
+              "meaning": "မြေငှား"
+            }
+          ]
+        },
+        {
+          "character": "返",
+          "onyomi": "ハン",
+          "kunyomi": "かえ・る、かえ・す",
+          "meaning": "ပြန်ပေး / အကြောင်းပြန်ခြင်း",
+          "vocab": [
+            {
+              "word": "返す",
+              "reading": "かえす",
+              "meaning": "ပြန်ပေးသည်"
+            },
+            {
+              "word": "返信",
+              "reading": "へんしん",
+              "meaning": "အကြောင်းပြန်စာ"
+            },
+            {
+              "word": "振り返る",
+              "reading": "ふりかえる",
+              "meaning": "နောက်ပြန်လှည့်ကြည့်သည်"
+            },
+            {
+              "word": "繰り返す",
+              "reading": "くりかえす",
+              "meaning": "ထပ်မံလုပ်ဆောင်သည်"
+            },
+            {
+              "word": "返事",
+              "reading": "へんじ",
+              "meaning": "အကြောင်းပြန်ခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "冊",
+          "onyomi": "サツ / サク",
           "kunyomi": "",
-          "meaning": "ပြန်လည်ဖြစ်ပေါ်သည်၊ ပြန်လေ့ကျင့်သည်",
+          "meaning": "စာအုပ်ရေတွက်ခြင်း",
           "vocab": [
             {
-              "word": "復習",
-              "reading": "ふくしゅう",
-              "meaning": "ပြန်လည်လေ့ကျင့်ခြင်း"
+              "word": "冊",
+              "reading": "さつ",
+              "meaning": "အုပ် (စာအုပ်ရေတွက်ရန်)"
             },
             {
-              "word": "回復",
-              "reading": "かいふく",
-              "meaning": "ပြန်လည်ကောင်းမွန်ခြင်း"
+              "word": "三冊",
+              "reading": "さんさつ",
+              "meaning": "သုံးအုပ်"
             },
             {
-              "word": "復旧",
-              "reading": "ふっきゅう",
-              "meaning": "ပြန်လည်ပြုပြင်ခြင်း"
+              "word": "別冊",
+              "reading": "べっさつ",
+              "meaning": "သီးခြားဖြည့်စွက်ချက်"
+            },
+            {
+              "word": "小冊子",
+              "reading": "しょうさっし",
+              "meaning": "ကြော်ငြာစာရွက် / Pamphlet"
             }
           ]
         },
         {
-          "character": "勉",
-          "onyomi": "ベン",
+          "character": "具",
+          "onyomi": "グ",
+          "kunyomi": "",
+          "meaning": "ပစ္စည်းကိရိယာ",
+          "vocab": [
+            {
+              "word": "道具",
+              "reading": "どうぐ",
+              "meaning": "ပစ္စည်းကိရိယာများ"
+            },
+            {
+              "word": "文具店",
+              "reading": "ぶんぐてん",
+              "meaning": "စာရေးကိရိယာဆိုင်"
+            },
+            {
+              "word": "具体例",
+              "reading": "ぐたいれい",
+              "meaning": "ခိုင်မာသောဥပမာ"
+            },
+            {
+              "word": "家具",
+              "reading": "かぐ",
+              "meaning": "ပရိဘောဂ"
+            },
+            {
+              "word": "遊具",
+              "reading": "ゆうぐ",
+              "meaning": "ကစားကွင်းပစ္စည်းများ"
+            }
+          ]
+        },
+        {
+          "character": "箱",
+          "onyomi": "ソウ",
+          "kunyomi": "はこ",
+          "meaning": "သေတ္တာ / ဗူး",
+          "vocab": [
+            {
+              "word": "箱",
+              "reading": "はこ",
+              "meaning": "ဗူး / သေတ္တာ"
+            },
+            {
+              "word": "ゴミ箱",
+              "reading": "ごみばこ",
+              "meaning": "အမှိုက်ပုံး"
+            },
+            {
+              "word": "本箱",
+              "reading": "ほんばこ",
+              "meaning": "စာအုပ်စင်"
+            }
+          ]
+        },
+        {
+          "character": "棒",
+          "onyomi": "ボウ",
+          "kunyomi": "",
+          "meaning": "တုတ်တိုင်",
+          "vocab": [
+            {
+              "word": "棒",
+              "reading": "ぼう",
+              "meaning": "တုတ်တိုင်"
+            },
+            {
+              "word": "鉄棒",
+              "reading": "てつぼう",
+              "meaning": "သံတိုင်"
+            },
+            {
+              "word": "泥棒",
+              "reading": "どろぼう",
+              "meaning": "သူခိုး"
+            }
+          ]
+        },
+        {
+          "character": "伸",
+          "onyomi": "シン",
+          "kunyomi": "の・びる、の・ばす",
+          "meaning": "ဆန့်ထုတ် / ရှည်ထွက်ခြင်း",
+          "vocab": [
+            {
+              "word": "伸びる",
+              "reading": "のびる",
+              "meaning": "ရှည်ထွက်သည်"
+            },
+            {
+              "word": "伸ばす",
+              "reading": "のばす",
+              "meaning": "ဆွဲဆန့်သည်"
+            },
+            {
+              "word": "屈伸",
+              "reading": "くっしん",
+              "meaning": "အကြောဆန့်ခြင်း"
+            },
+            {
+              "word": "伸びをする",
+              "reading": "のびをする",
+              "meaning": "အကြောဆန့်သည်"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 11,
+      "title": "Ch.11: 期待・将来 (မျှော်လင့်ချက်နှင့် အနာဂတ်)",
+      "kanjis": [
+        {
+          "character": "望",
+          "onyomi": "ボウ 、モウ",
+          "kunyomi": "のぞ・む",
+          "meaning": "မျှော်လင့်ခြင်း",
+          "vocab": [
+            {
+              "word": "希望",
+              "reading": "きぼう",
+              "meaning": "မျှော်လင့်ချက်"
+            },
+            {
+              "word": "望む",
+              "reading": "のぞむ",
+              "meaning": "မျှော်လင့်သည်"
+            },
+            {
+              "word": "失望する",
+              "reading": "しつぼうする",
+              "meaning": "စိတ်ပျက်သည်"
+            },
+            {
+              "word": "願望",
+              "reading": "がんぼう",
+              "meaning": "ဆန္ဒ / မျှော်လင့်ချက်"
+            }
+          ]
+        },
+        {
+          "character": "希",
+          "onyomi": "キ",
+          "kunyomi": "まれ",
+          "meaning": "မျှော်လင့်/ရှားပါးခြင်း",
+          "vocab": [
+            {
+              "word": "希望",
+              "reading": "きぼう",
+              "meaning": "မျှော်လင့်ချက်"
+            },
+            {
+              "word": "希少な",
+              "reading": "きしょうな",
+              "meaning": "ရှားပါးသော"
+            }
+          ]
+        },
+        {
+          "character": "待",
+          "onyomi": "タイ",
+          "kunyomi": "ま・つ",
+          "meaning": "စောင့်ဆိုင်း/မျှော်လင့်ခြင်း",
+          "vocab": [
+            {
+              "word": "待つ",
+              "reading": "まつ",
+              "meaning": "စောင့်သည်"
+            },
+            {
+              "word": "期待する",
+              "reading": "きたいする",
+              "meaning": "မျှော်လင့်သည်"
+            },
+            {
+              "word": "招待する",
+              "reading": "しょうたいする",
+              "meaning": "ဖိတ်ကြားသည်"
+            },
+            {
+              "word": "待合室",
+              "reading": "まちあいしつ",
+              "meaning": "စောင့်ဆိုင်းခန်း"
+            }
+          ]
+        },
+        {
+          "character": "祈",
+          "onyomi": "キ",
+          "kunyomi": "いの・る",
+          "meaning": "ဆုတောင်းခြင်း",
+          "vocab": [
+            {
+              "word": "祈る",
+              "reading": "いのる",
+              "meaning": "ဆုတောင်းသည်"
+            },
+            {
+              "word": "祈願",
+              "reading": "きがん",
+              "meaning": "ဆုတောင်းပတ္ထနာ"
+            },
+            {
+              "word": "祈祷",
+              "reading": "きとう",
+              "meaning": "ဆုတောင်းမေတ္တာပို့ခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "願",
+          "onyomi": "ガン",
+          "kunyomi": "ねが・う",
+          "meaning": "တောင်းဆို/ဆုတောင်းခြင်း",
+          "vocab": [
+            {
+              "word": "願う",
+              "reading": "ねがう",
+              "meaning": "ဆုတောင်းသည်"
+            },
+            {
+              "word": "願書",
+              "reading": "がんしょ",
+              "meaning": "လျှောက်လွှာ"
+            },
+            {
+              "word": "願い",
+              "reading": "ねがい",
+              "meaning": "ဆုတောင်း / တောင်းဆိုချက်"
+            }
+          ]
+        },
+        {
+          "character": "夢",
+          "onyomi": "ム",
+          "kunyomi": "ゆめ",
+          "meaning": "အိပ်မက်/စိတ်ကူး",
+          "vocab": [
+            {
+              "word": "夢",
+              "reading": "ゆめ",
+              "meaning": "အိပ်မက်"
+            },
+            {
+              "word": "夢中",
+              "reading": "むちゅう",
+              "meaning": "စိတ်လွတ်ကိုယ်လွတ် စွဲလမ်းခြင်း"
+            },
+            {
+              "word": "悪夢",
+              "reading": "あくむ",
+              "meaning": "အိပ်မက်ဆိုး"
+            }
+          ]
+        },
+        {
+          "character": "将",
+          "onyomi": "ショウ",
+          "kunyomi": "",
+          "meaning": "အနာဂတ်/ခေါင်းဆောင်",
+          "vocab": [
+            {
+              "word": "将来",
+              "reading": "しょうらい",
+              "meaning": "အနာဂတ်"
+            },
+            {
+              "word": "将軍",
+              "reading": "しょうぐん",
+              "meaning": "စစ်သူကြီး"
+            }
+          ]
+        },
+        {
+          "character": "来",
+          "onyomi": "ライ",
+          "kunyomi": "く・る 、き・たる",
+          "meaning": "လာခြင်း/အနာဂတ်",
+          "vocab": [
+            {
+              "word": "未来",
+              "reading": "みらい",
+              "meaning": "အနာဂတ်"
+            },
+            {
+              "word": "来年",
+              "reading": "らいねん",
+              "meaning": "နောက်နှစ်"
+            },
+            {
+              "word": "来世",
+              "reading": "らいせ",
+              "meaning": "နောင်ဘဝ"
+            }
+          ]
+        },
+        {
+          "character": "進",
+          "onyomi": "シン",
+          "kunyomi": "すす・む 、すす・める",
+          "meaning": "ရှေ့သို့တိုးခြင်း",
+          "vocab": [
+            {
+              "word": "進む",
+              "reading": "すすむ",
+              "meaning": "ရှေ့သို့တိုးသည်"
+            },
+            {
+              "word": "進路",
+              "reading": "しんろ",
+              "meaning": "ရှေ့ဆက်မည့်လမ်းကြောင်း"
+            },
+            {
+              "word": "進学する",
+              "reading": "しんがくする",
+              "meaning": "အထက်တန်း/တက္ကသိုလ် ဆက်တက်သည်"
+            }
+          ]
+        },
+        {
+          "character": "路",
+          "onyomi": "ロ",
+          "kunyomi": "じ",
+          "meaning": "လမ်းကြောင်း",
+          "vocab": [
+            {
+              "word": "進路",
+              "reading": "しんろ",
+              "meaning": "ရှေ့ဆက်မည့်လမ်းကြောင်း"
+            },
+            {
+              "word": "道路",
+              "reading": "どうろ",
+              "meaning": "ကားလမ်း"
+            },
+            {
+              "word": "線路",
+              "reading": "せんろ",
+              "meaning": "ရထားလမ်း"
+            }
+          ]
+        },
+        {
+          "character": "志",
+          "onyomi": "シ",
+          "kunyomi": "こころざ・す 、こころざし",
+          "meaning": "ရည်မှန်းချက်/စိတ်ဆန္ဒ",
+          "vocab": [
+            {
+              "word": "志す",
+              "reading": "こころざす",
+              "meaning": "ရည်မှန်းသည်"
+            },
+            {
+              "word": "意志",
+              "reading": "いし",
+              "meaning": "စိတ်ဆန္ဒ / စိတ်ဓာတ်"
+            },
+            {
+              "word": "志望する",
+              "reading": "しぼうする",
+              "meaning": "လျှောက်ထားရည်မှန်းသည်"
+            }
+          ]
+        },
+        {
+          "character": "目",
+          "onyomi": "モク 、ボク",
+          "kunyomi": "め",
+          "meaning": "မျက်စိ/ပန်းတိုင်",
+          "vocab": [
+            {
+              "word": "目標",
+              "reading": "もくひょう",
+              "meaning": "ပန်းတိုင် / ရည်မှန်းချက်"
+            },
+            {
+              "word": "目的",
+              "reading": "もくてき",
+              "meaning": "ရည်ရွယ်ချက်"
+            },
+            {
+              "word": "目立つ",
+              "reading": "めだつ",
+              "meaning": "ထင်ရှားပေါ်လွင်သည်"
+            }
+          ]
+        },
+        {
+          "character": "標",
+          "onyomi": "ヒョウ",
+          "kunyomi": "",
+          "meaning": "အမှတ်အသား/ပန်းတိုင်",
+          "vocab": [
+            {
+              "word": "目標",
+              "reading": "もくひょう",
+              "meaning": "ပန်းတိုင် / ရည်မှန်းချက်"
+            },
+            {
+              "word": "標識",
+              "reading": "ひょうしき",
+              "meaning": "လမ်းညွှန်ဆိုင်းဘုတ်"
+            },
+            {
+              "word": "標準",
+              "reading": "ひょうじゅん",
+              "meaning": "စံနှုန်း"
+            }
+          ]
+        },
+        {
+          "character": "達",
+          "onyomi": "タツ",
+          "kunyomi": "",
+          "meaning": "ရောက်ရှိ/ပြည့်မြောက်ခြင်း",
+          "vocab": [
+            {
+              "word": "達成する",
+              "reading": "たっせいする",
+              "meaning": "ပြည့်မြောက်အောင်မြင်သည်"
+            },
+            {
+              "word": "発達する",
+              "reading": "はったつする",
+              "meaning": "ဖွံ့ဖြိုးတိုးတက်သည်"
+            },
+            {
+              "word": "上達する",
+              "reading": "じょうたつする",
+              "meaning": "တိုးတက်ကောင်းမွန်လာသည်"
+            }
+          ]
+        },
+        {
+          "character": "成",
+          "onyomi": "セイ 、ジョウ",
+          "kunyomi": "な・る 、な・す",
+          "meaning": "ဖြစ်မြောက်/အောင်မြင်ခြင်း",
+          "vocab": [
+            {
+              "word": "成功する",
+              "reading": "せいこうする",
+              "meaning": "အောင်မြင်သည်"
+            },
+            {
+              "word": "完成する",
+              "reading": "かんせいする",
+              "meaning": "ပြီးစီးအောင်မြင်သည်"
+            },
+            {
+              "word": "成長する",
+              "reading": "せいちょうする",
+              "meaning": "ကြီးပြင်းတိုးတက်သည်"
+            }
+          ]
+        },
+        {
+          "character": "挑",
+          "onyomi": "チョウ",
+          "kunyomi": "いど・む",
+          "meaning": "စိန်ခေါ်ခြင်း",
+          "vocab": [
+            {
+              "word": "挑戦する",
+              "reading": "ちょうせんする",
+              "meaning": "စိန်ခေါ်သည် / စမ်းသပ်လုပ်ဆောင်သည်"
+            },
+            {
+              "word": "挑む",
+              "reading": "いどむ",
+              "meaning": "စိန်ခေါ်သည်"
+            }
+          ]
+        },
+        {
+          "character": "戦",
+          "onyomi": "セン",
+          "kunyomi": "たたか・う",
+          "meaning": "တိုက်ခိုက်/ပြိုင်ဆိုင်ခြင်း",
+          "vocab": [
+            {
+              "word": "挑戦",
+              "reading": "ちょうせん",
+              "meaning": "စိန်ခေါ်မှု"
+            },
+            {
+              "word": "戦う",
+              "reading": "たたかう",
+              "meaning": "တိုက်ခိုက်ပြိုင်ဆိုင်သည်"
+            },
+            {
+              "word": "戦勝",
+              "reading": "せんしょう",
+              "meaning": "စစ်နိုင်ခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "努",
+          "onyomi": "ド",
           "kunyomi": "つと・める",
-          "meaning": "ကြိုးစားအားထုတ်သည်",
+          "meaning": "ကြိုးစားခြင်း",
           "vocab": [
             {
-              "word": "勉強",
-              "reading": "べんきょう",
-              "meaning": "စာကြည့်ခြင်း"
+              "word": "努力する",
+              "reading": "どりょくする",
+              "meaning": "ကြိုးစားအားထုတ်သည်"
             },
             {
-              "word": "勤勉な",
-              "reading": "きんべんな",
-              "meaning": "ကြိုးစားအားထုတ်သော"
+              "word": "努める",
+              "reading": "つとめる",
+              "meaning": "ကြိုးပမ်းသည်"
             }
           ]
         },
         {
-          "character": "強",
-          "onyomi": "キョウ、ゴウ",
-          "kunyomi": "つよ・い、つよ・まる",
-          "meaning": "သန်မာသော၊ အားကောင်းသော",
+          "character": "力",
+          "onyomi": "リョク 、リキ",
+          "kunyomi": "ちから",
+          "meaning": "ခွန်အား/အရည်အချင်း",
           "vocab": [
             {
-              "word": "強い",
-              "reading": "つよい",
-              "meaning": "သန်မာသော"
+              "word": "努力",
+              "reading": "どりょく",
+              "meaning": "ကြိုးစားအားထုတ်မှု"
             },
             {
-              "word": "強調する",
-              "reading": "きょうちょうする",
-              "meaning": "အလေးပေးပြောဆိုသည်"
+              "word": "実力",
+              "reading": "じつりょく",
+              "meaning": "လက်တွေ့အရည်အချင်း"
             },
             {
-              "word": "強引な",
-              "reading": "ごういんな",
-              "meaning": "အတင်းအဓမ္မပြုလုပ်သော"
+              "word": "協力する",
+              "reading": "きょうりょくする",
+              "meaning": "ပူးပေါင်းကူညီသည်"
             }
           ]
         },
         {
-          "character": "題",
-          "onyomi": "ダイ",
-          "kunyomi": "",
-          "meaning": "ခေါင်းစဉ်၊ ပြဿနာ၊ ပုစ္ဆာ",
+          "character": "叶",
+          "onyomi": "キョウ",
+          "kunyomi": "かな・う 、かな・える",
+          "meaning": "ပြည့်ဝ/အောင်မြင်ခြင်း",
           "vocab": [
             {
-              "word": "宿題",
-              "reading": "しゅくだい",
-              "meaning": "အိမ်စာ"
+              "word": "叶う",
+              "reading": "かなう",
+              "meaning": "အကောင်အထည်ပေါ်သည် / ပြည့်ဝသည်"
             },
             {
-              "word": "問題",
-              "reading": "もんだい",
-              "meaning": "မေးခွန်းပြဿနာ"
-            },
-            {
-              "word": "話題",
-              "reading": "わだい",
-              "meaning": "ပြောစရာခေါင်းစဉ်"
-            }
-          ]
-        },
-        {
-          "character": "宿",
-          "onyomi": "シュク",
-          "kunyomi": "やど、やど・る",
-          "meaning": "တည်းခိုသည်၊ အိမ်",
-          "vocab": [
-            {
-              "word": "宿題",
-              "reading": "しゅくだい",
-              "meaning": "အိမ်စာ"
-            },
-            {
-              "word": "宿泊する",
-              "reading": "しゅくはくする",
-              "meaning": "တည်းခိုသည်"
-            },
-            {
-              "word": "宿",
-              "reading": "やど",
-              "meaning": "တည်းခိုခန်း"
-            }
-          ]
-        },
-        {
-          "character": "研",
-          "onyomi": "ケン",
-          "kunyomi": "と・ぐ",
-          "meaning": "လေ့လာဆန်းစစ်သည်၊ သွေးသည်",
-          "vocab": [
-            {
-              "word": "研究",
-              "reading": "けんきゅう",
-              "meaning": "သုတေသန"
-            },
-            {
-              "word": "研修",
-              "reading": "けんしゅう",
-              "meaning": "သင်တန်း"
-            },
-            {
-              "word": "研ぐ",
-              "reading": "とぐ",
-              "meaning": "သွေးသည်ဆေးကြောသည်"
-            }
-          ]
-        },
-        {
-          "character": "究",
-          "onyomi": "キュウ",
-          "kunyomi": "きわ・める",
-          "meaning": "သုတေသနပြုသည်၊ အဆုံးစွန်ရှာဖွေသည်",
-          "vocab": [
-            {
-              "word": "研究",
-              "reading": "けんきゅう",
-              "meaning": "သုတေသန"
-            },
-            {
-              "word": "究極",
-              "reading": "きゅうきょく",
-              "meaning": "အဆုံးစွန်"
-            }
-          ]
-        },
-        {
-          "character": "質",
-          "onyomi": "シツ、シチ",
-          "kunyomi": "",
-          "meaning": "အရည်အသွေး၊ သဘောသဘာဝ၊ မေးခွန်း",
-          "vocab": [
-            {
-              "word": "質問",
-              "reading": "しつもん",
-              "meaning": "မေးခွန်း"
-            },
-            {
-              "word": "性質",
-              "reading": "せいしつ",
-              "meaning": "သဘာဝစရိုက်"
-            },
-            {
-              "word": "画質",
-              "reading": "がしつ",
-              "meaning": "ရုပ်ထွက်အရည်အသွေး"
-            }
-          ]
-        },
-        {
-          "character": "問",
-          "onyomi": "モン",
-          "kunyomi": "と・う",
-          "meaning": "မေးမြန်းသည်၊ မေးခွန်း",
-          "vocab": [
-            {
-              "word": "質問",
-              "reading": "しつもん",
-              "meaning": "မေးခွန်း"
-            },
-            {
-              "word": "問題",
-              "reading": "もんだい",
-              "meaning": "ပြဿနာ"
-            },
-            {
-              "word": "問い合わせ",
-              "reading": "といあわせ",
-              "meaning": "စုံစမ်းမေးမြန်းခြင်း"
-            }
-          ]
-        },
-        {
-          "character": "答",
-          "onyomi": "トウ",
-          "kunyomi": "こた・える",
-          "meaning": "အဖြေ၊ ဖြေဆိုသည်",
-          "vocab": [
-            {
-              "word": "答え",
-              "reading": "こたえ",
-              "meaning": "အဖြေ"
-            },
-            {
-              "word": "回答",
-              "reading": "かいとう",
-              "meaning": "တုံ့ပြန်ချက်"
-            },
-            {
-              "word": "答案",
-              "reading": "とうあん",
-              "meaning": "အဖြေလွှာ"
-            }
-          ]
-        },
-        {
-          "character": "考",
-          "onyomi": "コウ",
-          "kunyomi": "かんが・える",
-          "meaning": "စဉ်းစားသည်၊ အတွေးအခေါ်",
-          "vocab": [
-            {
-              "word": "考える",
-              "reading": "かんがえる",
-              "meaning": "စဉ်းစားသည်"
-            },
-            {
-              "word": "思考",
-              "reading": "しこう",
-              "meaning": "အတွေးအခေါ်"
-            },
-            {
-              "word": "参考",
-              "reading": "さんこう",
-              "meaning": "ကိုးကားချက်"
-            }
-          ]
-        },
-        {
-          "character": "正",
-          "onyomi": "セイ、ショウ",
-          "kunyomi": "ただ・しい、ただ・す",
-          "meaning": "မှန်ကန်သော၊ ဖြောင့်မတ်သော",
-          "vocab": [
-            {
-              "word": "正しい",
-              "reading": "ただしい",
-              "meaning": "မှန်ကန်သော"
-            },
-            {
-              "word": "正解",
-              "reading": "せいかい",
-              "meaning": "မှန်ကန်သောအဖြေ"
-            },
-            {
-              "word": "正直な",
-              "reading": "しょうじきな",
-              "meaning": "ရိုးသားသော"
-            }
-          ]
-        },
-        {
-          "character": "誤",
-          "onyomi": "ゴ",
-          "kunyomi": "あやま・る",
-          "meaning": "မှားယွင်းသည်၊ အမှား",
-          "vocab": [
-            {
-              "word": "誤り",
-              "reading": "あやまり",
-              "meaning": "အမှား"
-            },
-            {
-              "word": "誤解する",
-              "reading": "ごかいする",
-              "meaning": "အထင်လွဲသည်"
-            },
-            {
-              "word": "誤算",
-              "reading": "ごさん",
-              "meaning": "အတွက်မှားခြင်း"
+              "word": "叶える",
+              "reading": "かなえる",
+              "meaning": "အကောင်အထည်ဖော်သည် / ပြည့်ဝစေသည်"
             }
           ]
         }

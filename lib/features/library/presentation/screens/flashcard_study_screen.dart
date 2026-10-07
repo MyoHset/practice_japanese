@@ -24,6 +24,7 @@ class FlashcardStudyScreen extends ConsumerStatefulWidget {
     this.chapterNumber,
     this.chapterNumbers,
     this.questionLimit,
+    this.isRandom = true,
   }) : assert(
           unitId != null || chapterNumber != null || chapterNumbers != null,
           'Either unitId, chapterNumber, or chapterNumbers must be provided',
@@ -35,6 +36,7 @@ class FlashcardStudyScreen extends ConsumerStatefulWidget {
   final int? chapterNumber;
   final List<int>? chapterNumbers;
   final int? questionLimit;
+  final bool isRandom;
 
   @override
   ConsumerState<FlashcardStudyScreen> createState() =>
@@ -43,13 +45,14 @@ class FlashcardStudyScreen extends ConsumerStatefulWidget {
 
 class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final AnimationController _flipController;
   late final Animation<double> _flipAnimation;
 
   int _currentIndex = 0;
   bool _isFlipped = false;
   bool _showReadingHint = false;
-  bool _isShuffled = false;
+  late bool _isShuffled = widget.isRandom;
   bool _isCompleted = false;
 
   int _rememberedCount = 0;
@@ -141,6 +144,127 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
       _activeDeck = null;
       _flipController.reset();
     });
+  }
+
+  Widget _buildCardGrid(BuildContext context, int deckLength, {bool isDrawer = false}) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: List.generate(deckLength, (index) {
+          final isCurrent = index == _currentIndex;
+          return GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              if (_isFlipped) _flipController.reverse();
+              setState(() {
+                _currentIndex = index;
+                _isFlipped = false;
+                _showReadingHint = false;
+              });
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isCurrent
+                    ? AppColors.primary
+                    : AppColors.surface,
+                border: Border.all(
+                  color: isCurrent
+                      ? AppColors.primary
+                      : AppColors.divider,
+                  width: isCurrent ? 2 : 1,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  color: isCurrent ? Colors.white : AppColors.text,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  void _showCardSelector(BuildContext context, int deckLength) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.divider,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Text(
+                'ကတ်ရွေးရန်',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              const Divider(height: 1),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.6,
+                ),
+                child: _buildCardGrid(sheetContext, deckLength),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEndDrawer(BuildContext context, int deckLength) {
+    return Drawer(
+      backgroundColor: AppColors.surface,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Text(
+                'ကတ်ရွေးရန်',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: Builder(
+                builder: (drawerContext) => _buildCardGrid(drawerContext, deckLength, isDrawer: true),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _answerCard(bool remembered) async {
@@ -235,8 +359,22 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
       screenTitle = '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel';
     }
 
+    // Get active deck length early to pass to endDrawer if needed
+    final int activeDeckLength;
+    if (_activeDeck != null) {
+      activeDeckLength = _activeDeck!.length;
+    } else if (itemsAsync.valueOrNull != null) {
+      activeDeckLength = widget.questionLimit != null && widget.questionLimit! > 0 && widget.questionLimit! < itemsAsync.valueOrNull!.length 
+          ? widget.questionLimit! 
+          : itemsAsync.valueOrNull!.length;
+    } else {
+      activeDeckLength = 0;
+    }
+
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      endDrawer: activeDeckLength > 0 ? _buildEndDrawer(context, activeDeckLength) : null,
       appBar: AppBar(
         title: Text(
           screenTitle,
@@ -245,6 +383,19 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
               ),
         ),
         actions: [
+          IconButton(
+            tooltip: 'ကတ်ရွေးရန်',
+            icon: const Icon(Icons.grid_view_rounded, color: AppColors.textSoft),
+            onPressed: () {
+              if (activeDeckLength == 0) return;
+              final isDesktop = MediaQuery.sizeOf(context).width >= 600;
+              if (isDesktop) {
+                _scaffoldKey.currentState?.openEndDrawer();
+              } else {
+                _showCardSelector(context, activeDeckLength);
+              }
+            },
+          ),
           IconButton(
             tooltip:
                 _isShuffled ? AppStrings.orderedDeck : AppStrings.shuffleDeck,

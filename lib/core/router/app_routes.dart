@@ -30,9 +30,16 @@ class AppRoutes {
     ContentKind kind,
     int sourceId,
     int unitId,
-    StudyMode mode,
-  ) =>
-      '/library/${kind.slug}/source/$sourceId/unit/$unitId/${mode.slug}';
+    StudyMode mode, {
+    int? limit,
+    bool isRandom = true,
+  }) {
+    final params = <String>[];
+    if (limit != null) params.add('limit=$limit');
+    if (!isRandom) params.add('isRandom=false');
+    final query = params.isNotEmpty ? '?${params.join('&')}' : '';
+    return '/library/${kind.slug}/source/$sourceId/unit/$unitId/${mode.slug}$query';
+  }
 
   static String chapterStudy(
     ContentKind kind,
@@ -48,6 +55,7 @@ class AppRoutes {
     StudyMode mode, {
     List<int>? chapters,
     int? limit,
+    bool isRandom = true,
   }) {
     final params = <String>[];
     if (chapters != null && chapters.isNotEmpty) {
@@ -55,6 +63,9 @@ class AppRoutes {
     }
     if (limit != null) {
       params.add('limit=$limit');
+    }
+    if (!isRandom) {
+      params.add('isRandom=false');
     }
     final query = params.isNotEmpty ? '?${params.join('&')}' : '';
     return '/library/${kind.slug}/source/$sourceId/practice/${mode.slug}$query';
