@@ -18,43 +18,51 @@ class CategoryGrid extends ConsumerWidget {
     final selectedLevel = ref.watch(selectedLevelProvider);
     final softColor = AppColors.levelSoft(selectedLevel);
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: AppSpacing.md,
-      crossAxisSpacing: AppSpacing.md,
-      childAspectRatio: 1.1,
-      children: [
-        CategoryCard(
-          glyph: ContentKind.kanji.glyph,
-          title: ContentKind.kanji.label,
-          subtitle: AppStrings.categoryKanjiSub,
-          glyphBoxColor: softColor,
-          onTap: () => context.push(AppRoutes.sourceList(ContentKind.kanji)),
-        ),
-        CategoryCard(
-          glyph: ContentKind.vocab.glyph,
-          title: ContentKind.vocab.label,
-          subtitle: AppStrings.categoryVocabSub,
-          glyphBoxColor: softColor,
-          onTap: () => context.push(AppRoutes.sourceList(ContentKind.vocab)),
-        ),
-        CategoryCard(
-          glyph: ContentKind.grammar.glyph,
-          title: ContentKind.grammar.label,
-          subtitle: AppStrings.categoryGrammarSub,
-          glyphBoxColor: softColor,
-          onTap: () => context.push(AppRoutes.sourceList(ContentKind.grammar)),
-        ),
-        CategoryCard(
-          glyph: '問',
-          title: AppStrings.categoryPastExam,
-          subtitle: AppStrings.categoryPastExamSub,
-          glyphBoxColor: softColor,
-          onTap: () => context.push(AppRoutes.pastExam),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth >= 600 ? 4 : 2;
+        // Tweak aspect ratio slightly for larger screens to look balanced
+        final childAspectRatio = constraints.maxWidth >= 600 ? 0.9 : 1.1;
+
+        return GridView.count(
+          crossAxisCount: crossAxisCount,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: AppSpacing.md,
+          crossAxisSpacing: AppSpacing.md,
+          childAspectRatio: childAspectRatio,
+          children: [
+            CategoryCard(
+              glyph: ContentKind.kanji.glyph,
+              title: ContentKind.kanji.label,
+              subtitle: AppStrings.categoryKanjiSub,
+              glyphBoxColor: softColor,
+              onTap: () => context.push(AppRoutes.sourceList(ContentKind.kanji)),
+            ),
+            CategoryCard(
+              glyph: ContentKind.vocab.glyph,
+              title: ContentKind.vocab.label,
+              subtitle: AppStrings.categoryVocabSub,
+              glyphBoxColor: softColor,
+              onTap: () => context.push(AppRoutes.sourceList(ContentKind.vocab)),
+            ),
+            CategoryCard(
+              glyph: ContentKind.grammar.glyph,
+              title: ContentKind.grammar.label,
+              subtitle: AppStrings.categoryGrammarSub,
+              glyphBoxColor: softColor,
+              onTap: () => context.push(AppRoutes.sourceList(ContentKind.grammar)),
+            ),
+            CategoryCard(
+              glyph: '問',
+              title: AppStrings.categoryPastExam,
+              subtitle: AppStrings.categoryPastExamSub,
+              glyphBoxColor: softColor,
+              onTap: () => context.push(AppRoutes.pastExam),
+            ),
+          ],
+        );
+      },
     );
   }
 }
