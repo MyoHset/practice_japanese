@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 33;
+const int _kCurrentDevSeedVersion = 34;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -26,6 +26,7 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
   if (sourceCount > 0) {
     await _ensureTangoLevelN3(db);
     await _updateTangoIfCorrupted(db);
+    await _restoreTango2000VocabItems(db);
     await _ensureSpeedMasterN3Kanji(db, DateTime.now());
     await _ensurePastExam201007(db, DateTime.now());
     await _ensurePastExam201012(db, DateTime.now());
@@ -712,8 +713,14 @@ Future<void> _seedTangoFromJson(AppDatabase db, DateTime now) async {
 /// Automatically updates corrupted/stale Tango 2000 vocabulary meanings and
 /// unit titles in an already seeded database to standard Myanmar Unicode.
 Future<void> _updateTangoIfCorrupted(AppDatabase db) async {
+  final tangoSource = await (db.sources.select()
+        ..where((s) => s.name.equals('Tango 2000')))
+      .getSingleOrNull();
+
+  if (tangoSource == null) return;
+
   final corruptedUnit = await (db.units.select()
-        ..where((u) => u.name.contains('ြိသာားစု'))
+        ..where((u) => u.sourceId.equals(tangoSource.id) & u.name.contains('ြိသာားစု'))
         ..limit(1))
       .getSingleOrNull();
 
@@ -746,7 +753,10 @@ Future<void> _updateTangoIfCorrupted(AppDatabase db) async {
       final secTitle = sec['title'] as String;
       final words = sec['words'] as List<dynamic>;
 
-      await (db.update(db.units)..where((u) => u.orderNo.equals(sIdx + 1)))
+      await (db.update(db.units)
+            ..where((u) =>
+                u.sourceId.equals(tangoSource.id) &
+                u.orderNo.equals(sIdx + 1)))
           .write(UnitsCompanion(name: Value(secTitle)));
 
       for (final w in words) {
@@ -760,6 +770,76 @@ Future<void> _updateTangoIfCorrupted(AppDatabase db) async {
                 (v) => v.word.equals(wordStr) & v.reading.equals(readingStr),
               ))
             .write(VocabulariesCompanion(meaningMy: Value(meaningStr)));
+      }
+    }
+  });
+}
+
+/// Restores Tango 2000 vocabSourceItems if they were dropped during schema migration.
+Future<void> _restoreTango2000VocabItems(AppDatabase db) async {
+  final tangoSource = await (db.sources.select()
+        ..where((s) => s.name.equals('Tango 2000')))
+      .getSingleOrNull();
+
+  if (tangoSource == null) return;
+
+  final itemsCount = await db.vocabSourceItems.count(
+        where: (vsi) => vsi.sourceId.equals(tangoSource.id),
+      ).getSingle();
+
+  if (itemsCount > 0) return; // Data is intact
+
+  String? jsonStr;
+  try {
+    jsonStr = await rootBundle.loadString('assets/data/tango_2000_n3.json');
+  } catch (_) {
+    if (!kIsWeb) {
+      final file = File('assets/data/tango_2000_n3.json');
+      if (file.existsSync()) {
+        jsonStr = await file.readAsString();
+      }
+    }
+  }
+  if (jsonStr == null || jsonStr.isEmpty) return;
+
+  final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+  final sections = data['sections'] as List<dynamic>;
+
+  await db.transaction(() async {
+    for (var sIdx = 0; sIdx < sections.length; sIdx++) {
+      final sec = sections[sIdx] as Map<String, dynamic>;
+      final words = sec['words'] as List<dynamic>;
+
+      final unit = await (db.units.select()
+            ..where((u) =>
+                u.sourceId.equals(tangoSource.id) &
+                u.orderNo.equals(sIdx + 1)))
+          .getSingleOrNull();
+
+      if (unit == null) continue;
+
+      for (var wIdx = 0; wIdx < words.length; wIdx++) {
+        final w = words[wIdx] as Map<String, dynamic>;
+        final wordStr = w['word'] as String;
+        final readingStr = w['reading'] as String;
+
+        final vocab = await (db.vocabularies.select()
+              ..where(
+                  (v) => v.word.equals(wordStr) & v.reading.equals(readingStr))
+              ..limit(1))
+            .getSingleOrNull();
+
+        if (vocab != null) {
+          await db.into(db.vocabSourceItems).insert(
+                VocabSourceItemsCompanion.insert(
+                  vocabId: vocab.id,
+                  sourceId: tangoSource.id,
+                  unitId: Value(unit.id),
+                  position: Value(wIdx + 1),
+                  jlptLevel: const Value('N3'),
+                ),
+              );
+        }
       }
     }
   });
