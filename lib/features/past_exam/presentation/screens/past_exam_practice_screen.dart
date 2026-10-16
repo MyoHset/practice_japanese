@@ -42,6 +42,9 @@ class _PastExamPracticeScreenState
   bool _isCompleted = false;
   bool _isPassageExpanded = true;
 
+  /// When non-null, overrides the provider's questions (e.g. retry-wrong-only).
+  List<PastExamQuestion>? _filteredQuestions;
+
   int get _correctCount => _correctness.values.where((c) => c).length;
   int get _wrongCount => _correctness.values.where((c) => !c).length;
 
@@ -189,6 +192,26 @@ class _PastExamPracticeScreenState
 
   void _restartQuiz() {
     setState(() {
+      _currentIndex = 0;
+      _answers.clear();
+      _correctness.clear();
+      _isCompleted = false;
+      _isPassageExpanded = true;
+      _filteredQuestions = null;
+    });
+  }
+
+  /// Retry only the questions that were answered incorrectly.
+  void _retryWrongOnly(List<PastExamQuestion> allQuestions) {
+    final wrongQuestions = _correctness.entries
+        .where((e) => !e.value)
+        .map((e) => allQuestions[e.key])
+        .toList();
+
+    if (wrongQuestions.isEmpty) return;
+
+    setState(() {
+      _filteredQuestions = wrongQuestions;
       _currentIndex = 0;
       _answers.clear();
       _correctness.clear();
@@ -379,9 +402,10 @@ class _PastExamPracticeScreenState
         value: questionsAsync,
         isEmpty: (questions) => questions.isEmpty,
         emptyMessage: 'ရွေးချယ်ထားသော မေးခွန်းများ ရှာမတွေ့ပါ။',
-        data: (questions) {
+        data: (providerQuestions) {
+          final questions = _filteredQuestions ?? providerQuestions;
           if (_isCompleted) {
-            return _buildCompletionScreen(context, questions.length);
+            return _buildCompletionScreen(context, questions);
           }
           final currentQuestion = questions[_currentIndex];
           return _buildQuizContent(context, currentQuestion, questions.length);
@@ -918,7 +942,8 @@ class _PastExamPracticeScreenState
     );
   }
 
-  Widget _buildCompletionScreen(BuildContext context, int totalQuestions) {
+  Widget _buildCompletionScreen(BuildContext context, List<PastExamQuestion> questions) {
+    final totalQuestions = questions.length;
     final percentage = totalQuestions > 0
         ? ((_correctCount / totalQuestions) * 100).round()
         : 0;
@@ -999,6 +1024,20 @@ class _PastExamPracticeScreenState
                   label: const Text('ပြန်လည်ဖြေဆိုမည် (Retry)'),
                 ),
               ),
+              if (_wrongCount > 0) ...[
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                    ),
+                    onPressed: () => _retryWrongOnly(questions),
+                    icon: const Icon(Icons.replay_rounded),
+                    label: Text('မှားခဲ့သည့်များ ပြန်ဖြေမည် ($_wrongCount)'),
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.sm),
               SizedBox(
                 width: double.infinity,

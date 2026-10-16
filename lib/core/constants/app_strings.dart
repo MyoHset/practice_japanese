@@ -75,6 +75,7 @@ class AppStrings {
   static const String correct = 'မှန်ပါသည်';
   static const String wrong = 'မှားပါသည်';
   static const String retryQuiz = 'ပြန်လည်ဖြေဆိုမည်';
+  static const String retryWrongOnly = 'မှားခဲ့သည့်များ ပြန်ဖြေမည်';
   static const String quizCompletedTitle = 'Quiz ပြီးဆုံးပါပြီ 🎉';
   static const String excellentJob = 'ထူးချွန်ပါတယ် 🏆';
   static const String goodJob = 'ကောင်းမွန်ပါတယ် 🌟';

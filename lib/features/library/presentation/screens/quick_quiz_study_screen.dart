@@ -201,6 +201,63 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
     });
   }
 
+  /// Retry only the questions that were answered incorrectly.
+  void _retryWrongOnly() {
+    if (_questions == null) return;
+
+    final random = math.Random();
+
+    // Collect the wrong question items
+    final wrongItems = _selectedAnswers.entries
+        .where((e) => _questions![e.key].correctIndex != e.value)
+        .map((e) => _questions![e.key].item)
+        .toList();
+
+    if (wrongItems.isEmpty) return;
+
+    // Gather all meanings from the ORIGINAL full question set for distractors
+    String getCoreMeaning(StudyItem item) {
+      final m = item.meaning?.trim() ?? '';
+      if (m.contains('\n')) {
+        return m.split('\n').first.trim();
+      }
+      return m;
+    }
+
+    final allMeanings = _questions!
+        .map((q) => getCoreMeaning(q.item))
+        .where((m) => m.isNotEmpty)
+        .toSet()
+        .toList();
+
+    // Regenerate quiz questions for wrong items only
+    final newQuestions = wrongItems.map((item) {
+      final correctMeaning = getCoreMeaning(item);
+      final distractors =
+          allMeanings.where((m) => m != correctMeaning).toList()..shuffle(random);
+      final pickedDistractors = distractors.take(3).toList();
+      var fillerIndex = 1;
+      while (pickedDistractors.length < 3) {
+        pickedDistractors.add('အခြားအဓိပ္ပာယ် $fillerIndex');
+        fillerIndex++;
+      }
+      final options = [correctMeaning, ...pickedDistractors]..shuffle(random);
+      final correctIndex = options.indexOf(correctMeaning);
+      return QuizQuestion(
+        item: item,
+        options: options,
+        correctIndex: correctIndex,
+      );
+    }).toList();
+
+    setState(() {
+      _questions = newQuestions;
+      _currentIndex = 0;
+      _selectedAnswers.clear();
+      _isCompleted = false;
+    });
+  }
+
   Widget _buildQuestionGrid(BuildContext context, {bool isDrawer = false}) {
     if (_questions == null) return const SizedBox.shrink();
     return SingleChildScrollView(
@@ -823,6 +880,28 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
                   ),
                 ),
               ),
+              if (_wrongCount > 0) ...[
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                    ),
+                    onPressed: _retryWrongOnly,
+                    icon: const Icon(Icons.replay_rounded),
+                    label: Text(
+                      '${AppStrings.retryWrongOnly} ($_wrongCount)',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.sm),
               SizedBox(
                 width: double.infinity,
