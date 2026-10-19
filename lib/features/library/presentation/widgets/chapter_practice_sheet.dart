@@ -187,14 +187,17 @@ class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
                     Text(
                       'Random',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _isRandom ? AppColors.primary : AppColors.textSoft,
-                            fontWeight: _isRandom ? FontWeight.w700 : FontWeight.w500,
+                            color: _isRandom
+                                ? AppColors.primary
+                                : AppColors.textSoft,
+                            fontWeight:
+                                _isRandom ? FontWeight.w700 : FontWeight.w500,
                           ),
                     ),
                     Switch(
                       value: _isRandom,
                       onChanged: (v) => setState(() => _isRandom = v),
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ],

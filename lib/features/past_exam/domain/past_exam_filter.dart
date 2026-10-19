@@ -14,7 +14,7 @@ class ExamSession {
   int get hashCode => Object.hash(year, month);
 
   @override
-  String toString() => '$year ${month}လပိုင်း';
+  String toString() => '$year $monthလပိုင်း';
 }
 
 /// Immutable filter state for Past Exam List screen.

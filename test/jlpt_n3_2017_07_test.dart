@@ -17,7 +17,8 @@ void main() {
     expect(data['month'], equals(7));
 
     final sections = data['sections'] as List;
-    expect(sections.length, equals(4), reason: 'Should have 4 sections: vocab, grammar, reading, listening');
+    expect(sections.length, equals(4),
+        reason: 'Should have 4 sections: vocab, grammar, reading, listening');
 
     int totalQuestions = 0;
     final Map<String, int> sectionQuestionCounts = {};
@@ -35,8 +36,11 @@ void main() {
 
           // Verify choices
           final choices = q['choices'] as List;
-          expect(choices.length, anyOf(equals(3), equals(4)),
-              reason: 'Questions should have 3 or 4 choices');
+          expect(
+            choices.length,
+            anyOf(equals(3), equals(4)),
+            reason: 'Questions should have 3 or 4 choices',
+          );
 
           // Verify correctIndex
           final correctIndex = q['correctIndex'] as int;
@@ -60,10 +64,15 @@ void main() {
       sectionQuestionCounts[subject] = sectionCount;
     }
 
-    expect(sectionQuestionCounts['vocab'], equals(35), reason: 'Vocab should have 35 questions');
-    expect(sectionQuestionCounts['grammar'], equals(23), reason: 'Grammar should have 23 questions');
-    expect(sectionQuestionCounts['reading'], equals(16), reason: 'Reading should have 16 questions');
-    expect(sectionQuestionCounts['listening'], equals(28), reason: 'Listening should have 28 questions');
-    expect(totalQuestions, equals(102), reason: 'Total questions should be 102');
+    expect(sectionQuestionCounts['vocab'], equals(35),
+        reason: 'Vocab should have 35 questions');
+    expect(sectionQuestionCounts['grammar'], equals(23),
+        reason: 'Grammar should have 23 questions');
+    expect(sectionQuestionCounts['reading'], equals(16),
+        reason: 'Reading should have 16 questions');
+    expect(sectionQuestionCounts['listening'], equals(28),
+        reason: 'Listening should have 28 questions');
+    expect(totalQuestions, equals(102),
+        reason: 'Total questions should be 102');
   });
 }

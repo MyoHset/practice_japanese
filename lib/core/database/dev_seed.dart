@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 34;
+const int _kCurrentDevSeedVersion = 40;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -53,6 +53,12 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
     await _ensurePastExam202307(db, DateTime.now());
     await _ensurePastExam202312(db, DateTime.now());
     await _ensurePastExam202407(db, DateTime.now());
+    await _ensurePastExam202412(db, DateTime.now());
+    await _ensurePastExam202507(db, DateTime.now());
+    await _ensurePastExam202512(db, DateTime.now());
+    await _ensurePastExam201507(db, DateTime.now());
+    await _ensurePastExam201812(db, DateTime.now());
+
     if (prefs != null) {
       await prefs.setInt(_kDevSeedVersionKey, _kCurrentDevSeedVersion);
     }
@@ -720,7 +726,10 @@ Future<void> _updateTangoIfCorrupted(AppDatabase db) async {
   if (tangoSource == null) return;
 
   final corruptedUnit = await (db.units.select()
-        ..where((u) => u.sourceId.equals(tangoSource.id) & u.name.contains('ြိသာားစု'))
+        ..where(
+          (u) =>
+              u.sourceId.equals(tangoSource.id) & u.name.contains('ြိသာားစု'),
+        )
         ..limit(1))
       .getSingleOrNull();
 
@@ -754,9 +763,11 @@ Future<void> _updateTangoIfCorrupted(AppDatabase db) async {
       final words = sec['words'] as List<dynamic>;
 
       await (db.update(db.units)
-            ..where((u) =>
-                u.sourceId.equals(tangoSource.id) &
-                u.orderNo.equals(sIdx + 1)))
+            ..where(
+              (u) =>
+                  u.sourceId.equals(tangoSource.id) &
+                  u.orderNo.equals(sIdx + 1),
+            ))
           .write(UnitsCompanion(name: Value(secTitle)));
 
       for (final w in words) {
@@ -783,9 +794,11 @@ Future<void> _restoreTango2000VocabItems(AppDatabase db) async {
 
   if (tangoSource == null) return;
 
-  final itemsCount = await db.vocabSourceItems.count(
+  final itemsCount = await db.vocabSourceItems
+      .count(
         where: (vsi) => vsi.sourceId.equals(tangoSource.id),
-      ).getSingle();
+      )
+      .getSingle();
 
   if (itemsCount > 0) return; // Data is intact
 
@@ -811,9 +824,11 @@ Future<void> _restoreTango2000VocabItems(AppDatabase db) async {
       final words = sec['words'] as List<dynamic>;
 
       final unit = await (db.units.select()
-            ..where((u) =>
-                u.sourceId.equals(tangoSource.id) &
-                u.orderNo.equals(sIdx + 1)))
+            ..where(
+              (u) =>
+                  u.sourceId.equals(tangoSource.id) &
+                  u.orderNo.equals(sIdx + 1),
+            ))
           .getSingleOrNull();
 
       if (unit == null) continue;
@@ -825,7 +840,8 @@ Future<void> _restoreTango2000VocabItems(AppDatabase db) async {
 
         final vocab = await (db.vocabularies.select()
               ..where(
-                  (v) => v.word.equals(wordStr) & v.reading.equals(readingStr))
+                (v) => v.word.equals(wordStr) & v.reading.equals(readingStr),
+              )
               ..limit(1))
             .getSingleOrNull();
 
@@ -870,8 +886,12 @@ Future<void> _ensureSpeedMasterN3Kanji(AppDatabase db, DateTime now) async {
     // Force clean and re-seed to pick up any kanji/vocab replacement in the JSON asset
     // Deleting the source will cascade and delete units, sourceItems, compounds automatically.
     await db.transaction(() async {
-      await (db.delete(db.sources)..where((tbl) => tbl.id.equals(existingKanjiSource.id))).go();
-      await (db.delete(db.sources)..where((tbl) => tbl.id.equals(existingVocabSource.id))).go();
+      await (db.delete(db.sources)
+            ..where((tbl) => tbl.id.equals(existingKanjiSource.id)))
+          .go();
+      await (db.delete(db.sources)
+            ..where((tbl) => tbl.id.equals(existingVocabSource.id)))
+          .go();
     });
   }
 
@@ -1878,6 +1898,66 @@ Future<void> _ensurePastExam202407(AppDatabase db, DateTime now) async {
   );
 }
 
+/// Ensures the 2024-12 JLPT N3 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202412(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N3') &
+              s.examYear.equals(2024) &
+              s.examMonth.equals(12),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 70) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n3_2024_12.json',
+    sortOrder: 13,
+  );
+}
+
+/// Ensures the 2025-07 JLPT N3 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202507(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N3') &
+              s.examYear.equals(2025) &
+              s.examMonth.equals(7),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 70) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n3_2025_07.json',
+    sortOrder: 14,
+  );
+}
+
 /// Ensures the 2015-12 JLPT N3 Past Exam data is loaded into the DB.
 Future<void> _ensurePastExam201512(AppDatabase db, DateTime now) async {
   final existingSource = await (db.sources.select()
@@ -2160,3 +2240,93 @@ Future<void> _seedPastExamFromJson(
 
 /// Backwards compatibility alias.
 Future<void> devSeed(AppDatabase db) => seedDevData(db);
+
+/// Ensures the 2025-12 JLPT N3 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202512(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N3') &
+              s.examYear.equals(2025) &
+              s.examMonth.equals(12),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 70) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n3_2025_12.json',
+    sortOrder: 15,
+  );
+}
+
+/// Ensures the 2015-07 JLPT N3 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam201507(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N3') &
+              s.examYear.equals(2015) &
+              s.examMonth.equals(7),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 70) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n3_2015_07.json',
+    sortOrder: 5,
+  );
+}
+
+/// Ensures the 2018-12 JLPT N3 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam201812(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N3') &
+              s.examYear.equals(2018) &
+              s.examMonth.equals(12),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 70) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n3_2018_12.json',
+    sortOrder: 9,
+  );
+}

@@ -55,8 +55,11 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   late bool _isShuffled = widget.isRandom;
   bool _isCompleted = false;
 
-  int _rememberedCount = 0;
-  int _needsReviewCount = 0;
+  final Set<int> _rememberedItemIds = {};
+  final Set<int> _unrememberedItemIds = {};
+
+  int get _rememberedCount => _rememberedItemIds.length;
+  int get _needsReviewCount => _unrememberedItemIds.length;
 
   List<StudyItem>? _activeDeck;
   List<StudyItem>? _originalDeck;
@@ -98,8 +101,8 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
       _isFlipped = false;
       _showReadingHint = false;
       _isCompleted = deck.isEmpty;
-      _rememberedCount = 0;
-      _needsReviewCount = 0;
+      _rememberedItemIds.clear();
+      _unrememberedItemIds.clear();
     }
   }
 
@@ -114,20 +117,22 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   }
 
   void _toggleShuffle() {
-    if (_originalDeck == null) return;
+    if (_activeDeck == null || _activeDeck!.isEmpty) return;
     setState(() {
       _isShuffled = !_isShuffled;
       if (_isShuffled) {
-        _activeDeck = List.of(_originalDeck!)..shuffle(math.Random());
+        _activeDeck = List.of(_activeDeck!)..shuffle(math.Random());
       } else {
-        _activeDeck = List.of(_originalDeck!);
+        _activeDeck = _originalDeck != null
+            ? List.of(_originalDeck!)
+            : List.of(_activeDeck!);
       }
       _currentIndex = 0;
       _isFlipped = false;
       _showReadingHint = false;
       _isCompleted = false;
-      _rememberedCount = 0;
-      _needsReviewCount = 0;
+      _rememberedItemIds.clear();
+      _unrememberedItemIds.clear();
       _flipController.reset();
     });
   }
@@ -138,10 +143,34 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
       _isFlipped = false;
       _showReadingHint = false;
       _isCompleted = false;
-      _rememberedCount = 0;
-      _needsReviewCount = 0;
+      _rememberedItemIds.clear();
+      _unrememberedItemIds.clear();
       _originalDeck = null;
       _activeDeck = null;
+      _flipController.reset();
+    });
+  }
+
+  /// Retry only the cards that were marked as "မသိသေးပါ" (Don't know).
+  void _retryUnknownOnly() {
+    if (_activeDeck == null || _activeDeck!.isEmpty) return;
+
+    final unknownItems = _activeDeck!
+        .where((item) => _unrememberedItemIds.contains(item.id))
+        .toList();
+
+    if (unknownItems.isEmpty) return;
+
+    setState(() {
+      _activeDeck = _isShuffled
+          ? (List.of(unknownItems)..shuffle(math.Random()))
+          : List.of(unknownItems);
+      _currentIndex = 0;
+      _isFlipped = false;
+      _showReadingHint = false;
+      _isCompleted = false;
+      _rememberedItemIds.clear();
+      _unrememberedItemIds.clear();
       _flipController.reset();
     });
   }
@@ -154,6 +183,34 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
         runSpacing: 10,
         children: List.generate(deckLength, (index) {
           final isCurrent = index == _currentIndex;
+          final item = (_activeDeck != null && index < _activeDeck!.length)
+              ? _activeDeck![index]
+              : null;
+          final isRemembered = item != null && _rememberedItemIds.contains(item.id);
+          final isUnknown = item != null && _unrememberedItemIds.contains(item.id);
+
+          Color bgColor;
+          Color borderColor;
+          Color textColor;
+
+          if (isCurrent) {
+            bgColor = AppColors.primary;
+            borderColor = AppColors.primary;
+            textColor = Colors.white;
+          } else if (isUnknown) {
+            bgColor = AppColors.error.withValues(alpha: 0.12);
+            borderColor = AppColors.error;
+            textColor = AppColors.error;
+          } else if (isRemembered) {
+            bgColor = AppColors.secondary.withValues(alpha: 0.12);
+            borderColor = AppColors.secondary;
+            textColor = AppColors.secondary;
+          } else {
+            bgColor = AppColors.surface;
+            borderColor = AppColors.divider;
+            textColor = AppColors.text;
+          }
+
           return GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -169,13 +226,9 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
               height: 40,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: isCurrent
-                    ? AppColors.primary
-                    : AppColors.surface,
+                color: bgColor,
                 border: Border.all(
-                  color: isCurrent
-                      ? AppColors.primary
-                      : AppColors.divider,
+                  color: borderColor,
                   width: isCurrent ? 2 : 1,
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -183,7 +236,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
               child: Text(
                 '${index + 1}',
                 style: TextStyle(
-                  color: isCurrent ? Colors.white : AppColors.text,
+                  color: textColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -280,16 +333,44 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
       remembered: remembered,
     );
 
-    if (remembered) {
-      _rememberedCount++;
-    } else {
-      _needsReviewCount++;
-    }
+    setState(() {
+      if (remembered) {
+        _rememberedItemIds.add(currentItem.id);
+        _unrememberedItemIds.remove(currentItem.id);
+      } else {
+        _unrememberedItemIds.add(currentItem.id);
+        _rememberedItemIds.remove(currentItem.id);
+      }
+    });
 
-    if (_currentIndex + 1 >= _activeDeck!.length) {
+    final totalAnswered = _rememberedItemIds.length + _unrememberedItemIds.length;
+    final isLastIndex = _currentIndex + 1 >= _activeDeck!.length;
+
+    if (isLastIndex && totalAnswered >= _activeDeck!.length) {
       setState(() {
         _isCompleted = true;
       });
+    } else if (isLastIndex) {
+      // Find first unanswered card if user jumped ahead with the card selector
+      final nextUnanswered = _activeDeck!.indexWhere(
+        (item) =>
+            !_rememberedItemIds.contains(item.id) &&
+            !_unrememberedItemIds.contains(item.id),
+      );
+      if (nextUnanswered != -1) {
+        if (_isFlipped) {
+          await _flipController.reverse();
+        }
+        setState(() {
+          _currentIndex = nextUnanswered;
+          _isFlipped = false;
+          _showReadingHint = false;
+        });
+      } else {
+        setState(() {
+          _isCompleted = true;
+        });
+      }
     } else {
       if (_isFlipped) {
         await _flipController.reverse();
@@ -1094,6 +1175,28 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                 const SizedBox(height: AppSpacing.xl),
 
                 // Action buttons
+                if (_unrememberedItemIds.isNotEmpty) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
+                        ),
+                      ),
+                      onPressed: _retryUnknownOnly,
+                      icon: const Icon(Icons.replay_rounded),
+                      label: Text(
+                        '${AppStrings.retryUnknownOnly} (${_unrememberedItemIds.length})',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
                 SizedBox(
                   width: double.infinity,
                   height: 48,

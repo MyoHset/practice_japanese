@@ -76,8 +76,11 @@ class _PastExamPracticeScreenState
     }
   }
 
-  Widget _buildQuestionGrid(BuildContext context, int totalQuestions,
-      {bool isDrawer = false}) {
+  Widget _buildQuestionGrid(
+    BuildContext context,
+    int totalQuestions, {
+    bool isDrawer = false,
+  }) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Wrap(
@@ -181,8 +184,11 @@ class _PastExamPracticeScreenState
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.6,
               ),
-              child: _buildQuestionGrid(sheetContext, totalQuestions,
-                  isDrawer: false),
+              child: _buildQuestionGrid(
+                sheetContext,
+                totalQuestions,
+                isDrawer: false,
+              ),
             ),
           ],
         );
@@ -319,8 +325,10 @@ class _PastExamPracticeScreenState
                     Expanded(
                       child: Builder(
                         builder: (drawerContext) => _buildQuestionGrid(
-                            drawerContext, questionsAsync.valueOrNull!.length,
-                            isDrawer: true),
+                          drawerContext,
+                          questionsAsync.valueOrNull!.length,
+                          isDrawer: true,
+                        ),
                       ),
                     ),
                   ],
@@ -362,7 +370,9 @@ class _PastExamPracticeScreenState
                   if (questionsAsync.valueOrNull != null) {
                     if (context.isMobile) {
                       _showQuestionNavigationSheet(
-                          context, questionsAsync.valueOrNull!.length);
+                        context,
+                        questionsAsync.valueOrNull!.length,
+                      );
                     } else {
                       Scaffold.of(buttonContext).openEndDrawer();
                     }
@@ -395,7 +405,7 @@ class _PastExamPracticeScreenState
                 ),
               ),
             ),
-          ]
+          ],
         ],
       ),
       body: AsyncValueView(
@@ -942,7 +952,8 @@ class _PastExamPracticeScreenState
     );
   }
 
-  Widget _buildCompletionScreen(BuildContext context, List<PastExamQuestion> questions) {
+  Widget _buildCompletionScreen(
+      BuildContext context, List<PastExamQuestion> questions) {
     final totalQuestions = questions.length;
     final percentage = totalQuestions > 0
         ? ((_correctCount / totalQuestions) * 100).round()

@@ -61,6 +61,7 @@ class AppStrings {
   static const String know = 'သိတယ်';
   static const String dontKnow = 'မသိသေးပါ';
   static const String restartDeck = 'ပြန်လည်လေ့လာမည်';
+  static const String retryUnknownOnly = 'မသိသေးတာများ ပြန်လေ့လာမည်';
   static const String backToUnits = 'အခန်းများသို့ ပြန်သွားမည်';
   static const String completedDeckTitle = 'ဂုဏ်ယူပါတယ် 🎉';
   static const String completedDeckSubtitle = 'ကတ်ပြားအားလုံး လေ့လာပြီးပါပြီ';

@@ -122,7 +122,8 @@ class PastExamRepository {
           ])
             ..addColumns([_db.questions.sourceId])
             ..where(
-                _db.mondaiTypes.type.isInValues(filter.selectedMondaiTypes));
+              _db.mondaiTypes.type.isInValues(filter.selectedMondaiTypes),
+            );
           cond = cond & tbl.id.isInQuery(sub);
         }
 
@@ -245,7 +246,7 @@ class PastExamRepository {
 
     if (sourceId != null) {
       query.where(_db.questions.sourceId.equals(sourceId));
-    } else if (sourceIds != null && sourceIds.isNotEmpty) {
+    } else if (sourceIds.isNotEmpty) {
       query.where(_db.questions.sourceId.isIn(sourceIds));
     }
 
@@ -280,7 +281,9 @@ class PastExamRepository {
       OrderingTerm(expression: _db.sources.examMonth, mode: OrderingMode.asc),
       OrderingTerm(expression: _db.questions.mondaiNo, mode: OrderingMode.asc),
       OrderingTerm(
-          expression: _db.questions.questionNo, mode: OrderingMode.asc),
+        expression: _db.questions.questionNo,
+        mode: OrderingMode.asc,
+      ),
       OrderingTerm(expression: _db.questions.id, mode: OrderingMode.asc),
     ]);
 

@@ -411,7 +411,6 @@ class _FilterBottomSheet extends StatelessWidget {
 
 class _FilterPanel extends ConsumerStatefulWidget {
   const _FilterPanel({
-    super.key,
     required this.ref,
     this.scrollController,
     this.onClose,

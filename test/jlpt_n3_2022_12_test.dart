@@ -17,8 +17,11 @@ void main() {
     expect(data['month'], equals(12));
 
     final sections = data['sections'] as List;
-    expect(sections.length, equals(4),
-        reason: 'Should have 4 sections: vocab, grammar, reading, listening');
+    expect(
+      sections.length,
+      equals(4),
+      reason: 'Should have 4 sections: vocab, grammar, reading, listening',
+    );
 
     int totalQuestions = 0;
     final Map<String, int> sectionQuestionCounts = {};
@@ -36,8 +39,11 @@ void main() {
 
           // Verify choices
           final choices = q['choices'] as List;
-          expect(choices.length, anyOf(equals(3), equals(4)),
-              reason: 'Questions should have 3 or 4 choices');
+          expect(
+            choices.length,
+            anyOf(equals(3), equals(4)),
+            reason: 'Questions should have 3 or 4 choices',
+          );
 
           // Verify correctIndex
           final correctIndex = q['correctIndex'] as int;
@@ -58,24 +64,42 @@ void main() {
 
             final starPos = q['starPosition'] as int;
             final expectedAnswer = correctOrder[starPos - 1] as int;
-            expect(correctIndex, equals(expectedAnswer),
-                reason:
-                    'Star position $starPos in order $correctOrder should match correctIndex $correctIndex for question ${q['questionNo']}');
+            expect(
+              correctIndex,
+              equals(expectedAnswer),
+              reason:
+                  'Star position $starPos in order $correctOrder should match correctIndex $correctIndex for question ${q['questionNo']}',
+            );
           }
         }
       }
       sectionQuestionCounts[subject] = sectionCount;
     }
 
-    expect(sectionQuestionCounts['vocab'], equals(35),
-        reason: 'Vocab should have 35 questions');
-    expect(sectionQuestionCounts['grammar'], equals(22),
-        reason: 'Grammar should have 22 questions');
-    expect(sectionQuestionCounts['reading'], equals(16),
-        reason: 'Reading should have 16 questions');
-    expect(sectionQuestionCounts['listening'], equals(28),
-        reason: 'Listening should have 28 questions');
-    expect(totalQuestions, equals(101),
-        reason: 'Total questions should be 101');
+    expect(
+      sectionQuestionCounts['vocab'],
+      equals(35),
+      reason: 'Vocab should have 35 questions',
+    );
+    expect(
+      sectionQuestionCounts['grammar'],
+      equals(22),
+      reason: 'Grammar should have 22 questions',
+    );
+    expect(
+      sectionQuestionCounts['reading'],
+      equals(16),
+      reason: 'Reading should have 16 questions',
+    );
+    expect(
+      sectionQuestionCounts['listening'],
+      equals(28),
+      reason: 'Listening should have 28 questions',
+    );
+    expect(
+      totalQuestions,
+      equals(101),
+      reason: 'Total questions should be 101',
+    );
   });
 }

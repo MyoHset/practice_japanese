@@ -66,14 +66,16 @@ class _StudyModeSheetState extends State<StudyModeSheet> {
   void _onSelectMode(BuildContext context, StudyMode mode) {
     Navigator.of(context).pop();
     final int? passedLimit = (mode == StudyMode.list) ? null : _selectedLimit;
-    context.push(AppRoutes.study(
-      widget.kind,
-      widget.sourceId,
-      widget.unit.id,
-      mode,
-      limit: passedLimit,
-      isRandom: _isRandom,
-    ));
+    context.push(
+      AppRoutes.study(
+        widget.kind,
+        widget.sourceId,
+        widget.unit.id,
+        mode,
+        limit: passedLimit,
+        isRandom: _isRandom,
+      ),
+    );
   }
 
   @override
@@ -112,7 +114,7 @@ class _StudyModeSheetState extends State<StudyModeSheet> {
                     ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              
+
               // Limit Options
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,14 +132,17 @@ class _StudyModeSheetState extends State<StudyModeSheet> {
                       Text(
                         'Random',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: _isRandom ? AppColors.primary : AppColors.textSoft,
-                              fontWeight: _isRandom ? FontWeight.w700 : FontWeight.w500,
+                              color: _isRandom
+                                  ? AppColors.primary
+                                  : AppColors.textSoft,
+                              fontWeight:
+                                  _isRandom ? FontWeight.w700 : FontWeight.w500,
                             ),
                       ),
                       Switch(
                         value: _isRandom,
                         onChanged: (v) => setState(() => _isRandom = v),
-                        activeColor: AppColors.primary,
+                        activeThumbColor: AppColors.primary,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ],
@@ -156,7 +161,8 @@ class _StudyModeSheetState extends State<StudyModeSheet> {
                     selectedColor: AppColors.primary,
                     labelStyle: TextStyle(
                       color: isSelected ? Colors.white : AppColors.text,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
                     ),
                     onSelected: (_) {
                       setState(() => _selectedLimit = opt.limit);
