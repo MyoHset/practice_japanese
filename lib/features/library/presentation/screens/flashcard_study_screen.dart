@@ -692,7 +692,9 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                         color: AppColors.textSoft,
                       ),
                       label: Text(
-                        AppStrings.revealReading,
+                        widget.kind == ContentKind.grammar
+                            ? '接続 (တွဲစပ်ပုံ) ကြည့်မည်'
+                            : AppStrings.revealReading,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: AppColors.textSoft,
                             ),
@@ -852,12 +854,86 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                             borderRadius: BorderRadius.circular(AppRadius.sm),
                           ),
                           child: Text(
-                            item.connection!,
+                            widget.kind == ContentKind.grammar
+                                ? '接続: ${item.connection!}'
+                                : item.connection!,
                             textAlign: TextAlign.center,
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: AppColors.textSoft,
                                     ),
+                          ),
+                        ),
+                      ],
+                      if (item.exampleJp != null &&
+                          item.exampleJp!.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            border: Border.all(color: AppColors.divider),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primarySoft,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text(
+                                      '例文',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Expanded(
+                                    child: Text(
+                                      item.exampleJp!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.text,
+                                            height: 1.4,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (item.exampleMy != null &&
+                                  item.exampleMy!.isNotEmpty) ...[
+                                const SizedBox(height: AppSpacing.xs),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 36),
+                                  child: Text(
+                                    item.exampleMy!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: AppColors.textSoft,
+                                          height: 1.3,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                       ],
@@ -894,6 +970,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
   /// Displays readings with line-by-line distinction for Onyomi and Kunyomi when available.
   Widget _buildReadingsDisplay(BuildContext context, String secondary) {
     if (!secondary.contains('音読み:') && !secondary.contains('訓読み:')) {
+      final isGrammar = widget.kind == ContentKind.grammar;
       return Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.sm,
@@ -903,13 +980,36 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
           color: AppColors.primarySoft,
           borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
-        child: Text(
-          secondary,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w700,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isGrammar) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  '接続',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
               ),
+              const SizedBox(width: AppSpacing.xs),
+            ],
+            Text(
+              secondary,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ],
         ),
       );
     }

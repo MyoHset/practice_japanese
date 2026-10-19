@@ -20,11 +20,17 @@ class QuizQuestion {
     required this.item,
     required this.options,
     required this.correctIndex,
+    this.promptText,
+    this.promptSubtitle,
+    this.isFillInTheBlank = false,
   });
 
   final StudyItem item;
   final List<String> options;
   final int correctIndex;
+  final String? promptText;
+  final String? promptSubtitle;
+  final bool isFillInTheBlank;
 }
 
 /// Interactive 4-choice Quick Quiz screen for Section and Chapter study.
@@ -108,49 +114,102 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
       validItems = validItems.take(widget.questionLimit!).toList();
     }
 
-    String getCoreMeaning(StudyItem item) {
-      final m = item.meaning?.trim() ?? '';
-      if (m.contains('\n')) {
-        return m.split('\n').first.trim();
-      }
-      return m;
-    }
-
-    final allMeanings = validItems
-        .map(getCoreMeaning)
-        .where((m) => m.isNotEmpty)
-        .toSet()
-        .toList();
-
     _questions = validItems.map((item) {
-      final correctMeaning = getCoreMeaning(item);
-
-      // Pick 3 distractor meanings distinct from correctMeaning
-      final distractors = allMeanings.where((m) => m != correctMeaning).toList()
-        ..shuffle(random);
-
-      final pickedDistractors = distractors.take(3).toList();
-
-      // If we don't have 3 distractors, fill with generic fillers
-      var fillerIndex = 1;
-      while (pickedDistractors.length < 3) {
-        pickedDistractors.add('အခြားအဓိပ္ပာယ် $fillerIndex');
-        fillerIndex++;
-      }
-
-      final options = [correctMeaning, ...pickedDistractors]..shuffle(random);
-      final correctIndex = options.indexOf(correctMeaning);
-
-      return QuizQuestion(
+      return _buildQuizQuestion(
         item: item,
-        options: options,
-        correctIndex: correctIndex,
+        allItems: validItems,
+        random: random,
       );
     }).toList();
 
     _currentIndex = 0;
     _selectedAnswers.clear();
     _isCompleted = false;
+  }
+
+  QuizQuestion _buildQuizQuestion({
+    required StudyItem item,
+    required List<StudyItem> allItems,
+    required math.Random random,
+  }) {
+    if (widget.kind == ContentKind.grammar &&
+        item.exampleJp != null &&
+        item.exampleJp!.isNotEmpty) {
+      final patternCore =
+          item.primary.replaceAll('〜', '').replaceAll('~', '').trim();
+      if (item.exampleJp!.contains(patternCore)) {
+        final promptText =
+            item.exampleJp!.replaceFirst(patternCore, '（　★　）');
+        final promptSubtitle = item.exampleMy;
+        final correctOption = item.primary;
+
+        final otherPatterns = allItems
+            .map((i) => i.primary)
+            .where((p) => p != correctOption)
+            .toSet()
+            .toList()
+          ..shuffle(random);
+
+        final pickedDistractors = otherPatterns.take(3).toList();
+        final defaultDistractors = [
+          '〜につれて',
+          '〜に伴って',
+          '〜を通じて',
+          '〜に反して',
+          '〜にわたって',
+        ]..shuffle(random);
+
+        var fillerIndex = 0;
+        while (pickedDistractors.length < 3) {
+          final filler = fillerIndex < defaultDistractors.length
+              ? defaultDistractors[fillerIndex]
+              : '〜パターン ${fillerIndex + 1}';
+          if (!pickedDistractors.contains(filler) && filler != correctOption) {
+            pickedDistractors.add(filler);
+          }
+          fillerIndex++;
+        }
+
+        final options = [correctOption, ...pickedDistractors]..shuffle(random);
+        return QuizQuestion(
+          item: item,
+          options: options,
+          correctIndex: options.indexOf(correctOption),
+          promptText: promptText,
+          promptSubtitle: promptSubtitle,
+          isFillInTheBlank: true,
+        );
+      }
+    }
+
+    // Default meaning-based question
+    String getCoreMeaning(StudyItem i) {
+      final m = i.meaning?.trim() ?? '';
+      return m.contains('\n') ? m.split('\n').first.trim() : m;
+    }
+
+    final correctMeaning = getCoreMeaning(item);
+    final allMeanings = allItems
+        .map(getCoreMeaning)
+        .where((m) => m.isNotEmpty && m != correctMeaning)
+        .toSet()
+        .toList()
+      ..shuffle(random);
+
+    final pickedDistractors = allMeanings.take(3).toList();
+    var fillerIndex = 1;
+    while (pickedDistractors.length < 3) {
+      pickedDistractors.add('အခြားအဓိပ္ပာယ် $fillerIndex');
+      fillerIndex++;
+    }
+
+    final options = [correctMeaning, ...pickedDistractors]..shuffle(random);
+    return QuizQuestion(
+      item: item,
+      options: options,
+      correctIndex: options.indexOf(correctMeaning),
+      isFillInTheBlank: false,
+    );
   }
 
   Future<void> _handleOptionSelected(int index) async {
@@ -215,38 +274,12 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
 
     if (wrongItems.isEmpty) return;
 
-    // Gather all meanings from the ORIGINAL full question set for distractors
-    String getCoreMeaning(StudyItem item) {
-      final m = item.meaning?.trim() ?? '';
-      if (m.contains('\n')) {
-        return m.split('\n').first.trim();
-      }
-      return m;
-    }
-
-    final allMeanings = _questions!
-        .map((q) => getCoreMeaning(q.item))
-        .where((m) => m.isNotEmpty)
-        .toSet()
-        .toList();
-
     // Regenerate quiz questions for wrong items only
     final newQuestions = wrongItems.map((item) {
-      final correctMeaning = getCoreMeaning(item);
-      final distractors =
-          allMeanings.where((m) => m != correctMeaning).toList()..shuffle(random);
-      final pickedDistractors = distractors.take(3).toList();
-      var fillerIndex = 1;
-      while (pickedDistractors.length < 3) {
-        pickedDistractors.add('အခြားအဓိပ္ပာယ် $fillerIndex');
-        fillerIndex++;
-      }
-      final options = [correctMeaning, ...pickedDistractors]..shuffle(random);
-      final correctIndex = options.indexOf(correctMeaning);
-      return QuizQuestion(
+      return _buildQuizQuestion(
         item: item,
-        options: options,
-        correctIndex: correctIndex,
+        allItems: _questions!.map((q) => q.item).toList(),
+        random: random,
       );
     }).toList();
 
@@ -564,37 +597,68 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
                         child: Column(
                           children: [
                             AppPill(
-                              label: widget.kind.label,
+                              label: question.isFillInTheBlank
+                                  ? '文法形式 · ကွက်လပ်ဖြည့်'
+                                  : widget.kind.label,
                               color: AppColors.primarySoft,
                               textColor: AppColors.primary,
                             ),
                             const SizedBox(height: AppSpacing.md),
-                            if (question.item.secondary != null &&
-                                question.item.secondary!.isNotEmpty) ...[
+                            if (question.promptText != null) ...[
                               Text(
-                                question.item.secondary!,
+                                question.promptText!,
+                                textAlign: TextAlign.center,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .titleMedium
+                                    .titleLarge
                                     ?.copyWith(
-                                      color: AppColors.primary,
+                                      fontSize: 22,
                                       fontWeight: FontWeight.w700,
+                                      color: AppColors.text,
+                                      height: 1.5,
                                     ),
                               ),
-                              const SizedBox(height: AppSpacing.xs),
+                              if (question.promptSubtitle != null) ...[
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  question.promptSubtitle!,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: AppColors.textSoft,
+                                      ),
+                                ),
+                              ],
+                            ] else ...[
+                              if (question.item.secondary != null &&
+                                  question.item.secondary!.isNotEmpty) ...[
+                                Text(
+                                  question.item.secondary!,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                              ],
+                              Text(
+                                question.item.primary,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displaySmall
+                                    ?.copyWith(
+                                      fontSize: 38,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.text,
+                                    ),
+                              ),
                             ],
-                            Text(
-                              question.item.primary,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .displaySmall
-                                  ?.copyWith(
-                                    fontSize: 38,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.text,
-                                  ),
-                            ),
                           ],
                         ),
                       ),
@@ -612,6 +676,111 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
                           ),
                         );
                       }),
+
+                      // Instant Explanation Feedback Box
+                      if (_hasAnswered) ...[
+                        Builder(builder: (context) {
+                          final isAnswerCorrect =
+                              _selectedOptionIndex == question.correctIndex;
+                          return Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            decoration: BoxDecoration(
+                              color: isAnswerCorrect
+                                  ? const Color(0xFFE8F7EE)
+                                  : const Color(0xFFFDE8E8),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.card),
+                              border: Border.all(
+                                color: isAnswerCorrect
+                                    ? AppColors.secondary
+                                    : AppColors.error,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      isAnswerCorrect
+                                          ? Icons.check_circle_rounded
+                                          : Icons.cancel_rounded,
+                                      color: isAnswerCorrect
+                                          ? AppColors.secondary
+                                          : AppColors.error,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: AppSpacing.xs),
+                                    Text(
+                                      isAnswerCorrect
+                                          ? AppStrings.correct
+                                          : AppStrings.wrong,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: isAnswerCorrect
+                                          ? AppColors.secondary
+                                          : AppColors.error,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      question.item.primary,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (question.item.meaning != null &&
+                                    question.item.meaning!.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    question.item.meaning!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: AppColors.text,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                ],
+                                if (question.item.connection != null &&
+                                    question.item.connection!.isNotEmpty) ...[
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    '接続: ${question.item.connection!}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: AppColors.textSoft,
+                                        ),
+                                  ),
+                                ],
+                                if (question.item.exampleJp != null &&
+                                    question.item.exampleJp!.isNotEmpty) ...[
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    '例文: ${question.item.exampleJp!}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: AppColors.textSoft,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          );
+                        },),
+                      ],
                     ],
                   ),
                 ),

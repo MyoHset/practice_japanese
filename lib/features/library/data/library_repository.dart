@@ -163,6 +163,8 @@ class LibraryRepository {
             g.connection AS item_secondary,
             g.meaning_my AS item_meaning,
             g.connection AS item_connection,
+            g.example_jp AS item_example_jp,
+            g.example_my AS item_example_my,
             COALESCE(p.streak, 0) AS item_streak
           FROM grammar_source_items gsi
           JOIN grammar_points g ON g.id = gsi.grammar_id
@@ -276,6 +278,8 @@ class LibraryRepository {
             g.connection AS item_secondary,
             g.meaning_my AS item_meaning,
             g.connection AS item_connection,
+            g.example_jp AS item_example_jp,
+            g.example_my AS item_example_my,
             COALESCE(p.streak, 0) AS item_streak
           FROM grammar_source_items gsi
           JOIN grammar_points g ON g.id = gsi.grammar_id
@@ -392,6 +396,8 @@ class LibraryRepository {
       secondary: secondary,
       meaning: row.readNullable<String>('item_meaning'),
       connection: row.readNullable<String>('item_connection'),
+      exampleJp: row.readNullable<String>('item_example_jp'),
+      exampleMy: row.readNullable<String>('item_example_my'),
       streak: row.read<int>('item_streak'),
     );
   }

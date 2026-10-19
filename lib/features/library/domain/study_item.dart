@@ -10,6 +10,8 @@ class StudyItem {
     this.secondary,
     this.meaning,
     this.connection,
+    this.exampleJp,
+    this.exampleMy,
     this.streak = 0,
   });
 
@@ -28,6 +30,12 @@ class StudyItem {
   /// Connection / grammatical note if applicable.
   final String? connection;
 
+  /// Japanese example sentence if applicable.
+  final String? exampleJp;
+
+  /// Myanmar translation of the example sentence if applicable.
+  final String? exampleMy;
+
   /// Current SRS streak count.
   final int streak;
 
@@ -44,11 +52,21 @@ class StudyItem {
           secondary == other.secondary &&
           meaning == other.meaning &&
           connection == other.connection &&
+          exampleJp == other.exampleJp &&
+          exampleMy == other.exampleMy &&
           streak == other.streak;
 
   @override
-  int get hashCode =>
-      Object.hash(id, primary, secondary, meaning, connection, streak);
+  int get hashCode => Object.hash(
+        id,
+        primary,
+        secondary,
+        meaning,
+        connection,
+        exampleJp,
+        exampleMy,
+        streak,
+      );
 
   @override
   String toString() =>

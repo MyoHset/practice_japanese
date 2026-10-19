@@ -141,6 +141,75 @@ class StudyItemCard extends StatelessWidget {
                       ),
                     ),
                   ],
+                  if (item.exampleJp != null && item.exampleJp!.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        border: Border.all(color: AppColors.divider),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 1.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primarySoft,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  '例文',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Expanded(
+                                child: Text(
+                                  item.exampleJp!,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.text,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (item.exampleMy != null &&
+                              item.exampleMy!.isNotEmpty) ...[
+                            const SizedBox(height: 3),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 32),
+                              child: Text(
+                                item.exampleMy!,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: AppColors.textSoft,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
