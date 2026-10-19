@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 41;
+const int _kCurrentDevSeedVersion = 42;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -922,11 +922,83 @@ Future<void> _ensureSpeedMasterN3Kanji(AppDatabase db, DateTime now) async {
   }
 }
 
+/// Seeds Shinkanzen Master N3 文法 with 12 chapters and 100 grammar points from assets/data/grammar_n3_complete.json.
+Future<void> _seedGrammarN3FromJson(AppDatabase db, DateTime now) async {
+  String? jsonStr;
+  try {
+    jsonStr =
+        await rootBundle.loadString('assets/data/grammar_n3_complete.json');
+  } catch (_) {
+    if (!kIsWeb) {
+      final file = File('assets/data/grammar_n3_complete.json');
+      if (file.existsSync()) {
+        jsonStr = await file.readAsString();
+      }
+    }
+  }
+
+  if (jsonStr == null || jsonStr.isEmpty) return;
+
+  final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+  final bookTitle = data['book'] as String? ?? 'Shinkanzen Master N3 文法';
+  final bookLevel = data['level'] as String? ?? 'N3';
+  final chapters = data['chapters'] as List<dynamic>;
+
+  await db.transaction(() async {
+    final sourceId = await db.into(db.sources).insert(
+          SourcesCompanion.insert(
+            type: SourceType.grammarBook,
+            name: bookTitle,
+            jlptLevel: Value(bookLevel),
+            sortOrder: const Value(1),
+          ),
+        );
+
+    for (final ch in chapters) {
+      final chMap = ch as Map<String, dynamic>;
+      final chapterNum = chMap['chapter'] as int;
+      final chapterTitle = chMap['title'] as String;
+      final patterns = chMap['patterns'] as List<dynamic>;
+
+      final unitId = await db.into(db.units).insert(
+            UnitsCompanion.insert(
+              sourceId: sourceId,
+              name: chapterTitle,
+              orderNo: chapterNum,
+            ),
+          );
+
+      for (var i = 0; i < patterns.length; i++) {
+        final p = patterns[i] as Map<String, dynamic>;
+        final grammarPointId = await db.into(db.grammarPoints).insert(
+              GrammarPointsCompanion.insert(
+                pattern: p['pattern'] as String,
+                meaningMy: Value(p['meaning'] as String?),
+                connection: Value(p['connection'] as String?),
+                exampleJp: Value(p['exampleJp'] as String?),
+                exampleMy: Value(p['exampleMy'] as String?),
+              ),
+            );
+
+        await db.into(db.grammarSourceItems).insert(
+              GrammarSourceItemsCompanion.insert(
+                grammarId: grammarPointId,
+                sourceId: sourceId,
+                unitId: Value(unitId),
+                position: Value(i + 1),
+                jlptLevel: Value(bookLevel),
+              ),
+            );
+      }
+    }
+  });
+}
+
 /// Ensures Grammar Books (N3 and N2) and their units and points are seeded in the database.
 Future<void> _ensureGrammarBooks(AppDatabase db, DateTime now) async {
   try {
     // Check N3
-    final existingN3 = await (db.sources.select()
+    final existingN3List = await (db.sources.select()
           ..where(
             (s) =>
                 s.type.equalsValue(SourceType.grammarBook) &
@@ -934,227 +1006,35 @@ Future<void> _ensureGrammarBooks(AppDatabase db, DateTime now) async {
           ))
         .get();
 
-    if (existingN3.isEmpty) {
-      await db.transaction(() async {
-        final shinkanzenGrammarN3Id = await db.into(db.sources).insert(
-              SourcesCompanion.insert(
-                type: SourceType.grammarBook,
-                name: 'Shinkanzen Master N3 文法',
-                jlptLevel: const Value('N3'),
-                sortOrder: const Value(1),
-              ),
-            );
+    bool needsN3Seed = false;
+    if (existingN3List.isEmpty) {
+      needsN3Seed = true;
+    } else {
+      final existingN3 = existingN3List.first;
+      final unitCount = await (db.units.select()
+            ..where((u) => u.sourceId.equals(existingN3.id)))
+          .get()
+          .then((l) => l.length);
 
-        final n3Units = [
-          'Unit 1: 時・契機 (အချိန်နှင့် အခိုက်အတန့်)',
-          'Unit 2: 原因・理由 (အကြောင်းပြချက်)',
-          'Unit 3: 逆接・譲歩 (ဆန့်ကျင်ဘက်ပြ)',
-          'Unit 4: 範囲・限定・対象 (နယ်ပယ်နှင့် သတ်မှတ်ချက်)',
-          'Unit 5: 目的・手段・関係 (ရည်ရွယ်ချက်နှင့် နည်းလမ်း)',
-        ];
-
-        final unitIds = <int>[];
-        for (var i = 0; i < n3Units.length; i++) {
-          final uId = await db.into(db.units).insert(
-                UnitsCompanion.insert(
-                  sourceId: shinkanzenGrammarN3Id,
-                  name: n3Units[i],
-                  orderNo: i + 1,
-                ),
-              );
-          unitIds.add(uId);
+      if (unitCount < 12) {
+        // Old stub/incomplete seed detected. Clean up and re-seed full 12 chapters.
+        for (final source in existingN3List) {
+          await (db.grammarSourceItems.delete()
+                ..where((item) => item.sourceId.equals(source.id)))
+              .go();
+          await (db.units.delete()
+                ..where((u) => u.sourceId.equals(source.id)))
+              .go();
+          await (db.sources.delete()
+                ..where((s) => s.id.equals(source.id)))
+              .go();
         }
+        needsN3Seed = true;
+      }
+    }
 
-        final n3Patterns = [
-          // Unit 1
-          (
-            title: '〜に際して',
-            meaning: '〜လုပ်သည့်အခါ / အချိန်တွင် (တရားဝင်)',
-            formation: 'V-辞書形 / N + に際して',
-            exampleJp: '新しい事業の開始に際して、関係者会議が行われた。',
-            exampleMy: 'လုပ်ငန်းသစ်စတင်သည့်အခါ သက်ဆိုင်ရာအစည်းအဝေး ကျင်းပခဲ့သည်။',
-            unit: unitIds[0],
-          ),
-          (
-            title: '〜最中に',
-            meaning: '〜လုပ်နေတုန်း / ဖြစ်နေဆဲတွင် (မထင်မှတ်တာ ဖြစ်ပေါ်လာ)',
-            formation: 'V-ている / Nの + 最中に',
-            exampleJp: 'スピーチの最中に、突然マイクの電源が切れた。',
-            exampleMy: 'မိန့်ခွန်းပြောနေတုန်းမှာ ရုတ်တရက် မိုက်ဖွင့်အား ပျက်သွားခဲ့သည်။',
-            unit: unitIds[0],
-          ),
-          (
-            title: '〜うちに',
-            meaning: '〜နေစဉ်အတွင်း / မ...ခင်',
-            formation: 'V-辞書形/ている/ない / A-い/な / Nの + うちに',
-            exampleJp: '日本にいるうちに、一度富士山に登ってみたい。',
-            exampleMy: 'ဂျပန်မှာ ရှိနေစဉ်အတွင်း ဖူဂျီတောင်ကို တစ်ကြိမ်လောက် တက်ကြည့်ချင်သည်။',
-            unit: unitIds[0],
-          ),
-          (
-            title: '〜たとたん（に）',
-            meaning: '〜ပြီးပြီးချင်း (မထင်မှတ်တာ ချက်ချင်းဖြစ်ပေါ်)',
-            formation: 'V-た + とたんに',
-            exampleJp: '窓を開けたとたん、冷たい風が一気に入ってきた。',
-            exampleMy: 'ပြတင်းပေါက်ဖွင့်လိုက်သည်နှင့် တစ်ပြိုင်နက် လေအေးများ ဝင်လာခဲ့သည်။',
-            unit: unitIds[0],
-          ),
-          // Unit 2
-          (
-            title: '〜おかげで',
-            meaning: '〜ကြောင့် / ကျေးဇူးကြောင့် (ရလဒ်ကောင်း)',
-            formation: '普通形 (Aな / Nの) + おかげで',
-            exampleJp: '先生が熱心に教えてくださったおかげで、試験に合格できた。',
-            exampleMy: 'ဆရာက စိတ်အားထက်သန်စွာ သင်ကြားပေးခဲ့သောကြောင့် စာမေးပွဲ အောင်မြင်ခဲ့သည်။',
-            unit: unitIds[1],
-          ),
-          (
-            title: '〜せいで',
-            meaning: '〜ကြောင့် / အပြစ်ကြောင့် (ရလဒ်ဆိုး)',
-            formation: '普通形 (Aな / Nの) + せいで',
-            exampleJp: '昨夜寝不足だったせいで、今朝から頭が痛くてたまらない。',
-            exampleMy: 'မနေ့ညက အိပ်ရေးပျက်ခဲ့သောကြောင့် ဒီမနက် ခေါင်းကိုက်နေသည်။',
-            unit: unitIds[1],
-          ),
-          (
-            title: '〜によって',
-            meaning: '〜ကြောင့် (သဘာဝဘေး/အကြောင်းရင်း) / 〜နည်းလမ်းဖြင့်',
-            formation: 'N + によって',
-            exampleJp: '大雨によって、電車の運行がストップした。',
-            exampleMy: 'မိုးသည်းထန်စွာ ရွာသွန်းမှုကြောင့် ရထားပြေးဆွဲမှု ရပ်တန့်သွားခဲ့သည်။',
-            unit: unitIds[1],
-          ),
-          (
-            title: '〜ばかりに',
-            meaning: '〜လုပ်မိသောကြောင့်သာ (မကောင်းသောရလဒ်ဖြစ်သွား)',
-            formation: '普通形 (Aな / Nである) + ばかりに',
-            exampleJp: 'うそをついたばかりに、友達の信頼を失ってしまった。',
-            exampleMy: 'လိမ်ပြောမိသောကြောင့်သာ သူငယ်ချင်း၏ ယုံကြည်မှုကို ဆုံးရှုံးခဲ့ရသည်။',
-            unit: unitIds[1],
-          ),
-          // Unit 3
-          (
-            title: '〜に対して',
-            meaning: '〜နှင့် ဆန့်ကျင်ဘက်အနေဖြင့် / 〜အပေါ်တွင်',
-            formation: 'N / 普通形(な/である) + に対して',
-            exampleJp: '兄が活発な性格であるのに対して、弟は静かでおとなしい。',
-            exampleMy: 'အစ်ကိုဖြစ်သူက တက်ကြွသော စရိုက်ရှိသည်နှင့် ဆန့်ကျင်ဘက်အနေဖြင့် ညီဖြစ်သူက တည်ငြိမ်အေးဆေးသည်။',
-            unit: unitIds[2],
-          ),
-          (
-            title: '〜反面',
-            meaning: 'တစ်ဖက်တွင်မူ / ဆန့်ကျင်ဘက်အားဖြင့်',
-            formation: '普通形 (Aな / Nである) + 反面',
-            exampleJp: '都会の生活は便利な反面、生活費が高くかかる。',
-            exampleMy: 'မြို့ပြလူနေမှုဘဝက အဆင်ပြေလွယ်ကူသော်လည်း တစ်ဖက်တွင်မူ ကုန်ကျစရိတ် မြင့်မားသည်။',
-            unit: unitIds[2],
-          ),
-          (
-            title: '〜にもかかわらず',
-            meaning: '〜သော်လည်းပဲ / ဖြစ်လင့်ကစား (ထင်ထားတာနဲ့ကွဲပြား)',
-            formation: '普通形 (Aな/である / Nである) + にもかかわらず',
-            exampleJp: '激しい雨にもかかわらず、多くの観客が集まった。',
-            exampleMy: 'မိုးသည်းထန်စွာရွာနေသော်လည်းပဲ ပရိသတ်များစွာ လာရောက်စုဝေးခဲ့ကြသည်။',
-            unit: unitIds[2],
-          ),
-          (
-            title: '〜わりに（は）',
-            meaning: '〜နှင့် နှိုင်းယှဉ်လျှင် / 〜ဖြစ်သော်လည်း မထင်ထားလောက်အောင်',
-            formation: '普通形 (Aな / Nの) + わりに',
-            exampleJp: 'この料理は値段が安いわりに、とても美味しい。',
-            exampleMy: 'ဒီဟင်းက ဈေးပေါသော်လည်း မထင်ထားလောက်အောင် အရမ်းအရသာရှိသည်။',
-            unit: unitIds[2],
-          ),
-          // Unit 4
-          (
-            title: '〜をはじめ',
-            meaning: '〜အပါအဝင် / ဦးစွာထား၍',
-            formation: 'N + をはじめ',
-            exampleJp: '日本には富士山をはじめ、世界に誇る名所がたくさんある。',
-            exampleMy: 'ဂျပန်နိုင်ငံတွင် ဖူဂျီတောင် အပါအဝင် ကမ္ဘာကဂုဏ်ယူရသော အထင်ကရနေရာများစွာ ရှိသည်။',
-            unit: unitIds[3],
-          ),
-          (
-            title: '〜を通じて',
-            meaning: '〜မှတစ်ဆင့် / ကာလတစ်ခုလုံးတစ်လျှောက်လုံး',
-            formation: 'N + を通じて',
-            exampleJp: '私は友人の紹介を通じて、現在の素晴らしい仕事を見つけました。',
-            exampleMy: 'ကျွန်တော်သည် သူငယ်ချင်း၏ မိတ်ဆက်ပေးမှုမှတစ်ဆင့် လက်ရှိကောင်းမွန်သောအလုပ်ကို ရှာဖွေတွေ့ရှိခဲ့သည်။',
-            unit: unitIds[3],
-          ),
-          (
-            title: '〜を問わず',
-            meaning: '〜ကို မခွဲခြားဘဲ / မသက်ဆိုင်ဘဲ',
-            formation: 'N + を問わず',
-            exampleJp: 'このイベントは、年齢や性別を問わずどなたでも参加できます。',
-            exampleMy: 'ဒီပွဲကို အသက်အရွယ် ကျား/မ မခွဲခြားဘဲ မည်သူမဆို ပါဝင်တက်ရောက်နိုင်သည်။',
-            unit: unitIds[3],
-          ),
-          (
-            title: '〜向けに',
-            meaning: '〜အတွက် ရည်ရွယ်၍ (Target group)',
-            formation: 'N + 向けに',
-            exampleJp: 'この教科書は、日本語初級の学習者向けに分かりやすく書かれている。',
-            exampleMy: 'ဒီဖတ်စာအုပ်သည် ဂျပန်စာ အခြေခံလေ့လာသူများအတွက် ရည်ရွယ်၍ နားလည်လွယ်အောင် ရေးသားထားသည်။',
-            unit: unitIds[3],
-          ),
-          // Unit 5
-          (
-            title: '〜ために',
-            meaning: '〜အတွက် / 〜ရန် ရည်ရွယ်၍',
-            formation: 'V-辞書形 / Nの + ために',
-            exampleJp: '健康のために、毎朝欠かさずジョギングをしています。',
-            exampleMy: 'ကျန်းမာရေးအတွက် မနက်တိုင်း မပျက်မကွက် ပြေးလေ့ကျင့်ခန်း လုပ်နေပါသည်။',
-            unit: unitIds[4],
-          ),
-          (
-            title: '〜ように',
-            meaning: '〜ဖြစ်စေရန် / 〜နိုင်စေရန် (ရည်ရွယ်ချက်)',
-            formation: 'V-辞書形/ない形 + ように',
-            exampleJp: '後ろの席の人にも聞こえるように、大きな声で話してください。',
-            exampleMy: 'နောက်ခုံမှ လူများလည်း ကြားနိုင်စေရန် အသံကျယ်ကျယ်ဖြင့် ပြောပေးပါ။',
-            unit: unitIds[4],
-          ),
-          (
-            title: '〜を中心に',
-            meaning: '〜ကို အဓိကထား၍ / ဗဟိုပြု၍',
-            formation: 'N + を中心に',
-            exampleJp: '文法を中心に、日本語の基礎をしっかりと勉強した。',
-            exampleMy: 'သဒ္ဒါကို အဓိကထား၍ ဂျပန်စာ အခြေခံကို သေချာစွာ လေ့လာခဲ့သည်။',
-            unit: unitIds[4],
-          ),
-          (
-            title: '〜を通して',
-            meaning: '〜မှတစ်ဆင့် (ကြားခံထား၍)',
-            formation: 'N + を通して',
-            exampleJp: 'ボランティア活動を通して、多くの貴重な経験ができた。',
-            exampleMy: 'စေတနာ့ဝန်ထမ်း လှုပ်ရှားမှုမှတစ်ဆင့် တန်ဖိုးရှိသော အတွေ့အကြုံများစွာ ရရှိခဲ့သည်။',
-            unit: unitIds[4],
-          ),
-        ];
-
-        for (var i = 0; i < n3Patterns.length; i++) {
-          final g = n3Patterns[i];
-          final grammarPointId = await db.into(db.grammarPoints).insert(
-                GrammarPointsCompanion.insert(
-                  pattern: g.title,
-                  meaningMy: Value(g.meaning),
-                  connection: Value(g.formation),
-                  exampleJp: Value(g.exampleJp),
-                  exampleMy: Value(g.exampleMy),
-                ),
-              );
-          await db.into(db.grammarSourceItems).insert(
-                GrammarSourceItemsCompanion.insert(
-                  grammarId: grammarPointId,
-                  sourceId: shinkanzenGrammarN3Id,
-                  unitId: Value(g.unit),
-                  position: Value(i % 4 + 1),
-                  jlptLevel: const Value('N3'),
-                ),
-              );
-        }
-      });
+    if (needsN3Seed) {
+      await _seedGrammarN3FromJson(db, now);
     }
 
     // Also check N2
@@ -1313,7 +1193,6 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
     vocabSourceId = vocabSource.id;
   }
 
-  final seenVocabInSource = <int>{};
 
   for (final chObj in chapters) {
     final ch = chObj as Map<String, dynamic>;
