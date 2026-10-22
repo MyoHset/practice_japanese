@@ -6879,306 +6879,151 @@
     },
     {
       "chapter": 16,
-      "title": "Ch.16: 事件・事故 (မှုခင်းနှင့် မတော်တဆမှု)",
+      "title": "Ch.16: 仕事 (အလုပ်)",
       "kanjis": [
         {
-          "character": "罪",
-          "onyomi": "ザイ",
-          "kunyomi": "つみ",
-          "meaning": "ပြစ်မှု၊ အပြစ်",
+          "character": "仕",
+          "onyomi": "シ、ジ",
+          "kunyomi": "つか・える",
+          "meaning": "အလုပ်အကျွေးပြုသည်၊ အလုပ်",
           "vocab": [
             {
-              "word": "犯罪",
-              "reading": "はんざい",
-              "meaning": "ပြစ်မှုရာဇဝတ်မှု"
+              "word": "仕える",
+              "reading": "つかえる",
+              "meaning": "အလုပ်အကျွေးပြုသည်"
             },
             {
-              "word": "罪",
-              "reading": "つみ",
-              "meaning": "ပြစ်မှုအပြစ်"
+              "word": "仕方",
+              "reading": "しかた",
+              "meaning": "နည်းလမ်း"
             },
             {
-              "word": "無罪",
-              "reading": "むざい",
-              "meaning": "အပြစ်မရှိခြင်း"
+              "word": "仕方がない",
+              "reading": "しかたない",
+              "meaning": "နည်းလမ်းမရှိသော / မတတ်နိုင်သော"
+            },
+            {
+              "word": "仕事",
+              "reading": "しごと",
+              "meaning": "အလုပ်"
+            },
+            {
+              "word": "給仕",
+              "reading": "きゅうじ",
+              "meaning": "စားပွဲထိုး"
+            },
+            {
+              "word": "仕送り",
+              "reading": "しおくり",
+              "meaning": "ထောက်ပံ့ကြေး"
             }
           ]
         },
         {
-          "character": "犯",
-          "onyomi": "ハン",
-          "kunyomi": "おか・す",
-          "meaning": "ကျူးလွန်သည်၊ တရားခံ",
-          "vocab": [
-            {
-              "word": "犯人",
-              "reading": "はんにん",
-              "meaning": "တရားခံ"
-            },
-            {
-              "word": "犯す",
-              "reading": "おかす",
-              "meaning": "ကျူးလွန်သည်"
-            },
-            {
-              "word": "防犯",
-              "reading": "ぼうはん",
-              "meaning": "ပြစ်မှုကာကွယ်ရေး"
-            }
-          ]
-        },
-        {
-          "character": "捕",
-          "onyomi": "ホ",
-          "kunyomi": "つか・まえる、と・らえる",
-          "meaning": "ဖမ်းဆီးသည်",
-          "vocab": [
-            {
-              "word": "捕まえる",
-              "reading": "つかまえる",
-              "meaning": "ဖမ်းဆီးသည်"
-            },
-            {
-              "word": "逮捕する",
-              "reading": "たいほする",
-              "meaning": "ဖမ်းဆီးသည်"
-            }
-          ]
-        },
-        {
-          "character": "害",
-          "onyomi": "ガイ",
+          "character": "職",
+          "onyomi": "ショク",
           "kunyomi": "",
-          "meaning": "ထိခိုက်နစ်နာမှု၊ ပျက်စီးမှု",
+          "meaning": "အလုပ်၊ အလုပ်အကိုင်၊ လုပ်ငန်းခွင်",
           "vocab": [
             {
-              "word": "被害",
-              "reading": "ひがい",
-              "meaning": "ပျက်စီးဆုံးရှုံးမှု"
+              "word": "職",
+              "reading": "しょく",
+              "meaning": "အလုပ် / အလုပ်အကိုင် / လုပ်ငန်းခွင်"
             },
             {
-              "word": "害虫",
-              "reading": "がいちゅう",
-              "meaning": "ဖျက်ဆီးတတ်သောပိုးမွှား"
+              "word": "就職",
+              "reading": "しゅうしょく",
+              "meaning": "အလုပ်ရခြင်း / အလုပ်ဝင်ခြင်း"
             },
             {
-              "word": "公害",
-              "reading": "こうがい",
-              "meaning": "ပတ်ဝန်းကျင်ညစ်ညမ်းမှု"
+              "word": "職業",
+              "reading": "しょくぎょう",
+              "meaning": "လုပ်ငန်း"
+            },
+            {
+              "word": "転職",
+              "reading": "てんしょく",
+              "meaning": "အလုပ်ပြောင်းခြင်း"
             }
           ]
         },
         {
-          "character": "遭",
-          "onyomi": "ソウ",
-          "kunyomi": "あ・う",
-          "meaning": "ကြုံတွေ့ရသည်၊ ရင်ဆိုင်ရသည်",
+          "character": "求",
+          "onyomi": "キュウ",
+          "kunyomi": "もと・める",
+          "meaning": "ဆန္ဒရှိသည်၊ တောင်းခံသည်၊ လိုအပ်သည်",
           "vocab": [
             {
-              "word": "遭難する",
-              "reading": "そうなんする",
-              "meaning": "ဘေးအန္တရာယ်ကြုံတွေ့သည်"
+              "word": "求める",
+              "reading": "もとめる",
+              "meaning": "ဆန္ဒရှိသည် / တောင်းခံသည် / လိုအပ်သည်"
             },
             {
-              "word": "遭う",
-              "reading": "あう",
-              "meaning": "ကြုံတွေ့ရသည်"
-            }
-          ]
-        },
-        {
-          "character": "殺",
-          "onyomi": "サツ",
-          "kunyomi": "ころ・す",
-          "meaning": "သတ်ဖြတ်သည်",
-          "vocab": [
-            {
-              "word": "殺人",
-              "reading": "さつじん",
-              "meaning": "လူသတ်မှု"
+              "word": "要求",
+              "reading": "ようきゅう",
+              "meaning": "တောင်းဆိုမှု / တောင်းခံမှု / ဆန္ဒ"
             },
             {
-              "word": "殺す",
-              "reading": "ころす",
-              "meaning": "သတ်ဖြတ်သည်"
+              "word": "求職中",
+              "reading": "きゅうしょくちゅう",
+              "meaning": "အလုပ်ရှာနေဆဲ"
             },
             {
-              "word": "自殺する",
-              "reading": "じさつする",
-              "meaning": "ကိုယ့်ကိုယ်ကိုသတ်သေသည်"
-            }
-          ]
-        },
-        {
-          "character": "警",
-          "onyomi": "ケイ",
-          "kunyomi": "",
-          "meaning": "သတိပေးသည်၊ ရဲတပ်ဖွဲ့",
-          "vocab": [
-            {
-              "word": "警察",
-              "reading": "けいさつ",
-              "meaning": "ရဲတပ်ဖွဲ့"
-            },
-            {
-              "word": "警告する",
-              "reading": "けいこくする",
-              "meaning": "သတိပေးသည်"
-            },
-            {
-              "word": "警備",
-              "reading": "けいび",
-              "meaning": "လုံခြုံရေး"
-            }
-          ]
-        },
-        {
-          "character": "察",
-          "onyomi": "サツ",
-          "kunyomi": "",
-          "meaning": "စစ်ဆေးစုံစမ်းသည်၊ ရဲ",
-          "vocab": [
-            {
-              "word": "警察",
-              "reading": "けいさつ",
-              "meaning": "ရဲတပ်ဖွဲ့"
-            },
-            {
-              "word": "観察する",
-              "reading": "かんさつする",
-              "meaning": "စောင့်ကြည့်လေ့လာသည်"
-            }
-          ]
-        },
-        {
-          "character": "判",
-          "onyomi": "ハン、バン",
-          "kunyomi": "",
-          "meaning": "တရားစီရင်သည်၊ ဆုံးဖြတ်သည်",
-          "vocab": [
-            {
-              "word": "裁判",
-              "reading": "さいばん",
-              "meaning": "တရားစီရင်မှု"
-            },
-            {
-              "word": "判断する",
-              "reading": "はんだんする",
-              "meaning": "ဆုံးဖြတ်သည်"
-            }
-          ]
-        },
-        {
-          "character": "疑",
-          "onyomi": "ギ",
-          "kunyomi": "うたが・う",
-          "meaning": "သံသယရှိသည်",
-          "vocab": [
-            {
-              "word": "疑う",
-              "reading": "うたがう",
-              "meaning": "သံသယရှိသည်"
-            },
-            {
-              "word": "疑問",
-              "reading": "ぎもん",
-              "meaning": "သံသယမေးခွန်း"
-            },
-            {
-              "word": "容疑者",
-              "reading": "ようぎしゃ",
-              "meaning": "သံသယရှိသူ"
-            }
-          ]
-        },
-        {
-          "character": "避",
-          "onyomi": "ヒ",
-          "kunyomi": "さ・ける",
-          "meaning": "ရှောင်ရှားသည်၊ ဘေးလွတ်ရာရှောင်သည်",
-          "vocab": [
-            {
-              "word": "避ける",
-              "reading": "さける",
-              "meaning": "ရှောင်ရှားသည်"
-            },
-            {
-              "word": "避難する",
-              "reading": "ひなんする",
-              "meaning": "ဘေးလွတ်ရာသို့ရှောင်သည်"
-            }
-          ]
-        },
-        {
-          "character": "防",
-          "onyomi": "ボウ",
-          "kunyomi": "ふせ・ぐ",
-          "meaning": "ကာကွယ်သည်၊ တားဆီးသည်",
-          "vocab": [
-            {
-              "word": "防ぐ",
-              "reading": "ふせぐ",
-              "meaning": "ကာကွယ်သည်"
-            },
-            {
-              "word": "防止する",
-              "reading": "ぼうしする",
-              "meaning": "တားဆီးသည်"
-            },
-            {
-              "word": "予防する",
-              "reading": "よぼうする",
-              "meaning": "ကြိုတင်ကာကွယ်သည်"
-            }
-          ]
-        },
-        {
-          "character": "非",
-          "onyomi": "ヒ",
-          "kunyomi": "",
-          "meaning": "မဟုတ်မမှန်သော၊ အရေးပေါ်",
-          "vocab": [
-            {
-              "word": "非常口",
-              "reading": "ひじょうぐち",
-              "meaning": "အရေးပေါ်ထွက်ပေါက်"
-            },
-            {
-              "word": "非常識な",
-              "reading": "ひじょうしきな",
-              "meaning": "မပြုလုပ်သင့်သော"
+              "word": "求人",
+              "reading": "きゅうじん",
+              "meaning": "အလုပ်လူခေါ်ခြင်း / လူခေါ်ခြင်း (Recruitment)"
             }
           ]
         },
         {
           "character": "常",
           "onyomi": "ジョウ",
-          "kunyomi": "つね、とこ",
-          "meaning": "ပုံမှန်၊ အမြဲတမ်း",
+          "kunyomi": "つね",
+          "meaning": "အမြဲတမ်း၊ သာမန်",
           "vocab": [
             {
-              "word": "非常な",
-              "reading": "ひじょうな",
-              "meaning": "အလွန်အမင်းအရေးပေါ်"
+              "word": "常に",
+              "reading": "つねに",
+              "meaning": "အမြဲတမ်း"
+            },
+            {
+              "word": "常夏",
+              "reading": "とこなつ",
+              "meaning": "အမြဲနွေရာသီ"
+            },
+            {
+              "word": "常識",
+              "reading": "じょうしき",
+              "meaning": "သာမန်အသိ / ပုံမှန်အသိ"
+            },
+            {
+              "word": "通常通り",
+              "reading": "つうじょうどおり",
+              "meaning": "ထုံးစံအတိုင်း / ပုံမှန်အတိုင်း"
             },
             {
               "word": "日常",
               "reading": "にちじょう",
               "meaning": "နေ့စဉ်"
-            },
-            {
-              "word": "正常な",
-              "reading": "せいじょうな",
-              "meaning": "ပုံမှန်ဖြစ်သော"
             }
           ]
         },
         {
           "character": "識",
-          "onyomi": "シク",
+          "onyomi": "シキ",
           "kunyomi": "",
-          "meaning": "အသိပညာ၊ ဗဟုသုတ",
+          "meaning": "အသိ၊ ဗဟုသုတ",
           "vocab": [
+            {
+              "word": "識",
+              "reading": "しき",
+              "meaning": "အသိ (consciousness)"
+            },
+            {
+              "word": "面識",
+              "reading": "めんしき",
+              "meaning": "အသိမိတ်ဆွေ / အသိအကျွမ်း"
+            },
             {
               "word": "知識",
               "reading": "ちしき",
@@ -7188,121 +7033,471 @@
               "word": "意識",
               "reading": "いしき",
               "meaning": "အသိစိတ်"
-            },
-            {
-              "word": "常識",
-              "reading": "じょうしき",
-              "meaning": "အခြေခံအသိတရား"
             }
           ]
         },
         {
-          "character": "断",
-          "onyomi": "ダン",
-          "kunyomi": "た・つ、ことわ・る",
-          "meaning": "ဖြတ်တောက်သည်၊ ငြင်းပယ်သည်၊ ဆုံးဖြတ်သည်",
+          "character": "失",
+          "onyomi": "シツ",
+          "kunyomi": "うしな・う",
+          "meaning": "ဆုံးရှုံးသည်၊ မရှိတော့သည်",
           "vocab": [
             {
-              "word": "断る",
-              "reading": "ことわる",
-              "meaning": "ငြင်းပယ်သည်"
+              "word": "失う",
+              "reading": "うしなう",
+              "meaning": "ဆုံးရှုံးသည်"
             },
             {
-              "word": "中断する",
-              "reading": "ちゅうだんする",
-              "meaning": "ခေတ္တရပ်နားသည်"
+              "word": "失業",
+              "reading": "しつぎょう",
+              "meaning": "အလုပ်လက်မဲ့ဖြစ်ခြင်း"
             },
             {
-              "word": "決断する",
-              "reading": "けつだんする",
-              "meaning": "ဆုံးဖြတ်သည်"
+              "word": "失礼",
+              "reading": "しつれい",
+              "meaning": "မယဉ်ကျေးသော"
+            },
+            {
+              "word": "紛失",
+              "reading": "ふんしつ",
+              "meaning": "ဆုံးရှုံးမှု"
+            },
+            {
+              "word": "紛失届",
+              "reading": "ふんしつとどけ",
+              "meaning": "ဆုံးရှုံးမှုအစီရင်ခံစာ"
             }
           ]
         },
         {
-          "character": "求",
+          "character": "礼",
+          "onyomi": "レイ、ライ",
+          "kunyomi": "",
+          "meaning": "ကျေးဇူးတင်ခြင်း၊ ယဉ်ကျေးမှု",
+          "vocab": [
+            {
+              "word": "お礼",
+              "reading": "おれい",
+              "meaning": "ကျေးဇူးတင်ခြင်း"
+            },
+            {
+              "word": "礼儀正しい",
+              "reading": "れいぎただしい",
+              "meaning": "ယဉ်ကျေးသော"
+            },
+            {
+              "word": "礼金",
+              "reading": "れいきん",
+              "meaning": "ငွေကြေး (ကျေးဇူးတင်၍ပေးသော) / ညှပ်ပူဇော်ခ"
+            },
+            {
+              "word": "お礼状",
+              "reading": "おれいじょう",
+              "meaning": "ကျေးဇူးတင်လွှာ"
+            },
+            {
+              "word": "礼賛",
+              "reading": "らいさん",
+              "meaning": "ချီးမွမ်းခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "労",
+          "onyomi": "ロウ",
+          "kunyomi": "",
+          "meaning": "ပင်ပန်းဆင်းရဲခြင်း၊ အလုပ်လုပ်သည်",
+          "vocab": [
+            {
+              "word": "苦労",
+              "reading": "くろう",
+              "meaning": "ပင်ပန်းဆင်းရဲခြင်း / ဒုက္ခအခက်အခဲ"
+            },
+            {
+              "word": "疲労",
+              "reading": "ひろう",
+              "meaning": "ပင်ပန်းနွမ်းနယ်ခြင်း"
+            },
+            {
+              "word": "労働",
+              "reading": "ろうどう",
+              "meaning": "ကာယအလုပ်"
+            }
+          ]
+        },
+        {
+          "character": "員",
+          "onyomi": "イン",
+          "kunyomi": "",
+          "meaning": "ဝန်ထမ်း၊ အဖွဲ့ဝင်",
+          "vocab": [
+            {
+              "word": "員",
+              "reading": "いん",
+              "meaning": "ဝန်ထမ်း / အဖွဲ့ဝင်"
+            },
+            {
+              "word": "社員",
+              "reading": "しゃいん",
+              "meaning": "ရုံးဝန်ထမ်း"
+            },
+            {
+              "word": "店員",
+              "reading": "てんいん",
+              "meaning": "ဆိုင်ဝန်ထမ်း"
+            },
+            {
+              "word": "全員",
+              "reading": "ぜんいん",
+              "meaning": "အဖွဲ့ဝင်အားလုံး"
+            },
+            {
+              "word": "満員",
+              "reading": "まんいん",
+              "meaning": "လူအပြည့်"
+            }
+          ]
+        },
+        {
+          "character": "官",
+          "onyomi": "カン",
+          "kunyomi": "",
+          "meaning": "အစိုးရအရာရှိ၊ သံတမန်",
+          "vocab": [
+            {
+              "word": "器官",
+              "reading": "きかん",
+              "meaning": "အတွင်းအင်္ဂါကလီစာများ"
+            },
+            {
+              "word": "外交官",
+              "reading": "がいこうかん",
+              "meaning": "သံတမန်"
+            },
+            {
+              "word": "官民一体",
+              "reading": "かんみんいったい",
+              "meaning": "အစိုးရနှင့် ပုဂ္ဂလိက ကဏ္ဍများ စည်းလုံးညီညွတ်ရေး"
+            },
+            {
+              "word": "官邸",
+              "reading": "かんてい",
+              "meaning": "အစိုးရအိမ်တော် / အစိုးရနေအိမ် (ဝန်ကြီး)"
+            },
+            {
+              "word": "官僚",
+              "reading": "かんりょう",
+              "meaning": "အစိုးရအရာရှိ"
+            }
+          ]
+        },
+        {
+          "character": "局",
+          "onyomi": "キョク",
+          "kunyomi": "",
+          "meaning": "ဌာန၊ ဒေသ၊ အခြေအနေ",
+          "vocab": [
+            {
+              "word": "局",
+              "reading": "きょく",
+              "meaning": "ဌာန"
+            },
+            {
+              "word": "郵便局",
+              "reading": "ゆうびんきょく",
+              "meaning": "စာတိုက်"
+            },
+            {
+              "word": "薬局",
+              "reading": "やっきょく",
+              "meaning": "ဆေးဆိုင်"
+            },
+            {
+              "word": "難局",
+              "reading": "なんきょく",
+              "meaning": "ခက်ခဲသောအခြေအနေ"
+            },
+            {
+              "word": "結局",
+              "reading": "けっきょく",
+              "meaning": "နောက်ဆုံးမှာ / အဆုံးမှာ"
+            },
+            {
+              "word": "局地",
+              "reading": "きょくち",
+              "meaning": "နေရာဒေသ / ဒေသခံဧရိယာ"
+            },
+            {
+              "word": "局地的な",
+              "reading": "きょくちてきな",
+              "meaning": "ဒေသအလိုက်"
+            }
+          ]
+        },
+        {
+          "character": "辞",
+          "onyomi": "ジ",
+          "kunyomi": "や・める",
+          "meaning": "ရပ်တန့်သည်၊ ငြင်းဆိုသည်၊ စကား",
+          "vocab": [
+            {
+              "word": "辞める",
+              "reading": "やめる",
+              "meaning": "ရပ်တန့်သည်"
+            },
+            {
+              "word": "辞書",
+              "reading": "じしょ",
+              "meaning": "အဘိဓာန်"
+            },
+            {
+              "word": "辞退",
+              "reading": "じたい",
+              "meaning": "ငြင်းဆိုခြင်း / လက်မခံခြင်း"
+            },
+            {
+              "word": "漢和辞典",
+              "reading": "かんわじてん",
+              "meaning": "ခန်းဂျီးအဘိဓာန်"
+            },
+            {
+              "word": "総辞職",
+              "reading": "そうじしょく",
+              "meaning": "အစုလိုက်အပြုံလိုက်နှုတ်ထွက်ခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "退",
+          "onyomi": "タイ",
+          "kunyomi": "しりぞ・く、しりぞ・ける",
+          "meaning": "ရပ်နားသည်၊ နှုတ်ထွက်သည်၊ နောက်ဆုတ်သည်",
+          "vocab": [
+            {
+              "word": "退く",
+              "reading": "しりぞく",
+              "meaning": "ရပ်နားသည် / နှုတ်ထွက်သည် / နောက်ဆုတ်သည်"
+            },
+            {
+              "word": "退ける",
+              "reading": "しりぞける",
+              "meaning": "ငြင်းဆိုသည် / နောက်ဆုတ်သည်"
+            },
+            {
+              "word": "退屈する",
+              "reading": "たいくつする",
+              "meaning": "ပျင်းသည်"
+            },
+            {
+              "word": "退学",
+              "reading": "たいがく",
+              "meaning": "ကျောင်းနားခြင်း"
+            },
+            {
+              "word": "後退",
+              "reading": "こうたい",
+              "meaning": "ဆုတ်ခွာ ပြန်ကျသွားသည်"
+            },
+            {
+              "word": "退職",
+              "reading": "たいしょく",
+              "meaning": "အလုပ်နားသည် / အငြိမ်းစားယူသည်"
+            }
+          ]
+        },
+        {
+          "character": "積",
+          "onyomi": "セキ",
+          "kunyomi": "つ・もる、つ・む",
+          "meaning": "စုပုံသည်၊ ပုံသည်",
+          "vocab": [
+            {
+              "word": "積もる",
+              "reading": "つもる",
+              "meaning": "စုပုံသည်"
+            },
+            {
+              "word": "積む",
+              "reading": "つむ",
+              "meaning": "ပုံသည် / စုပုံစေသည်"
+            },
+            {
+              "word": "見積",
+              "reading": "みつもり",
+              "meaning": "ခန့်မှန်းချက် / တန်ဖိုးဖြတ်ခြင်း / ခန့်မှန်းတွက်ချက်ခြင်း"
+            },
+            {
+              "word": "面積",
+              "reading": "めんせき",
+              "meaning": "ဧရိယာ"
+            },
+            {
+              "word": "山積する",
+              "reading": "さんせきする",
+              "meaning": "တောင်ပုံယာပုံဖြစ်နေသည်"
+            }
+          ]
+        },
+        {
+          "character": "給",
           "onyomi": "キュウ",
-          "kunyomi": "もと・める",
-          "meaning": "တောင်းဆိုသည်၊ ရှာဖွေသည်",
+          "kunyomi": "",
+          "meaning": "ထောက်ပံ့သည်၊ လစာ",
           "vocab": [
             {
-              "word": "求める",
-              "reading": "もとめる",
-              "meaning": "တောင်းဆိုသည်"
+              "word": "給料日",
+              "reading": "きゅうりょうび",
+              "meaning": "လစာထုတ်ရက်"
             },
             {
-              "word": "要求する",
-              "reading": "ようきゅうする",
-              "meaning": "တောင်းဆိုသည်"
+              "word": "時給",
+              "reading": "じきゅう",
+              "meaning": "အချိန်ပိုင်းလုပ်အားခ / တစ်နာရီလုပ်အားခ"
             },
             {
-              "word": "求人",
-              "reading": "きゅうじん",
-              "meaning": "အလုပ်ခေါ်ယူခြင်း"
+              "word": "初任給",
+              "reading": "しょにんきゅう",
+              "meaning": "ပထမဆုံးလစာ"
+            },
+            {
+              "word": "自給自足",
+              "reading": "じきゅうじそく",
+              "meaning": "မိမိကိုယ်ကိုယ်ဖူလုံရေး"
             }
           ]
         },
         {
-          "character": "要",
-          "onyomi": "ヨウ",
-          "kunyomi": "い・る",
-          "meaning": "လိုအပ်သည်၊ အရေးကြီးသော",
+          "character": "収",
+          "onyomi": "シュウ",
+          "kunyomi": "おさ・まる",
+          "meaning": "အဝင်ခွင်ကျဖြစ်စေသည်၊ ဝင်ငွေ",
           "vocab": [
             {
-              "word": "要る",
-              "reading": "いる",
-              "meaning": "လိုအပ်သည်"
+              "word": "収まる",
+              "reading": "おさまる",
+              "meaning": "အဝင်ခွင်ကျဖြစ်စေသည် / ကွက်တိဖြစ်သည်။"
             },
             {
-              "word": "必要",
-              "reading": "ひつよう",
-              "meaning": "လိုအပ်ချက်"
+              "word": "吸収",
+              "reading": "きゅうしゅう",
+              "meaning": "စုတ်ယူမှု"
             },
             {
-              "word": "重要",
-              "reading": "じゅうよう",
-              "meaning": "အရေးကြီးသော"
+              "word": "収入",
+              "reading": "しゅうにゅう",
+              "meaning": "ဝင်ငွေ"
             }
           ]
         },
         {
-          "character": "危",
-          "onyomi": "キ",
-          "kunyomi": "あぶ・ない、あや・うい",
-          "meaning": "အန္တရာယ်ရှိသော",
+          "character": "支",
+          "onyomi": "シ",
+          "kunyomi": "ささ・える",
+          "meaning": "ထောက်ကူသည်၊ အသုံးစရိတ်",
           "vocab": [
             {
-              "word": "危険な",
-              "reading": "きけんな",
-              "meaning": "အန္တရာယ်ရှိသော"
+              "word": "支える",
+              "reading": "ささえる",
+              "meaning": "ထောက်ကူသည်"
             },
             {
-              "word": "危ない",
-              "reading": "あぶない",
-              "meaning": "အန္တရာယ်ရှိသော"
+              "word": "収支",
+              "reading": "しゅうし",
+              "meaning": "ဝင်ငွေနှင့်ထွက်ငွေ"
             },
             {
-              "word": "危機",
-              "reading": "きき",
-              "meaning": "အကြပ်အတည်း"
+              "word": "支配人",
+              "reading": "しはいにん",
+              "meaning": "မန်နေဂျာ"
+            },
+            {
+              "word": "支出",
+              "reading": "ししゅつ",
+              "meaning": "အသုံးပြုစရိတ်"
+            },
+            {
+              "word": "支持",
+              "reading": "しじ",
+              "meaning": "ထောက်ခံအားပေးခြင်း"
             }
           ]
         },
         {
-          "character": "険",
-          "onyomi": "ケン",
-          "kunyomi": "けわ・しい",
-          "meaning": "မတ်စောက်သော၊ အန္တရာယ်ရှိသော",
+          "character": "厚",
+          "onyomi": "コウ",
+          "kunyomi": "あつ・い",
+          "meaning": "ထူသော၊ နူးညံ့သိမ်မွေ့သော",
           "vocab": [
             {
-              "word": "危険な",
-              "reading": "きけんな",
-              "meaning": "အန္တရာယ်ရှိသော"
+              "word": "厚い",
+              "reading": "あつい",
+              "meaning": "ထူသော"
             },
             {
-              "word": "険しい",
-              "reading": "けわしい",
-              "meaning": "မတ်စောက်သော"
+              "word": "温厚な",
+              "reading": "おんこうな",
+              "meaning": "နူးညံ့သိမ်မွေ့သော"
+            },
+            {
+              "word": "濃厚な",
+              "reading": "のうこうな",
+              "meaning": "ကြွယ်ဝသော / ပြင်းသော"
+            }
+          ]
+        },
+        {
+          "character": "薄",
+          "onyomi": "ハク",
+          "kunyomi": "うす・い、うす・める",
+          "meaning": "ပါးသော၊ ကျဲသော",
+          "vocab": [
+            {
+              "word": "薄い",
+              "reading": "うすい",
+              "meaning": "ပါးသော / ကျဲသော"
+            },
+            {
+              "word": "薄める",
+              "reading": "うすめる",
+              "meaning": "(အရည်) ကျဲစေသည်"
+            },
+            {
+              "word": "軽薄な",
+              "reading": "けいはくな",
+              "meaning": "ပေါ့ပျက်ပျက်နိုင်သော"
+            },
+            {
+              "word": "薄暗い",
+              "reading": "うすぐらい",
+              "meaning": "မှိန်ဖျဖျဖြစ်သော"
+            }
+          ]
+        },
+        {
+          "character": "申",
+          "onyomi": "シン",
+          "kunyomi": "もう・す",
+          "meaning": "လျှောက်ထားသည်၊ ကြေညာသည်၊ တင်ပြသည်",
+          "vocab": [
+            {
+              "word": "申し込む",
+              "reading": "もうしこむ",
+              "meaning": "လျှောက်ထားသည်"
+            },
+            {
+              "word": "申込書",
+              "reading": "もうしこみしょ",
+              "meaning": "လျှောက်လွှာ"
+            },
+            {
+              "word": "申請する",
+              "reading": "しんせいする",
+              "meaning": "လျှောက်ထားတင်ပြသည်"
+            },
+            {
+              "word": "申告する",
+              "reading": "しんこくする",
+              "meaning": "ကြေညာ/သတင်းပို့သည်"
             }
           ]
         }
@@ -7746,777 +7941,206 @@
     },
     {
       "chapter": 18,
-      "title": "Ch.18: 地理・地域 (ပထဝီနှင့် ဒေသ)",
+      "title": "Ch.18: 会議 (အစည်းအဝေး)",
       "kanjis": [
         {
-          "character": "都",
-          "onyomi": "ト、ツ",
-          "kunyomi": "みやこ",
-          "meaning": "မြို့တော်၊ မြို့ကြီး",
-          "vocab": [
-            {
-              "word": "東京都",
-              "reading": "とうきょうと",
-              "meaning": "တိုကျိုမြို့"
-            },
-            {
-              "word": "都市",
-              "reading": "とし",
-              "meaning": "မြို့ကြီး"
-            },
-            {
-              "word": "都合",
-              "reading": "つごう",
-              "meaning": "အဆင်ပြေမှု"
-            }
-          ]
-        },
-        {
-          "character": "道",
-          "onyomi": "ドウ、トウ",
-          "kunyomi": "みち",
-          "meaning": "လမ်း၊ ပြည်နယ်",
-          "vocab": [
-            {
-              "word": "北海道",
-              "reading": "ほっかいどう",
-              "meaning": "ဟော့ကိုင်းဒိုး"
-            },
-            {
-              "word": "道路",
-              "reading": "どうろ",
-              "meaning": "ကားလမ်း"
-            },
-            {
-              "word": "水道",
-              "reading": "すいどう",
-              "meaning": "ရေပိုက်"
-            }
-          ]
-        },
-        {
-          "character": "府",
-          "onyomi": "フ",
+          "character": "議",
+          "onyomi": "ギ",
           "kunyomi": "",
-          "meaning": "မြို့တော်ခရိုင် (အိုဆာကာ၊ ကျိုတို)",
+          "meaning": "ဆွေးနွေးတိုင်ပင်သည်၊ အစည်းအဝေး",
           "vocab": [
             {
-              "word": "大阪府",
-              "reading": "おおさかふ",
-              "meaning": "အိုဆာကာခရိုင်"
+              "word": "会議",
+              "reading": "かいぎ",
+              "meaning": "အစည်းအဝေး"
             },
             {
-              "word": "政府",
-              "reading": "せいふ",
-              "meaning": "အစိုးရ"
+              "word": "議事録",
+              "reading": "ぎじろく",
+              "meaning": "အစည်းအဝေးမှတ်တမ်း"
+            },
+            {
+              "word": "議題",
+              "reading": "ぎだい",
+              "meaning": "အစည်းအဝေးခေါင်းစဉ်"
             }
           ]
         },
         {
-          "character": "県",
-          "onyomi": "ケン",
+          "character": "賛",
+          "onyomi": "サン",
           "kunyomi": "",
-          "meaning": "ခရိုင်",
+          "meaning": "ထောက်ခံသည်၊ သဘောတူသည်",
           "vocab": [
             {
-              "word": "青森県",
-              "reading": "あおもりけん",
-              "meaning": "အအိုမိုရီခရိုင်"
+              "word": "賛",
+              "reading": "さん",
+              "meaning": "ထောက်ခံခြင်း"
             },
             {
-              "word": "県庁",
-              "reading": "けんちょう",
-              "meaning": "ခရိုင်ရုံး"
+              "word": "賛成",
+              "reading": "さんせい",
+              "meaning": "ထောက်ခံခြင်း၊ သဘောတူခြင်း"
+            },
+            {
+              "word": "賛同",
+              "reading": "さんどう",
+              "meaning": "ထောက်ခံချက်"
+            },
+            {
+              "word": "賛同を得る",
+              "reading": "さんどうをえる",
+              "meaning": "ထောက်ခံချက်ကိုရယူသည်"
+            },
+            {
+              "word": "自画自賛",
+              "reading": "じがじさん",
+              "meaning": "မိမိကိုယ်ကိုယ်ချီးကျူးခြင်း"
             }
           ]
         },
         {
-          "character": "市",
-          "onyomi": "シ",
-          "kunyomi": "いち",
-          "meaning": "မြို့",
+          "character": "反",
+          "onyomi": "ハン、ホン、タン",
+          "kunyomi": "そ・る、そ・らす",
+          "meaning": "ဆန့်ကျင်သည်၊ ပြောင်းပြန်လှန်သည်",
           "vocab": [
             {
-              "word": "市民",
-              "reading": "しみん",
-              "meaning": "မြို့သူမြို့သား"
+              "word": "反る",
+              "reading": "そる",
+              "meaning": "ဆန့်ကျင်သည်"
             },
             {
-              "word": "市長",
-              "reading": "しちょう",
-              "meaning": "မြို့တော်ဝန်"
+              "word": "反らす",
+              "reading": "そらす",
+              "meaning": "ဆန့်ကျင်စေသည်၊ ဆန့်ကျင်အောင်လုပ်သည်"
             },
             {
-              "word": "市場",
-              "reading": "いちば",
-              "meaning": "ဈေး"
+              "word": "反り返る",
+              "reading": "そりかえる",
+              "meaning": "နောက်ပြန်လှန်သည်"
+            },
+            {
+              "word": "反省する",
+              "reading": "はんせいする",
+              "meaning": "ပြန်လည်စဉ်းစားသည်၊ ပြန်လည်ဆင်ခြင်သည်"
+            },
+            {
+              "word": "交通違反",
+              "reading": "こうつういはん",
+              "meaning": "ယာဉ်စည်းကမ်း၊ လမ်းစည်းကမ်း ချိုးဖောက်မှု"
+            },
+            {
+              "word": "謀反",
+              "reading": "むほん",
+              "meaning": "ပုန်ကန်မှု"
+            },
+            {
+              "word": "反物",
+              "reading": "たんもの",
+              "meaning": "အထည်"
             }
           ]
         },
         {
-          "character": "区",
-          "onyomi": "ク",
+          "character": "対",
+          "onyomi": "タイ、ツイ",
           "kunyomi": "",
-          "meaning": "မြို့နယ်၊ ဧရိယာ",
+          "meaning": "ဆန့်ကျင်သည်၊ ယှဉ်ပြိုင်သည်၊ အတွဲ",
           "vocab": [
             {
-              "word": "区役所",
-              "reading": "くやくしょ",
-              "meaning": "မြို့နယ်ရုံး"
+              "word": "日本対ブラジル",
+              "reading": "にほんたいブラジル",
+              "meaning": "ဂျပန် vs ဘရာဇီး"
             },
             {
-              "word": "区別する",
-              "reading": "くべつする",
-              "meaning": "ခွဲခြားသည်"
+              "word": "絶対に",
+              "reading": "ぜったいに",
+              "meaning": "လုံးဝ"
             },
             {
-              "word": "地区",
-              "reading": "ちく",
-              "meaning": "ဒေသ"
+              "word": "反対",
+              "reading": "はんたい",
+              "meaning": "ဆန့်ကျင်ခြင်း"
+            },
+            {
+              "word": "対立",
+              "reading": "たいりつ",
+              "meaning": "ထိပ်တိုက်ဆန့်ကျင်မှု၊ လုံးဝဆန့်ကျင်မှု"
+            },
+            {
+              "word": "対になる",
+              "reading": "ついになる",
+              "meaning": "အတွဲလိုက်ဖြစ်လာသည်၊ တစ်စုံဖြစ်လာသည်"
             }
           ]
         },
         {
-          "character": "町",
-          "onyomi": "チョウ",
-          "kunyomi": "まち",
-          "meaning": "မြို့ငယ်",
-          "vocab": [
-            {
-              "word": "町",
-              "reading": "まち",
-              "meaning": "မြို့ငယ်"
-            },
-            {
-              "word": "町長",
-              "reading": "ちょうちょう",
-              "meaning": "မြို့နယ်အုပ်ချုပ်ရေးမှူး"
-            }
-          ]
-        },
-        {
-          "character": "村",
-          "onyomi": "ソン",
-          "kunyomi": "むら",
-          "meaning": "ကျေးရွာ",
-          "vocab": [
-            {
-              "word": "村",
-              "reading": "むら",
-              "meaning": "ကျေးရွာ"
-            },
-            {
-              "word": "農村",
-              "reading": "のうそん",
-              "meaning": "လယ်ယာစိုက်ပျိုးရေးကျေးရွာ"
-            }
-          ]
-        },
-        {
-          "character": "港",
-          "onyomi": "コウ",
-          "kunyomi": "みなと",
-          "meaning": "ဆိပ်ကမ်း",
-          "vocab": [
-            {
-              "word": "港",
-              "reading": "みなと",
-              "meaning": "ဆိပ်ကမ်း"
-            },
-            {
-              "word": "空港",
-              "reading": "くうこう",
-              "meaning": "လေဆိပ်"
-            },
-            {
-              "word": "港町",
-              "reading": "みなとまち",
-              "meaning": "ဆိပ်ကမ်းမြို့"
-            }
-          ]
-        },
-        {
-          "character": "湾",
-          "onyomi": "ワン",
-          "kunyomi": "",
-          "meaning": "ပင်လယ်ကွေ့",
-          "vocab": [
-            {
-              "word": "台湾",
-              "reading": "たいわん",
-              "meaning": "ထိုင်ဝမ်"
-            },
-            {
-              "word": "東京湾",
-              "reading": "とうきょうわん",
-              "meaning": "တိုကျိုပင်လယ်ကွေ့"
-            }
-          ]
-        },
-        {
-          "character": "岸",
-          "onyomi": "ガン",
-          "kunyomi": "きし",
-          "meaning": "ကမ်းခြေ၊ ကမ်းပါး",
-          "vocab": [
-            {
-              "word": "海岸",
-              "reading": "かいがん",
-              "meaning": "ကမ်းခြေ"
-            },
-            {
-              "word": "岸",
-              "reading": "きし",
-              "meaning": "ကမ်းပါး"
-            },
-            {
-              "word": "湾岸",
-              "reading": "わんがん",
-              "meaning": "ပင်လယ်ကွေ့ကမ်းခြေ"
-            }
-          ]
-        },
-        {
-          "character": "砂",
-          "onyomi": "サ、シャ",
-          "kunyomi": "すな",
-          "meaning": "သဲ",
-          "vocab": [
-            {
-              "word": "砂",
-              "reading": "すな",
-              "meaning": "သဲ"
-            },
-            {
-              "word": "砂漠",
-              "reading": "さばく",
-              "meaning": "သဲကန္တာရ"
-            },
-            {
-              "word": "砂糖",
-              "reading": "さとう",
-              "meaning": "သကြား"
-            }
-          ]
-        },
-        {
-          "character": "漠",
-          "onyomi": "バク",
-          "kunyomi": "",
-          "meaning": "သဲကန္တာရ၊ ဝေဝါးသော",
-          "vocab": [
-            {
-              "word": "砂漠",
-              "reading": "さばく",
-              "meaning": "သဲကန္တာရ"
-            },
-            {
-              "word": "漠然とした",
-              "reading": "ばくぜんとした",
-              "meaning": "ဝေဝါးသော"
-            }
-          ]
-        },
-        {
-          "character": "域",
-          "onyomi": "イキ",
-          "kunyomi": "",
-          "meaning": "ဒေသ၊ ဧရိယာဇုန်",
-          "vocab": [
-            {
-              "word": "地域",
-              "reading": "ちいき",
-              "meaning": "ဒေသ"
-            },
-            {
-              "word": "区域",
-              "reading": "くいき",
-              "meaning": "ဧရိယာဇုံ"
-            },
-            {
-              "word": "流域",
-              "reading": "りゅういき",
-              "meaning": "မြစ်ဝှမ်း"
-            }
-          ]
-        },
-        {
-          "character": "州",
-          "onyomi": "シュウ",
-          "kunyomi": "す",
-          "meaning": "ပြည်နယ်၊ ကျွန်းကြီး",
-          "vocab": [
-            {
-              "word": "九州",
-              "reading": "きゅうしゅう",
-              "meaning": "ကျူရှူး"
-            },
-            {
-              "word": "本州",
-              "reading": "ほんしゅう",
-              "meaning": "ဟွန်ရှူးကျွန်း"
-            },
-            {
-              "word": "州",
-              "reading": "しゅう",
-              "meaning": "ပြည်နယ်"
-            }
-          ]
-        },
-        {
-          "character": "郊",
+          "character": "肯",
           "onyomi": "コウ",
           "kunyomi": "",
-          "meaning": "မြို့ပြင်ဆင်ခြေဖုံး",
+          "meaning": "သဘောတူသည်၊ အကောင်းမြင်သည်",
           "vocab": [
             {
-              "word": "郊外",
-              "reading": "こうがい",
-              "meaning": "မြို့ပြင်ဆန်ခါ"
+              "word": "肯定的な",
+              "reading": "こうていてきな",
+              "meaning": "အကောင်းမြင်တတ်သော"
             }
           ]
         },
         {
-          "character": "原",
-          "onyomi": "ゲン",
-          "kunyomi": "はら",
-          "meaning": "ကွင်းပြင်၊ မူလအစ",
-          "vocab": [
-            {
-              "word": "野原",
-              "reading": "のはら",
-              "meaning": "ကွင်းပြင်"
-            },
-            {
-              "word": "原因",
-              "reading": "げんいん",
-              "meaning": "အကြောင်းအရင်း"
-            },
-            {
-              "word": "原料",
-              "reading": "げんりょう",
-              "meaning": "ကုန်ကြမ်း"
-            }
-          ]
-        },
-        {
-          "character": "谷",
-          "onyomi": "コク",
-          "kunyomi": "たに",
-          "meaning": "ချိုင့်ဝှမ်း",
-          "vocab": [
-            {
-              "word": "谷",
-              "reading": "たに",
-              "meaning": "ချိုင့်ဝှမ်း"
-            },
-            {
-              "word": "谷底",
-              "reading": "たにぞこ",
-              "meaning": "ချိုင့်ဝှမ်းအောက်ခြေ"
-            }
-          ]
-        },
-        {
-          "character": "泉",
-          "onyomi": "セン",
-          "kunyomi": "いずみ",
-          "meaning": "စမ်းရေတွင်း၊ ရေပူစမ်း",
-          "vocab": [
-            {
-              "word": "温泉",
-              "reading": "おんせん",
-              "meaning": "ရေပူစမ်း"
-            },
-            {
-              "word": "泉",
-              "reading": "いずみ",
-              "meaning": "စမ်းရေတွင်း"
-            }
-          ]
-        },
-        {
-          "character": "央",
-          "onyomi": "オウ",
-          "kunyomi": "",
-          "meaning": "ဗဟို၊ အလယ်ဗဟိုချက်",
-          "vocab": [
-            {
-              "word": "中央",
-              "reading": "ちゅうおう",
-              "meaning": "ဗဟိုချက်"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "chapter": 19,
-      "title": "Ch.19: 交通・乗り物 (သယ်ယူပို့ဆောင်ရေးနှင့် ယာဉ်များ)",
-      "kanjis": [
-        {
-          "character": "航",
-          "onyomi": "コウ",
-          "kunyomi": "",
-          "meaning": "လေကြောင်း၊ ရေကြောင်းခရီး",
-          "vocab": [
-            {
-              "word": "航空",
-              "reading": "こうくう",
-              "meaning": "လေကြောင်း"
-            },
-            {
-              "word": "運航する",
-              "reading": "うんこうする",
-              "meaning": "ခရီးစဉ်ပြေးဆွဲသည်"
-            },
-            {
-              "word": "航海する",
-              "reading": "こうかいする",
-              "meaning": "ပင်လယ်ခရီးနှင်သည်"
-            }
-          ]
-        },
-        {
-          "character": "船",
-          "onyomi": "セン",
-          "kunyomi": "ふね、ふな",
-          "meaning": "သင်္ဘော",
-          "vocab": [
-            {
-              "word": "船",
-              "reading": "ふね",
-              "meaning": "သင်္ဘော"
-            },
-            {
-              "word": "船長",
-              "reading": "せんちょう",
-              "meaning": "သင်္ဘောကပ္ပတိန်"
-            },
-            {
-              "word": "風船",
-              "reading": "ふうせん",
-              "meaning": "မီးပုံးပျံမီးပူဖောင်း"
-            }
-          ]
-        },
-        {
-          "character": "飛",
+          "character": "否",
           "onyomi": "ヒ",
-          "kunyomi": "と・ぶ、と・ばす",
-          "meaning": "ပျံသန်းသည်",
+          "kunyomi": "いな",
+          "meaning": "ငြင်းဆိုသည်၊ မဟုတ်",
           "vocab": [
             {
-              "word": "飛行機",
-              "reading": "ひこうき",
-              "meaning": "လေယာဉ်ပျံ"
+              "word": "否",
+              "reading": "いな",
+              "meaning": "no, အငြင်း"
             },
             {
-              "word": "飛ぶ",
-              "reading": "とぶ",
-              "meaning": "ပျံသန်းသည်"
+              "word": "や否や",
+              "reading": "やいなや",
+              "meaning": "ချက်ချင်း၊ မကြာမီ၊ မကြာခင်"
+            },
+            {
+              "word": "否定",
+              "reading": "ひてい",
+              "meaning": "ငြင်းဆိုခြင်း"
+            },
+            {
+              "word": "賛否",
+              "reading": "さんぴ",
+              "meaning": "yes and no, လက်ခံခြင်းနှင့်ငြင်းဆိုခြင်း"
+            },
+            {
+              "word": "拒否",
+              "reading": "きょひ",
+              "meaning": "ငြင်းပယ်ခြင်း၊ ငြင်းဆိုခြင်း၊ ဗီတိုအာဏာ"
             }
           ]
         },
         {
-          "character": "機",
-          "onyomi": "キ",
-          "kunyomi": "はた",
-          "meaning": "စက်ပစ္စည်း၊ လေယာဉ်",
+          "character": "保",
+          "onyomi": "ホ",
+          "kunyomi": "たも・つ",
+          "meaning": "ထိန်းသိမ်းသည်၊ စောင့်ရှောက်သည်",
           "vocab": [
             {
-              "word": "飛行機",
-              "reading": "ひこうき",
-              "meaning": "လေယာဉ်ပျံ"
+              "word": "保つ",
+              "reading": "たもつ",
+              "meaning": "ထိန်းသိမ်းသည်"
             },
             {
-              "word": "機械",
-              "reading": "きかい",
-              "meaning": "စက်ပစ္စည်း"
+              "word": "保護する",
+              "reading": "ほごする",
+              "meaning": "ထိန်းသိမ်းစောင့်ရှောက်ထားသည်"
             },
             {
-              "word": "機会",
-              "reading": "きかい",
-              "meaning": "အခွင့်အရေး"
-            }
-          ]
-        },
-        {
-          "character": "乗",
-          "onyomi": "ジョウ",
-          "kunyomi": "の・る、の・せる",
-          "meaning": "စီးနင်းသည်",
-          "vocab": [
-            {
-              "word": "乗る",
-              "reading": "のる",
-              "meaning": "စီးနင်းသည်"
-            },
-            {
-              "word": "乗客",
-              "reading": "じょうきゃく",
-              "meaning": "ခရီးသည်"
-            },
-            {
-              "word": "乗車券",
-              "reading": "じょうしゃけん",
-              "meaning": "ကားရထားလက်မှတ်"
-            }
-          ]
-        },
-        {
-          "character": "降",
-          "onyomi": "コウ",
-          "kunyomi": "お・りる、お・ろす、ふ・る",
-          "meaning": "ဆင်းသည်၊ မိုးရွာသည်",
-          "vocab": [
-            {
-              "word": "降りる",
-              "reading": "おりる",
-              "meaning": "ဆင်းသည်"
-            },
-            {
-              "word": "降る",
-              "reading": "ふる",
-              "meaning": "ကျဆင်းသည် မိုးနှင်း"
-            },
-            {
-              "word": "降車する",
-              "reading": "こうしゃする",
-              "meaning": "ကားပေါ်မှဆင်းသည်"
-            }
-          ]
-        },
-        {
-          "character": "車",
-          "onyomi": "シャ",
-          "kunyomi": "くるま",
-          "meaning": "ကား၊ ရထား",
-          "vocab": [
-            {
-              "word": "電車",
-              "reading": "でんしゃ",
-              "meaning": "လျှပ်စစ်ရထား"
-            },
-            {
-              "word": "自動車",
-              "reading": "じどうしゃ",
-              "meaning": "မော်တော်ကား"
-            },
-            {
-              "word": "駐車場",
-              "reading": "ちゅうしゃじょう",
-              "meaning": "ကားပါကင်"
-            }
-          ]
-        },
-        {
-          "character": "輪",
-          "onyomi": "リン",
-          "kunyomi": "わ",
-          "meaning": "ဘီး၊ လက်စွပ်",
-          "vocab": [
-            {
-              "word": "車輪",
-              "reading": "しゃりん",
-              "meaning": "ဘီး"
-            },
-            {
-              "word": "指輪",
-              "reading": "ゆびわ",
-              "meaning": "လက်စွပ်"
-            },
-            {
-              "word": "三輪車",
-              "reading": "さんりんしゃ",
-              "meaning": "သုံးဘီးတပ်ယာဉ်"
-            }
-          ]
-        },
-        {
-          "character": "駐",
-          "onyomi": "チュウ",
-          "kunyomi": "",
-          "meaning": "ကားရပ်နားသည်",
-          "vocab": [
-            {
-              "word": "駐車場",
-              "reading": "ちゅうしゃじょう",
-              "meaning": "ကားပါကင်"
-            },
-            {
-              "word": "駐車する",
-              "reading": "ちゅうしゃする",
-              "meaning": "ကားရပ်နားသည်"
-            }
-          ]
-        },
-        {
-          "character": "途",
-          "onyomi": "ト",
-          "kunyomi": "",
-          "meaning": "လမ်းခရီး၊ လမ်းခုလတ်",
-          "vocab": [
-            {
-              "word": "途中",
-              "reading": "とちゅう",
-              "meaning": "လမ်းခုလတ်"
-            },
-            {
-              "word": "途中で",
-              "reading": "とちゅうで",
-              "meaning": "လမ်းတွင်"
-            },
-            {
-              "word": "用途",
-              "reading": "ようと",
-              "meaning": "အသုံးပြုမှု"
-            }
-          ]
-        },
-        {
-          "character": "渡",
-          "onyomi": "ト",
-          "kunyomi": "わた・る、わた・す",
-          "meaning": "ဖြတ်ကူးသည်၊ လွှဲပြောင်းပေးသည်",
-          "vocab": [
-            {
-              "word": "渡る",
-              "reading": "わたる",
-              "meaning": "ဖြတ်ကူးသည်"
-            },
-            {
-              "word": "渡す",
-              "reading": "わたす",
-              "meaning": "လက်လွှဲပေးသည်"
-            },
-            {
-              "word": "渡航する",
-              "reading": "とこうする",
-              "meaning": "နိုင်ငံခြားသို့ခရီးသွားသည်"
-            }
-          ]
-        },
-        {
-          "character": "過",
-          "onyomi": "カ",
-          "kunyomi": "す・ぎる、す・ごす",
-          "meaning": "ဖြတ်သန်းသည်၊ လွန်ကဲသည်",
-          "vocab": [
-            {
-              "word": "通過する",
-              "reading": "つうかする",
-              "meaning": "ဖြတ်သန်းသည်"
-            },
-            {
-              "word": "過ごす",
-              "reading": "すごす",
-              "meaning": "အချိန်ဖြုန်းသည်"
-            },
-            {
-              "word": "過去",
-              "reading": "かこ",
-              "meaning": "အတိတ်"
-            }
-          ]
-        },
-        {
-          "character": "追",
-          "onyomi": "ツイ",
-          "kunyomi": "お・う",
-          "meaning": "လိုက်လံသည်",
-          "vocab": [
-            {
-              "word": "追う",
-              "reading": "おう",
-              "meaning": "လိုက်လံဆွဲသည်"
-            },
-            {
-              "word": "追い付く",
-              "reading": "おいつく",
-              "meaning": "မီအောင်လိုက်သည်"
-            },
-            {
-              "word": "追加する",
-              "reading": "ついかする",
-              "meaning": "ဖြည့်စွက်သည်"
-            }
-          ]
-        },
-        {
-          "character": "超",
-          "onyomi": "チョウ",
-          "kunyomi": "こ・える、こ・す",
-          "meaning": "ကျော်လွန်သည်",
-          "vocab": [
-            {
-              "word": "超過する",
-              "reading": "ちょうかする",
-              "meaning": "ကျော်လွန်သည်"
-            },
-            {
-              "word": "超える",
-              "reading": "こえる",
-              "meaning": "ကျော်လွန်သည်"
-            }
-          ]
-        },
-        {
-          "character": "越",
-          "onyomi": "エツ",
-          "kunyomi": "こ・える、こ・す",
-          "meaning": "ကျော်ဖြတ်သည်၊ ပြောင်းရွှေ့သည်",
-          "vocab": [
-            {
-              "word": "引っ越す",
-              "reading": "ひっこす",
-              "meaning": "အိမ်ပြောင်းသည်"
-            },
-            {
-              "word": "追い越す",
-              "reading": "おいこす",
-              "meaning": "ကျော်တက်သည်"
-            }
-          ]
-        },
-        {
-          "character": "移",
-          "onyomi": "イ",
-          "kunyomi": "うつ・る、うつ・す",
-          "meaning": "ရွှေ့ပြောင်းသည်",
-          "vocab": [
-            {
-              "word": "移動する",
-              "reading": "いどうする",
-              "meaning": "ရွှေ့ပြောင်းသည်"
-            },
-            {
-              "word": "移る",
-              "reading": "うつる",
-              "meaning": "ပြောင်းရွှေ့သည်"
-            },
-            {
-              "word": "移転する",
-              "reading": "いてんする",
-              "meaning": "နေရာပြောင်းသည်"
-            }
-          ]
-        },
-        {
-          "character": "導",
-          "onyomi": "ドウ",
-          "kunyomi": "みちび・く",
-          "meaning": "လမ်းညွှန်သည်၊ မိတ်ဆက်သည်",
-          "vocab": [
-            {
-              "word": "指導する",
-              "reading": "しどうする",
-              "meaning": "လမ်းညွှန်သင်ကြားသည်"
-            },
-            {
-              "word": "導入する",
-              "reading": "どうにゅうする",
-              "meaning": "မိတ်ဆက်တပ်ဆင်သည်"
+              "word": "保育園",
+              "reading": "ほいくえん",
+              "meaning": "မူကြိုကျောင်း၊ နေ့ကလေးထိန်းကျောင်း"
             }
           ]
         },
@@ -8524,63 +8148,959 @@
           "character": "留",
           "onyomi": "リュウ、ル",
           "kunyomi": "と・まる、と・める",
-          "meaning": "နေထိုင်သည်၊ ချန်ထားသည်",
+          "meaning": "ရပ်တန့်သည်၊ ဆိုင်းငံ့သည်၊ ကျန်ရှိသည်",
           "vocab": [
             {
-              "word": "留学する",
-              "reading": "りゅうがくする",
-              "meaning": "နိုင်ငံခြားတွင်ပညာသင်သည်"
-            },
-            {
-              "word": "留守",
-              "reading": "るす",
-              "meaning": "အိမ်တွင်မရှိခြင်း"
-            }
-          ]
-        },
-        {
-          "character": "泊",
-          "onyomi": "ハク",
-          "kunyomi": "と・まる、と・める",
-          "meaning": "တည်းခိုသည်",
-          "vocab": [
-            {
-              "word": "泊まる",
+              "word": "留まる",
               "reading": "とまる",
-              "meaning": "တည်းခိုသည်"
+              "meaning": "ရပ်တန့်သည်"
             },
             {
-              "word": "一泊",
-              "reading": "いっぱく",
-              "meaning": "တစ်ညတည်းခိုခြင်း"
+              "word": "留める",
+              "reading": "とめる",
+              "meaning": "ရပ်တန့်လိုက်သည်"
             },
             {
-              "word": "宿泊する",
-              "reading": "しゅくはくする",
-              "meaning": "တည်းခိုသည်"
+              "word": "保留",
+              "reading": "ほりゅう",
+              "meaning": "ဆိုင်းငံ့ထားခြင်း (putting on hold)"
+            },
+            {
+              "word": "留守番電話",
+              "reading": "るすばんでんわ",
+              "meaning": "အိမ်စောင့်ဖုန်း"
+            },
+            {
+              "word": "残留",
+              "reading": "ざんりゅう",
+              "meaning": "နောက်ကျန်နေခဲ့သည်၊ ကျန်ကျန်နေခဲ့သည်"
+            },
+            {
+              "word": "留意",
+              "reading": "りゅうい",
+              "meaning": "အာရုံစိုက်ခြင်း (heeding)"
+            },
+            {
+              "word": "留年",
+              "reading": "りゅうねん",
+              "meaning": "ကျောင်းတစ်နှစ်အတန်းပြန်တက်ရခြင်း"
+            },
+            {
+              "word": "居留守",
+              "reading": "いるす",
+              "meaning": "အိမ်တွင်းလူမရှိယောင်ဆောင်ခြင်း"
             }
           ]
         },
         {
-          "character": "路",
-          "onyomi": "ロ",
-          "kunyomi": "じ",
-          "meaning": "လမ်းကြောင်း၊ ကားလမ်း",
+          "character": "判",
+          "onyomi": "ハン、バン",
+          "kunyomi": "",
+          "meaning": "ဆုံးဖြတ်သည်၊ စီရင်သည်",
           "vocab": [
             {
-              "word": "道路",
-              "reading": "どうろ",
-              "meaning": "ကားလမ်း"
+              "word": "判決",
+              "reading": "はんけつ",
+              "meaning": "တရားစီရင်ရေးဆုံးဖြတ်ချက်၊ စီရင်ချက်"
             },
             {
-              "word": "線路",
-              "reading": "せんろ",
-              "meaning": "ရထားလမ်း"
+              "word": "判定",
+              "reading": "はんてい",
+              "meaning": "ဆုံးဖြတ်ချက်ချခြင်း"
             },
             {
-              "word": "進路",
-              "reading": "しんろ",
-              "meaning": "ရှေ့ဆက်ရမည့်လမ်းစဉ်"
+              "word": "評判",
+              "reading": "ひょうばん",
+              "meaning": "ဂုဏ်သတင်း၊ ကျော်ကြားမှု (reputation)"
+            }
+          ]
+        },
+        {
+          "character": "断",
+          "onyomi": "ダン",
+          "kunyomi": "た・つ、ことわ・る",
+          "meaning": "ဖြတ်တောက်သည်၊ ငြင်းပယ်သည်၊ ဆုံးဖြတ်သည်",
+          "vocab": [
+            {
+              "word": "断つ",
+              "reading": "たつ",
+              "meaning": "ဖြတ်တောက်သည်၊ အမြစ်ဖြတ်သည်"
+            },
+            {
+              "word": "断る",
+              "reading": "ことわる",
+              "meaning": "ငြင်းပယ်သည်"
+            },
+            {
+              "word": "断定",
+              "reading": "だんてい",
+              "meaning": "နိဂုံးချုပ်ဆုံးဖြတ်ချက်ချခြင်း၊ စီရင်ချက်ချခြင်း"
+            },
+            {
+              "word": "判断する",
+              "reading": "はんだんする",
+              "meaning": "ဆုံးဖြတ်သည်၊ ယူဆသည်"
+            },
+            {
+              "word": "切断",
+              "reading": "せつだん",
+              "meaning": "ဖြတ်တောက်ခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "確",
+          "onyomi": "カク",
+          "kunyomi": "たし・かめる、たし・か",
+          "meaning": "သေချာသော၊ အတည်ပြုသည်",
+          "vocab": [
+            {
+              "word": "確かめる",
+              "reading": "たしかめる",
+              "meaning": "သေချာအောင်အတည်ပြုသည်"
+            },
+            {
+              "word": "確か",
+              "reading": "たしか",
+              "meaning": "သေချာခြင်း"
+            },
+            {
+              "word": "確信",
+              "reading": "かくしん",
+              "meaning": "ယုံကြည်ချက်၊ ယုံကြည်မှု"
+            },
+            {
+              "word": "正確に",
+              "reading": "せいかくに",
+              "meaning": "တိကျစွာ၊ တိတိကျကျ"
+            }
+          ]
+        },
+        {
+          "character": "認",
+          "onyomi": "ニン",
+          "kunyomi": "みと・める",
+          "meaning": "အသိအမှတ်ပြုသည်၊ လက်ခံသည်",
+          "vocab": [
+            {
+              "word": "認める",
+              "reading": "みとめる",
+              "meaning": "အသိအမှတ်ပြုသည်"
+            },
+            {
+              "word": "認識",
+              "reading": "にんしき",
+              "meaning": "သိမြင်မှု၊ နားလည်ထားမှု"
+            },
+            {
+              "word": "確認",
+              "reading": "かくにん",
+              "meaning": "အတည်ပြုခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "報",
+          "onyomi": "ホウ",
+          "kunyomi": "むく・いる",
+          "meaning": "သတင်းပို့သည်၊ ဆုချသည်၊ အကျိုးပေးသည်",
+          "vocab": [
+            {
+              "word": "報いる",
+              "reading": "むくいる",
+              "meaning": "ဆုချသည်၊ သတင်းပို့သည်"
+            },
+            {
+              "word": "情報",
+              "reading": "じょうほう",
+              "meaning": "သတင်းအချက်အလက်"
+            },
+            {
+              "word": "報告",
+              "reading": "ほうこく",
+              "meaning": "သတင်းပို့ခြင်း"
+            },
+            {
+              "word": "一報",
+              "reading": "いっぽう",
+              "meaning": "သတင်းအချက်အလက်တစ်ခုခု တစ်စုံတစ်ယောက်အား အသိပေးခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "告",
+          "onyomi": "コク",
+          "kunyomi": "つ・げる",
+          "meaning": "အသိပေးသည်၊ ထုတ်ပြောသည်၊ သတင်းပို့သည်",
+          "vocab": [
+            {
+              "word": "告げる",
+              "reading": "つげる",
+              "meaning": "အသိပေးသည်၊ ထုတ်ပြောသည်"
+            },
+            {
+              "word": "告白",
+              "reading": "こくはく",
+              "meaning": "ဝန်ခံခြင်း (အချစ်၊ မှားယွင်းမှု စသည်ဖြင့်)"
+            }
+          ]
+        },
+        {
+          "character": "連",
+          "onyomi": "レン",
+          "kunyomi": "つら・なる、つら・ねる、つ・れる",
+          "meaning": "ဆက်စပ်သည်၊ ချိတ်ဆက်သည်၊ ခေါ်ဆောင်သည်",
+          "vocab": [
+            {
+              "word": "連なる",
+              "reading": "つらなる",
+              "meaning": "ဆက်တိုက်ဖြစ်သည်"
+            },
+            {
+              "word": "連ねる",
+              "reading": "つらねる",
+              "meaning": "ချိတ်ဆက်သည်၊ ဆက်စပ်သည်"
+            },
+            {
+              "word": "連れる",
+              "reading": "つれる",
+              "meaning": "ခေါ်ဆောင်သွားသည်"
+            },
+            {
+              "word": "連続",
+              "reading": "れんぞく",
+              "meaning": "အဆက်မပြတ်ဖြစ်ခြင်း၊ ဆက်တိုက်ဖြစ်ခြင်း"
+            },
+            {
+              "word": "関連",
+              "reading": "かんれん",
+              "meaning": "ဆက်စပ်မှု"
+            },
+            {
+              "word": "連絡する",
+              "reading": "れんらくする",
+              "meaning": "ဆက်သွယ်သည်၊ အကြောင်းကြားသည်"
+            },
+            {
+              "word": "連絡網",
+              "reading": "れんらくもう",
+              "meaning": "အဆက်အသွယ်ကွန်ရက်"
+            }
+          ]
+        },
+        {
+          "character": "絡",
+          "onyomi": "ラク",
+          "kunyomi": "から・まる、から・める、から・む",
+          "meaning": "ချည်နှောင်သည်၊ ရစ်ပတ်သည်၊ ပတ်သက်သည်",
+          "vocab": [
+            {
+              "word": "絡まる",
+              "reading": "からまる",
+              "meaning": "ချည်နှောင်ရစ်ပတ်သည်၊ ပါဝင်ပတ်သက်သည်"
+            },
+            {
+              "word": "絡める",
+              "reading": "からめる",
+              "meaning": "ချည်နှောင်သည်၊ ရစ်ပတ်သည်"
+            },
+            {
+              "word": "絡む",
+              "reading": "からむ",
+              "meaning": "ချည်သည်၊ ပါဝင်ပတ်သက်သည်"
+            },
+            {
+              "word": "絡まれる",
+              "reading": "からまれる",
+              "meaning": "ချည်နှောင်ခံရသည်၊ ပတ်သက်အောင်လုပ်ခြင်းခံရသည်"
+            }
+          ]
+        },
+        {
+          "character": "相",
+          "onyomi": "ソウ、ショウ",
+          "kunyomi": "あい",
+          "meaning": "အပြန်အလှန်၊ ဝန်ကြီး၊ ပုံပန်းသဏ္ဌာန်",
+          "vocab": [
+            {
+              "word": "相",
+              "reading": "あい",
+              "meaning": "အတူ၊ အပြန်အလှန်"
+            },
+            {
+              "word": "相手",
+              "reading": "あいて",
+              "meaning": "တစ်ဖက်လူ"
+            },
+            {
+              "word": "真相",
+              "reading": "しんそう",
+              "meaning": "အမှန်တရား၊ တကယ့်အခြေအနေ"
+            },
+            {
+              "word": "首相",
+              "reading": "しゅしょう",
+              "meaning": "ဝန်ကြီးချုပ်"
+            },
+            {
+              "word": "相談",
+              "reading": "そうだん",
+              "meaning": "တိုင်ပင်ခြင်း"
+            },
+            {
+              "word": "相性",
+              "reading": "あいしょう",
+              "meaning": "လိုက်ဖက်မှု၊ chemistry"
+            },
+            {
+              "word": "相思相愛",
+              "reading": "そうしそうあい",
+              "meaning": "အပြန်အလှန်အချစ်"
+            },
+            {
+              "word": "外相会談",
+              "reading": "がいしょうかいだん",
+              "meaning": "နိုင်ငံခြားရေးဝန်ကြီးများ ညီလာခံ၊ နိုင်ငံခြားရေးဝန်ကြီးများ အစည်းအဝေး"
+            }
+          ]
+        },
+        {
+          "character": "談",
+          "onyomi": "ダン",
+          "kunyomi": "",
+          "meaning": "ဆွေးနွေးတိုင်ပင်သည်၊ စကားပြောသည်",
+          "vocab": [
+            {
+              "word": "談",
+              "reading": "だん",
+              "meaning": "ဆွေးနွေးခြင်း"
+            },
+            {
+              "word": "冗談",
+              "reading": "じょうだん",
+              "meaning": "နောက်ပြောင်ခြင်း၊ စနောက်ခြင်း"
+            },
+            {
+              "word": "商談",
+              "reading": "しょうだん",
+              "meaning": "စီးပွားရေးဆွေးနွေးမှု၊ စီးပွားရေးညှိနှိုင်းမှု"
+            }
+          ]
+        },
+        {
+          "character": "指",
+          "onyomi": "シ",
+          "kunyomi": "さ・す、ゆび",
+          "meaning": "ညွှန်ပြသည်၊ လက်ညှိုး၊ လက်ချောင်း",
+          "vocab": [
+            {
+              "word": "指す",
+              "reading": "さす",
+              "meaning": "ညွှန်ပြသည်"
+            },
+            {
+              "word": "指",
+              "reading": "ゆび",
+              "meaning": "လက်ညှိုး၊ လက်ချောင်း"
+            },
+            {
+              "word": "薬指",
+              "reading": "くすりゆび",
+              "meaning": "လက်သူကြွယ်"
+            },
+            {
+              "word": "指導",
+              "reading": "しどう",
+              "meaning": "လမ်းညွှန်ချက်၊ ဦးဆောင်မှု"
+            }
+          ]
+        },
+        {
+          "character": "示",
+          "onyomi": "ジ、シ",
+          "kunyomi": "しめ・す",
+          "meaning": "ပြသသည်၊ ညွှန်ပြသည်",
+          "vocab": [
+            {
+              "word": "示す",
+              "reading": "しめす",
+              "meaning": "ပြသသည်၊ ညွှန်ပြသည်"
+            },
+            {
+              "word": "指示",
+              "reading": "しじ",
+              "meaning": "ညွှန်ကြားချက်၊ ညွှန်ပြချက်"
+            },
+            {
+              "word": "表示",
+              "reading": "ひょうじ",
+              "meaning": "ဖော်ပြခြင်း၊ ပြသခြင်း"
+            },
+            {
+              "word": "暗示",
+              "reading": "あんじ",
+              "meaning": "သွယ်ဝိုက်ညွှန်ပြခြင်း"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 19,
+      "title": "Ch.19: 産業・貿易 (စက်မှုလုပ်ငန်းနှင့် ကုန်သွယ်မှု)",
+      "kanjis": [
+        {
+          "character": "産",
+          "onyomi": "サン",
+          "kunyomi": "う・む、う・まれる、うぶ",
+          "meaning": "မွေးဖွားသည်၊ ထုတ်လုပ်သည်၊ ပိုင်ဆိုင်မှု",
+          "vocab": [
+            {
+              "word": "産む",
+              "reading": "うむ",
+              "meaning": "မွေးဖွားသည်၊ ဥဥသည်"
+            },
+            {
+              "word": "産まれる",
+              "reading": "うまれる",
+              "meaning": "မွေးဖွားသည်"
+            },
+            {
+              "word": "生産",
+              "reading": "せいさん",
+              "meaning": "ထုတ်လုပ်ခြင်း"
+            },
+            {
+              "word": "産業",
+              "reading": "さんぎょう",
+              "meaning": "စက်မှုလက်မှုလုပ်ငန်း"
+            },
+            {
+              "word": "財産",
+              "reading": "ざいさん",
+              "meaning": "ပိုင်ဆိုင်မှုဥစ္စာဓန"
+            },
+            {
+              "word": "国産",
+              "reading": "こくさん",
+              "meaning": "ပြည်တွင်းဖြစ်၊ ပြည်တွင်းထုတ်"
+            }
+          ]
+        },
+        {
+          "character": "製",
+          "onyomi": "セイ",
+          "kunyomi": "",
+          "meaning": "ထုတ်လုပ်သည်၊ ပြုလုပ်သောပစ္စည်း",
+          "vocab": [
+            {
+              "word": "製品",
+              "reading": "せいひん",
+              "meaning": "ထုတ်ကုန်ပစ္စည်း"
+            },
+            {
+              "word": "製造",
+              "reading": "せいぞう",
+              "meaning": "ထုတ်လုပ်ခြင်း"
+            },
+            {
+              "word": "日本製",
+              "reading": "にほんせい",
+              "meaning": "ဂျပန်နိုင်ငံထုတ်"
+            },
+            {
+              "word": "製作",
+              "reading": "せいさく",
+              "meaning": "ထုတ်လုပ်ဖန်တီးခြင်း၊ ရိုက်ကူးထုတ်လုပ်ခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "造",
+          "onyomi": "ゾウ",
+          "kunyomi": "つく・る",
+          "meaning": "ပြုလုပ်သည်၊ တည်ဆောက်ထုတ်လုပ်သည်",
+          "vocab": [
+            {
+              "word": "造る",
+              "reading": "つくる",
+              "meaning": "ပြုလုပ်သည်၊ တည်ဆောက်ထုတ်လုပ်သည် (စက်ရုံ၊ သင်္ဘော၊ အရက် စသည်)"
+            },
+            {
+              "word": "構造",
+              "reading": "こうぞう",
+              "meaning": "ဖွဲ့စည်းပုံတည်ဆောက်ပုံ"
+            },
+            {
+              "word": "木造",
+              "reading": "もくぞう",
+              "meaning": "သစ်သားဖြင့်တည်ဆောက်ထားသော"
+            },
+            {
+              "word": "造船",
+              "reading": "ぞうせん",
+              "meaning": "သင်္ဘောတည်ဆောက်ခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "費",
+          "onyomi": "ヒ",
+          "kunyomi": "つい・やす",
+          "meaning": "သုံးစွဲသည်၊ ကုန်ကျစရိတ်",
+          "vocab": [
+            {
+              "word": "費やす",
+              "reading": "ついやす",
+              "meaning": "သုံးစွဲသည်၊ ကုန်ဆုံးစေသည်"
+            },
+            {
+              "word": "費用",
+              "reading": "ひよう",
+              "meaning": "ကုန်ကျစရိတ်"
+            },
+            {
+              "word": "消費",
+              "reading": "しょうひ",
+              "meaning": "သုံးစွဲခြင်း၊ စားသုံးမှု"
+            },
+            {
+              "word": "学費",
+              "reading": "がくひ",
+              "meaning": "ကျောင်းစရိတ်"
+            },
+            {
+              "word": "会費",
+              "reading": "かいひ",
+              "meaning": "အသင်းဝင်ကြေး"
+            }
+          ]
+        },
+        {
+          "character": "貿",
+          "onyomi": "ボウ",
+          "kunyomi": "",
+          "meaning": "ကုန်သွယ်သည်၊ လဲလှယ်သည်",
+          "vocab": [
+            {
+              "word": "貿易",
+              "reading": "ぼうえき",
+              "meaning": "နိုင်ငံတကာကုန်သွယ်မှု"
+            },
+            {
+              "word": "貿易会社",
+              "reading": "ぼうえきがいしゃ",
+              "meaning": "နိုင်ငံတကာကုန်သွယ်ရေးကုမ္ပဏီ"
+            }
+          ]
+        },
+        {
+          "character": "輸",
+          "onyomi": "ユ",
+          "kunyomi": "",
+          "meaning": "သယ်ယူပို့ဆောင်သည်၊ တင်ပို့/တင်သွင်းသည်",
+          "vocab": [
+            {
+              "word": "輸入",
+              "reading": "ゆにゅう",
+              "meaning": "ပြည်ပမှတင်သွင်းခြင်း"
+            },
+            {
+              "word": "輸出",
+              "reading": "ゆしゅつ",
+              "meaning": "ပြည်ပသို့တင်ပို့ခြင်း"
+            },
+            {
+              "word": "輸送",
+              "reading": "ゆそう",
+              "meaning": "ကုန်စည်သယ်ယူပို့ဆောင်ရေး"
+            },
+            {
+              "word": "密輸",
+              "reading": "みつゆ",
+              "meaning": "မှောင်ခိုတင်သွင်းခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "販",
+          "onyomi": "ハン",
+          "kunyomi": "",
+          "meaning": "ရောင်းချသည်၊ အရောင်းအဝယ်",
+          "vocab": [
+            {
+              "word": "販売",
+              "reading": "はんばい",
+              "meaning": "ရောင်းချခြင်း"
+            },
+            {
+              "word": "市販",
+              "reading": "しはん",
+              "meaning": "ဈေးကွက်တင်ရောင်းချခြင်း"
+            },
+            {
+              "word": "自動販売機",
+              "reading": "じどうはんばいき",
+              "meaning": "အလိုအလျောက်အရောင်းစက်"
+            },
+            {
+              "word": "通信販売",
+              "reading": "つうしんはんばい",
+              "meaning": "စာတိုက်/အွန်လိုင်းမှတစ်ဆင့် ရောင်းချခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "商",
+          "onyomi": "ショウ",
+          "kunyomi": "あきな・う",
+          "meaning": "အရောင်းအဝယ်လုပ်သည်၊ ကုန်ပစ္စည်း",
+          "vocab": [
+            {
+              "word": "商う",
+              "reading": "あきなう",
+              "meaning": "အရောင်းအဝယ်လုပ်သည်"
+            },
+            {
+              "word": "商業",
+              "reading": "しょうぎょう",
+              "meaning": "ကူးသန်းရောင်းဝယ်ရေး"
+            },
+            {
+              "word": "商品",
+              "reading": "しょうひん",
+              "meaning": "ကုန်ပစ္စည်း"
+            },
+            {
+              "word": "商売",
+              "reading": "しょうばい",
+              "meaning": "အရောင်းအဝယ်၊ စီးပွားရေးလုပ်ငန်း"
+            },
+            {
+              "word": "商店",
+              "reading": "しょうてん",
+              "meaning": "အရောင်းဆိုင်"
+            }
+          ]
+        },
+        {
+          "character": "営",
+          "onyomi": "エイ",
+          "kunyomi": "いとな・む",
+          "meaning": "လုပ်ကိုင်ဆောင်ရွက်သည်၊ စီမံခန့်ခွဲသည်",
+          "vocab": [
+            {
+              "word": "営む",
+              "reading": "いとなむ",
+              "meaning": "လုပ်ကိုင်ဆောင်ရွက်သည် (စီးပွားရေးလုပ်ငန်းစသည်)"
+            },
+            {
+              "word": "経営",
+              "reading": "けいえい",
+              "meaning": "စီမံခန့်ခွဲမှု၊ လုပ်ငန်းလည်ပတ်မှု"
+            },
+            {
+              "word": "営業",
+              "reading": "えいぎょう",
+              "meaning": "စီးပွားရေးလုပ်ငန်းလည်ပတ်ခြင်း၊ အရောင်းလုပ်ငန်း"
+            },
+            {
+              "word": "運営",
+              "reading": "うんえい",
+              "meaning": "လည်ပတ်စီမံခန့်ခွဲခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "払",
+          "onyomi": "",
+          "kunyomi": "はら・う",
+          "meaning": "ပေးချေသည်",
+          "vocab": [
+            {
+              "word": "払う",
+              "reading": "はらう",
+              "meaning": "ပေးချေသည်"
+            },
+            {
+              "word": "支払い",
+              "reading": "しはらい",
+              "meaning": "ငွေပေးချေမှု"
+            },
+            {
+              "word": "前払い",
+              "reading": "まえばらい",
+              "meaning": "ကြိုတင်ငွေပေးချေခြင်း"
+            },
+            {
+              "word": "分割払い",
+              "reading": "ぶんかつばらい",
+              "meaning": "အရစ်ကျပေးချေခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "値",
+          "onyomi": "チ",
+          "kunyomi": "ね、あたい",
+          "meaning": "ဈေးနှုန်း၊ တန်ဖိုး",
+          "vocab": [
+            {
+              "word": "値段",
+              "reading": "ねだん",
+              "meaning": "ဈေးနှုန်း"
+            },
+            {
+              "word": "値上げ",
+              "reading": "ねあげ",
+              "meaning": "ဈေးတက်ခြင်း"
+            },
+            {
+              "word": "値下げ",
+              "reading": "ねさげ",
+              "meaning": "ဈေးချခြင်း"
+            },
+            {
+              "word": "価値",
+              "reading": "かち",
+              "meaning": "တန်ဖိုး"
+            }
+          ]
+        },
+        {
+          "character": "価",
+          "onyomi": "カ",
+          "kunyomi": "あたい",
+          "meaning": "သတ်မှတ်ဈေးနှုန်း၊ တန်ဖိုး",
+          "vocab": [
+            {
+              "word": "価格",
+              "reading": "かかく",
+              "meaning": "သတ်မှတ်ဈေးနှုန်း"
+            },
+            {
+              "word": "物価",
+              "reading": "ぶっか",
+              "meaning": "ကုန်ဈေးနှုန်း"
+            },
+            {
+              "word": "評価",
+              "reading": "ひょうか",
+              "meaning": "တန်ဖိုးဖြတ်ခြင်း၊ အကဲဖြတ်ခြင်း"
+            },
+            {
+              "word": "高価な",
+              "reading": "こうかな",
+              "meaning": "တန်ဖိုးကြီးသော၊ ဈေးကြီးသော"
+            }
+          ]
+        },
+        {
+          "character": "額",
+          "onyomi": "ガク",
+          "kunyomi": "ひたい",
+          "meaning": "ပမာဏ၊ နဖူး",
+          "vocab": [
+            {
+              "word": "額",
+              "reading": "ひたい",
+              "meaning": "နဖူး"
+            },
+            {
+              "word": "金額",
+              "reading": "きんがく",
+              "meaning": "ငွေပမာဏ"
+            },
+            {
+              "word": "総額",
+              "reading": "そうがく",
+              "meaning": "စုစုပေါင်းပမာဏ"
+            },
+            {
+              "word": "半額",
+              "reading": "はんがく",
+              "meaning": "တစ်ဝက်ဈေး"
+            }
+          ]
+        },
+        {
+          "character": "税",
+          "onyomi": "ゼイ",
+          "kunyomi": "",
+          "meaning": "အခွန်",
+          "vocab": [
+            {
+              "word": "税金",
+              "reading": "ぜいきん",
+              "meaning": "အခွန်"
+            },
+            {
+              "word": "消費税",
+              "reading": "しょうひぜい",
+              "meaning": "ကုန်စည်နှင့် ဝန်ဆောင်မှုအခွန် (VAT)"
+            },
+            {
+              "word": "免税",
+              "reading": "めんぜい",
+              "meaning": "အခွန်ကင်းလွတ်ခွင့်"
+            },
+            {
+              "word": "減税",
+              "reading": "げんぜい",
+              "meaning": "အခွန်လျှော့ပေါ့ပေးခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "財",
+          "onyomi": "ザイ、サイ",
+          "kunyomi": "",
+          "meaning": "ပိုင်ဆိုင်မှု၊ ဥစ္စာပစ္စည်း၊ ဘဏ္ဍာရေး",
+          "vocab": [
+            {
+              "word": "財産",
+              "reading": "ざいさん",
+              "meaning": "ပိုင်ဆိုင်မှု၊ ဥစ္စာပစ္စည်း"
+            },
+            {
+              "word": "財布",
+              "reading": "さいふ",
+              "meaning": "ပိုက်ဆံအိတ်"
+            },
+            {
+              "word": "財政",
+              "reading": "ざいせい",
+              "meaning": "ဘဏ္ဍာရေးအခြေအနေ"
+            },
+            {
+              "word": "文化財",
+              "reading": "ぶんかざい",
+              "meaning": "ယဉ်ကျေးမှုအမွေအနှစ်ပစ္စည်း"
+            }
+          ]
+        },
+        {
+          "character": "預",
+          "onyomi": "ヨ",
+          "kunyomi": "あず・ける、あず・かる",
+          "meaning": "အပ်နှံသည်၊ လက်ခံထိန်းသိမ်းသည်",
+          "vocab": [
+            {
+              "word": "預ける",
+              "reading": "あずける",
+              "meaning": "အပ်နှံသည် (ပစ္စည်း/ငွေ)"
+            },
+            {
+              "word": "預かる",
+              "reading": "あずかる",
+              "meaning": "လက်ခံထိန်းသိမ်းပေးသည်"
+            },
+            {
+              "word": "預金",
+              "reading": "よきん",
+              "meaning": "ဘဏ်အပ်ငွေ"
+            }
+          ]
+        },
+        {
+          "character": "貯",
+          "onyomi": "チョ",
+          "kunyomi": "た・める",
+          "meaning": "စုဆောင်းသည်၊ သိုလှောင်သည်",
+          "vocab": [
+            {
+              "word": "貯金",
+              "reading": "ちょきん",
+              "meaning": "ငွေစုဆောင်းခြင်း"
+            },
+            {
+              "word": "貯蓄",
+              "reading": "ちょちく",
+              "meaning": "စုဆောင်းစုတုမှု"
+            },
+            {
+              "word": "貯水池",
+              "reading": "ちょすいち",
+              "meaning": "ရေလှောင်ကန်"
+            }
+          ]
+        },
+        {
+          "character": "納",
+          "onyomi": "ノウ、ナッ",
+          "kunyomi": "おさ・める、おさ・まる",
+          "meaning": "ပေးသွင်းသည်၊ အပ်နှံသည်၊ လက်ခံသည်",
+          "vocab": [
+            {
+              "word": "納める",
+              "reading": "おさめる",
+              "meaning": "ပေးသွင်းသည် (အခွန်စသည်)၊ ပစ္စည်းပို့အပ်သည်"
+            },
+            {
+              "word": "納得",
+              "reading": "なっとく",
+              "meaning": "ကျေနပ်သဘောပေါက်လက်ခံခြင်း"
+            },
+            {
+              "word": "納期",
+              "reading": "のうき",
+              "meaning": "ပစ္စည်းအပ်နှံရမည့်ရက်၊ ငွေသွင်းရမည့်ရက်"
+            },
+            {
+              "word": "納豆",
+              "reading": "なっとう",
+              "meaning": "ဂျပန်ပဲပုပ်"
+            }
+          ]
+        },
+        {
+          "character": "農",
+          "onyomi": "ノウ",
+          "kunyomi": "",
+          "meaning": "စိုက်ပျိုးရေး၊ လယ်ယာ",
+          "vocab": [
+            {
+              "word": "農業",
+              "reading": "のうぎょう",
+              "meaning": "စိုက်ပျိုးရေးလုပ်ငန်း"
+            },
+            {
+              "word": "農家",
+              "reading": "のうか",
+              "meaning": "တောင်သူလယ်သမားအိမ်ထောင်စု"
+            },
+            {
+              "word": "農産物",
+              "reading": "のうさんぶつ",
+              "meaning": "လယ်ယာထွက်ကုန်ပစ္စည်း"
+            },
+            {
+              "word": "農村",
+              "reading": "のうそん",
+              "meaning": "ကျေးလက်တောရွာ"
+            }
+          ]
+        },
+        {
+          "character": "豊",
+          "onyomi": "ホウ",
+          "kunyomi": "ゆた・か",
+          "meaning": "ပေါကြွယ်ဝသော၊ ပြည့်စုံသော",
+          "vocab": [
+            {
+              "word": "豊かな",
+              "reading": "ゆたかな",
+              "meaning": "ပေါကြွယ်ဝသော၊ ပြည့်စုံသော"
+            },
+            {
+              "word": "豊富",
+              "reading": "ほうふ",
+              "meaning": "ပေါများကြွယ်ဝခြင်း"
+            },
+            {
+              "word": "豊作",
+              "reading": "ほうさく",
+              "meaning": "သီးနှံအထွက်ကောင်းခြင်း"
             }
           ]
         }

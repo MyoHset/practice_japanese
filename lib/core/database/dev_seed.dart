@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 42;
+const int _kCurrentDevSeedVersion = 46;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -900,16 +900,20 @@ Future<void> _ensureSpeedMasterN3Kanji(AppDatabase db, DateTime now) async {
         ..where((s) => s.name.equals('Speed Master N3 語彙 (Kanji တွဲလုံးများ)')))
       .getSingleOrNull();
 
-  if (existingKanjiSource != null && existingVocabSource != null) {
+  if (existingKanjiSource != null || existingVocabSource != null) {
     // Force clean and re-seed to pick up any kanji/vocab replacement in the JSON asset
     // Deleting the source will cascade and delete units, sourceItems, compounds automatically.
     await db.transaction(() async {
-      await (db.delete(db.sources)
-            ..where((tbl) => tbl.id.equals(existingKanjiSource.id)))
-          .go();
-      await (db.delete(db.sources)
-            ..where((tbl) => tbl.id.equals(existingVocabSource.id)))
-          .go();
+      if (existingKanjiSource != null) {
+        await (db.delete(db.sources)
+              ..where((tbl) => tbl.id.equals(existingKanjiSource.id)))
+            .go();
+      }
+      if (existingVocabSource != null) {
+        await (db.delete(db.sources)
+              ..where((tbl) => tbl.id.equals(existingVocabSource.id)))
+            .go();
+      }
     });
   }
 
