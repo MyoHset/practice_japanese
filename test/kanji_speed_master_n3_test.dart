@@ -78,9 +78,9 @@ void main() {
       }
     }
 
-    expect(totalKanjis, equals(486), reason: 'Total kanji count across 25 chapters should be 486');
-    expect(totalVocabWords, equals(1504), reason: 'Total compound words across 25 chapters should be 1504');
-    expect(allVocabSet.length, equals(1337), reason: 'Total unique compound words across 25 chapters should be 1337');
+    expect(totalKanjis, equals(482), reason: 'Total kanji count across 25 chapters should be 482');
+    expect(totalVocabWords, equals(1517), reason: 'Total compound words across 25 chapters should be 1517');
+    expect(allVocabSet.length, equals(1349), reason: 'Total unique compound words across 25 chapters should be 1349');
   });
 
   test('Speed Master N3 Kanji Chapter 16 seeds into database with correct title and kanjis', () async {
@@ -183,6 +183,42 @@ void main() {
     expect(kanjiList, equals([
       '産', '製', '造', '費', '貿', '輸', '販', '商', '営', '払',
       '値', '価', '額', '税', '財', '預', '貯', '納', '農', '豊',
+    ]));
+  });
+
+  test('Speed Master N3 Kanji Chapter 20 seeds into database with correct title and kanjis', () async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+
+    await seedDevData(db);
+
+    final kanjiSource = await (db.select(db.sources)
+          ..where((s) => s.name.equals('Speed Master N3 漢字')))
+        .getSingle();
+
+    final ch20Unit = await (db.select(db.units)
+          ..where((u) => u.sourceId.equals(kanjiSource.id) & u.orderNo.equals(20)))
+        .getSingle();
+
+    expect(ch20Unit.name, equals('Ch.20: 仕事 (စည်းကမ်း၊ ပြစ်မှု၊ ယှဉ်ပြိုင်ခြင်းနှင့် နိုင်ငံရေး)'));
+
+    final items = await (db.select(db.kanjiSourceItems)
+          ..where((i) => i.sourceId.equals(kanjiSource.id) & i.unitId.equals(ch20Unit.id)))
+        .get();
+
+    expect(items.length, equals(16));
+
+    final kanjiList = <String>[];
+    for (final item in items) {
+      final k = await (db.select(db.kanjis)..where((k) => k.id.equals(item.kanjiId))).getSingle();
+      kanjiList.add(k.character);
+    }
+
+    expect(kanjiList, equals([
+      '法', '律', '規', '則', '禁', '許', '件',
+      '犯', '罪', '容', '疑',
+      '争', '兵', '軍',
+      '役', '臣',
     ]));
   });
 }

@@ -9108,425 +9108,458 @@
     },
     {
       "chapter": 20,
-      "title": "Ch.20: 観光・文化 (ခရီးသွားနှင့် ယဉ်ကျေးမှု)",
+      "title": "Ch.20: 仕事 (စည်းကမ်း၊ ပြစ်မှု၊ ယှဉ်ပြိုင်ခြင်းနှင့် နိုင်ငံရေး)",
       "kanjis": [
         {
-          "character": "旅",
-          "onyomi": "リョ",
-          "kunyomi": "たび",
-          "meaning": "ခရီးသွားခြင်း",
-          "vocab": [
-            {
-              "word": "旅行",
-              "reading": "りょこう",
-              "meaning": "ခရီးသွားခြင်း"
-            },
-            {
-              "word": "旅",
-              "reading": "たび",
-              "meaning": "ခရီး"
-            },
-            {
-              "word": "旅館",
-              "reading": "りょかん",
-              "meaning": "ဂျပန်စတိုင်ဟိုတယ်"
-            }
-          ]
-        },
-        {
-          "character": "観",
-          "onyomi": "カン",
+          "character": "法",
+          "onyomi": "ホウ、ハツ、ホッ",
           "kunyomi": "",
-          "meaning": "ကြည့်ရှုသည်၊ ရှုခင်း",
+          "meaning": "ဥပဒေ၊ နည်းလမ်း",
           "vocab": [
             {
-              "word": "観光",
-              "reading": "かんこう",
-              "meaning": "ခရီးလှည့်လည်ကြည့်ရှုခြင်း"
+              "word": "法学部",
+              "reading": "ほうがくぶ",
+              "meaning": "ဥပဒေကျောင်း / ဥပဒေပညာဌာန"
             },
             {
-              "word": "観客",
-              "reading": "かんきゃく",
-              "meaning": "ပွဲကြည့်ပရိသတ်"
+              "word": "方法",
+              "reading": "ほうほう",
+              "meaning": "နည်းလမ်း"
             },
             {
-              "word": "観察する",
-              "reading": "かんさつする",
-              "meaning": "စောင့်ကြည့်သည်"
+              "word": "立法",
+              "reading": "りっぽう",
+              "meaning": "ဥပဒေပြုရေး"
+            },
+            {
+              "word": "法律",
+              "reading": "ほうりつ",
+              "meaning": "တရားဥပဒေ"
+            },
+            {
+              "word": "法則",
+              "reading": "ほうそく",
+              "meaning": "ဥပဒေ / စည်းကမ်း"
+            },
+            {
+              "word": "文法",
+              "reading": "ぶんぽう",
+              "meaning": "သဒ္ဒါ"
+            },
+            {
+              "word": "法度",
+              "reading": "はっと",
+              "meaning": "ပိတ်ပင်/တားမြစ်ထားခြင်း"
+            },
+            {
+              "word": "法華",
+              "reading": "ほっけ",
+              "meaning": "ဗုဒ္ဓဘာသာဆိုင်ရာကျမ်း (Lotus Sutra)"
             }
           ]
         },
         {
-          "character": "光",
-          "onyomi": "コウ",
-          "kunyomi": "ひかり、ひか・る",
-          "meaning": "အလင်းရောင်",
-          "vocab": [
-            {
-              "word": "光",
-              "reading": "ひかり",
-              "meaning": "အလင်းရောင်"
-            },
-            {
-              "word": "日光",
-              "reading": "にっこう",
-              "meaning": "နေရောင်ခြည်"
-            },
-            {
-              "word": "観光",
-              "reading": "かんこう",
-              "meaning": "ခရီးသွားလုပ်ငန်း"
-            }
-          ]
-        },
-        {
-          "character": "客",
-          "onyomi": "キャク、カク",
+          "character": "律",
+          "onyomi": "リツ、リチ",
           "kunyomi": "",
-          "meaning": "ဧည့်သည်၊ ခရီးသည်",
+          "meaning": "စည်းကမ်း၊ ဥပဒေ",
           "vocab": [
             {
-              "word": "お客様",
-              "reading": "おきゃくさま",
-              "meaning": "ဧည့်သည်တော်"
+              "word": "律儀な",
+              "reading": "りちぎな",
+              "meaning": "မှန်ကန်ရိုးသားသော / စိတ်ရင်းမှန်သော"
             },
             {
-              "word": "乗客",
-              "reading": "じょうきゃく",
-              "meaning": "ခရီးသည်"
-            },
-            {
-              "word": "乗客",
-              "reading": "じょうきゃく",
-              "meaning": "ခရီးသည်"
+              "word": "自律的な",
+              "reading": "じりつてきな",
+              "meaning": "မိမိကိုယ်တိုင် ရပ်တည်နိုင်သော"
             }
           ]
         },
         {
-          "character": "景",
-          "onyomi": "ケイ",
+          "character": "規",
+          "onyomi": "キ",
           "kunyomi": "",
-          "meaning": "ရှုခင်း၊ အခြေအနေ",
+          "meaning": "စည်းကမ်း၊ စံသတ်မှတ်ချက်",
           "vocab": [
             {
-              "word": "景色",
-              "reading": "けしき",
-              "meaning": "ရှုခင်း"
+              "word": "規律",
+              "reading": "きりつ",
+              "meaning": "စည်းကမ်း"
             },
             {
-              "word": "風景",
-              "reading": "ふうけい",
-              "meaning": "သဘာဝရှုခင်း"
+              "word": "新規",
+              "reading": "しんき",
+              "meaning": "အသစ်"
             },
             {
-              "word": "景気",
-              "reading": "けいき",
-              "meaning": "စီးပွားရေးအခြေအနေ"
+              "word": "規格",
+              "reading": "きかく",
+              "meaning": "စံသတ်မှတ်ချက်"
+            },
+            {
+              "word": "規模",
+              "reading": "きぼ",
+              "meaning": "အတိုင်းအတာ (Scale)"
             }
           ]
         },
         {
-          "character": "礼",
-          "onyomi": "レイ、ライ",
+          "character": "則",
+          "onyomi": "ソク",
+          "kunyomi": "のっと・る",
+          "meaning": "စည်းမျဉ်း စည်းကမ်း",
+          "vocab": [
+            {
+              "word": "原則",
+              "reading": "げんそく",
+              "meaning": "အခြေခံကျသော နည်းလမ်းများ"
+            },
+            {
+              "word": "規則",
+              "reading": "きそく",
+              "meaning": "စည်းမျဉ်း စည်းကမ်းများ"
+            },
+            {
+              "word": "変則",
+              "reading": "へんそく",
+              "meaning": "မမှန်ခြင်း"
+            },
+            {
+              "word": "変則的な",
+              "reading": "へんそくてきな",
+              "meaning": "ပုံမှန်မဟုတ်သော"
+            }
+          ]
+        },
+        {
+          "character": "禁",
+          "onyomi": "キン",
           "kunyomi": "",
-          "meaning": "ယဉ်ကျေးမှု၊ ကျေးဇူးတုံ့ပြန်မှု",
+          "meaning": "တားမြစ်ခြင်း",
           "vocab": [
             {
-              "word": "お礼",
-              "reading": "おれい",
-              "meaning": "ကျေးဇူးတင်လွှာ"
+              "word": "禁止",
+              "reading": "きんし",
+              "meaning": "တားမြစ်ခြင်း"
             },
             {
-              "word": "礼儀",
-              "reading": "れいぎ",
-              "meaning": "ယဉ်ကျေးမှု"
+              "word": "禁じる",
+              "reading": "きんじる",
+              "meaning": "တားမြစ်ထားသည်"
             },
             {
-              "word": "失礼な",
-              "reading": "しつれいな",
-              "meaning": "ရိုင်းစိုင်းသော"
+              "word": "禁酒する",
+              "reading": "きんしゅする",
+              "meaning": "အရက်မသောက်ရ တားမြစ်သည်"
             }
           ]
         },
         {
-          "character": "祭",
-          "onyomi": "サイ",
-          "kunyomi": "まつ・り、まつ・る",
-          "meaning": "ပွဲတော်",
+          "character": "許",
+          "onyomi": "キョ",
+          "kunyomi": "ゆる・す",
+          "meaning": "ခွင့်ပြုသည်၊ ခွင့်လွှတ်သည်",
           "vocab": [
             {
-              "word": "祭り",
-              "reading": "まつり",
-              "meaning": "ပွဲတော်"
+              "word": "許す",
+              "reading": "ゆるす",
+              "meaning": "ခွင့်ပြုသည် / ခွင့်လွှတ်သည်"
             },
             {
-              "word": "学園祭",
-              "reading": "がくえんさい",
-              "meaning": "ကျောင်းပွဲတော်"
+              "word": "免許",
+              "reading": "めんきょ",
+              "meaning": "လိုင်စင်"
             },
             {
-              "word": "祝祭日",
-              "reading": "しゅくさいじつ",
-              "meaning": "ရုံးပိတ်ရက်ပွဲတော်ရက်"
+              "word": "許可",
+              "reading": "きょか",
+              "meaning": "ခွင့်ပြုချက်"
+            },
+            {
+              "word": "許容",
+              "reading": "きょよう",
+              "meaning": "ခွင့်ပြုလက်ခံခြင်း / သည်းခံခြင်း"
             }
           ]
         },
         {
-          "character": "芸",
-          "onyomi": "ゲイ",
+          "character": "件",
+          "onyomi": "ケン",
           "kunyomi": "",
-          "meaning": "အနုပညာ၊ စွမ်းရည်",
+          "meaning": "ဖြစ်ရပ်၊ ကိစ္စ",
           "vocab": [
             {
-              "word": "芸術",
-              "reading": "げいじゅつ",
-              "meaning": "အနုပညာ"
+              "word": "事件",
+              "reading": "じけん",
+              "meaning": "ဖြစ်ရပ် / အဖြစ်အပျက်"
             },
             {
-              "word": "芸能人",
-              "reading": "げいのうじん",
-              "meaning": "အနုပညာရှင်"
+              "word": "条件",
+              "reading": "じょうけん",
+              "meaning": "အခြေအနေ / လိုအပ်ချက်"
             },
             {
-              "word": "工芸",
-              "reading": "こうげい",
-              "meaning": "လက်မှုအနုပညာ"
+              "word": "要件",
+              "reading": "ようけん",
+              "meaning": "အရေးကြီးကိစ္စ"
+            },
+            {
+              "word": "物件",
+              "reading": "ぶっけん",
+              "meaning": "အဆောက်အအုံ / အိမ်ခြံမြေ"
+            },
+            {
+              "word": "件数",
+              "reading": "けんすう",
+              "meaning": "ကိစ္စ အရေအတွက်"
             }
           ]
         },
         {
-          "character": "演",
-          "onyomi": "エン",
+          "character": "犯",
+          "onyomi": "ハン",
+          "kunyomi": "おか・す",
+          "meaning": "ပြစ်မှုကျူးလွန်သည်",
+          "vocab": [
+            {
+              "word": "犯す",
+              "reading": "おかす",
+              "meaning": "ကျူးလွန်သည်"
+            },
+            {
+              "word": "犯人",
+              "reading": "はんにん",
+              "meaning": "တရားခံ"
+            },
+            {
+              "word": "防犯",
+              "reading": "ぼうはん",
+              "meaning": "မှုခင်းတားဆီးရေး"
+            },
+            {
+              "word": "防犯カメラ",
+              "reading": "ぼうはんカメラ",
+              "meaning": "လုံခြုံရေးကင်မရာ"
+            },
+            {
+              "word": "犯罪",
+              "reading": "はんざい",
+              "meaning": "ရာဇဝတ်မှု / ပြစ်မှု"
+            }
+          ]
+        },
+        {
+          "character": "罪",
+          "onyomi": "ザイ",
+          "kunyomi": "つみ",
+          "meaning": "အပြစ်၊ ရာဇဝတ်မှု",
+          "vocab": [
+            {
+              "word": "罪",
+              "reading": "つみ",
+              "meaning": "အပြစ်"
+            },
+            {
+              "word": "罪悪感",
+              "reading": "ざいあくかん",
+              "meaning": "အပြစ်ရှိသောစိတ် / စိတ်မသန့်ခြင်း"
+            }
+          ]
+        },
+        {
+          "character": "容",
+          "onyomi": "ヨウ",
           "kunyomi": "",
-          "meaning": "ဖျော်ဖြေသည်၊ မိန့်ခွန်းပြောသည်",
+          "meaning": "ပုံစံ၊ ထည့်သွင်းဆံ့သည်၊ အကြောင်းအရာ",
           "vocab": [
             {
-              "word": "演奏する",
-              "reading": "えんそうする",
-              "meaning": "တီးမှုတ်သည်"
+              "word": "内容",
+              "reading": "ないよう",
+              "meaning": "အကြောင်းအရာ"
             },
             {
-              "word": "演劇",
-              "reading": "えんげき",
-              "meaning": "ပြဇာတ်"
+              "word": "美容院",
+              "reading": "びよういん",
+              "meaning": "အလှပြင်ဆိုင်"
             },
             {
-              "word": "演説",
-              "reading": "えんぜつ",
-              "meaning": "မိန့်ခွန်း"
+              "word": "容量",
+              "reading": "ようりょう",
+              "meaning": "ထုထည် / ပမာဏ"
+            },
+            {
+              "word": "容疑者",
+              "reading": "ようぎしゃ",
+              "meaning": "သံသယရှိသူ"
+            },
+            {
+              "word": "収容人数",
+              "reading": "しゅうようにんずう",
+              "meaning": "ဆံ့သော လူအရေအတွက်"
+            },
+            {
+              "word": "容易に",
+              "reading": "よういに",
+              "meaning": "အလွယ်တကူ လွယ်ကူစွာ"
             }
           ]
         },
         {
-          "character": "劇",
-          "onyomi": "ゲキ",
-          "kunyomi": "",
-          "meaning": "ပြဇာတ်",
+          "character": "疑",
+          "onyomi": "ギ",
+          "kunyomi": "うたが・う",
+          "meaning": "သံသယရှိသည်၊ မေးခွန်းထုတ်သည်",
           "vocab": [
             {
-              "word": "劇",
-              "reading": "げき",
-              "meaning": "ပြဇာတ်"
+              "word": "疑う",
+              "reading": "うたがう",
+              "meaning": "သံသယရှိသည်"
             },
             {
-              "word": "劇場",
-              "reading": "げきじょう",
-              "meaning": "ဇာတ်ရုံ"
+              "word": "疑問",
+              "reading": "ぎもん",
+              "meaning": "သံသယ မေးခွန်းထုတ်ခြင်း"
             },
             {
-              "word": "悲劇",
-              "reading": "ひげき",
-              "meaning": "ဝမ်းနည်းစရာပြဇာတ်"
+              "word": "質疑応答",
+              "reading": "しつぎおうとう",
+              "meaning": "အမေးအဖြေကဏ္ဍ"
+            },
+            {
+              "word": "半信半疑",
+              "reading": "はんしんはんぎ",
+              "meaning": "မယုံတစ်ဝက် ယုံတစ်ဝက်"
             }
           ]
         },
         {
-          "character": "奏",
+          "character": "争",
           "onyomi": "ソウ",
-          "kunyomi": "かな・でる",
-          "meaning": "တီးမှုတ်သည်",
+          "kunyomi": "あらそ・う",
+          "meaning": "ယှဉ်ပြိုင်သည်၊ တိုက်ခိုက်သည်",
           "vocab": [
             {
-              "word": "演奏する",
-              "reading": "えんそうする",
-              "meaning": "တီးမှုတ်သည်"
+              "word": "争う",
+              "reading": "あらそう",
+              "meaning": "ယှဉ်ပြိုင်သည်"
             },
             {
-              "word": "奏でる",
-              "reading": "かなでる",
-              "meaning": "တီးမှုတ်သည်"
+              "word": "戦争",
+              "reading": "せんそう",
+              "meaning": "စစ်ပွဲ"
+            },
+            {
+              "word": "争い",
+              "reading": "あらそい",
+              "meaning": "ယှဉ်ပြိုင်ခြင်း"
             }
           ]
         },
         {
-          "character": "楽",
-          "onyomi": "ガク、ラク",
-          "kunyomi": "たの・しい、たの・しむ",
-          "meaning": "ဂီတ၊ ပျော်ရွှင်သော",
-          "vocab": [
-            {
-              "word": "音楽",
-              "reading": "おんがく",
-              "meaning": "ဂီတ"
-            },
-            {
-              "word": "楽しい",
-              "reading": "たのしい",
-              "meaning": "ပျော်စရာကောင်းသော"
-            },
-            {
-              "word": "気楽な",
-              "reading": "きらくな",
-              "meaning": "စိတ်ပေါ့ပါးသော"
-            }
-          ]
-        },
-        {
-          "character": "歌",
-          "onyomi": "カ",
-          "kunyomi": "うた、うた・う",
-          "meaning": "သီချင်း၊ သီဆိုသည်",
-          "vocab": [
-            {
-              "word": "歌",
-              "reading": "うた",
-              "meaning": "သီချင်း"
-            },
-            {
-              "word": "歌う",
-              "reading": "うたう",
-              "meaning": "သီဆိုသည်"
-            },
-            {
-              "word": "歌手",
-              "reading": "かしゅ",
-              "meaning": "အဆိုတော်"
-            }
-          ]
-        },
-        {
-          "character": "舞",
-          "onyomi": "ブ",
-          "kunyomi": "まい、ま・う",
-          "meaning": "ကပြသည်၊ စင်မြင့်",
-          "vocab": [
-            {
-              "word": "舞台",
-              "reading": "ぶたい",
-              "meaning": "စင်မြင့်"
-            },
-            {
-              "word": "舞踊",
-              "reading": "ぶよう",
-              "meaning": "ကနဦးအက"
-            },
-            {
-              "word": "歌舞伎",
-              "reading": "かぶき",
-              "meaning": "ခါဘူခီပြဇာတ်"
-            }
-          ]
-        },
-        {
-          "character": "尊",
-          "onyomi": "ソン",
-          "kunyomi": "とうと・い、たっと・い",
-          "meaning": "လေးစားတန်ဖိုးထားသည်",
-          "vocab": [
-            {
-              "word": "尊重する",
-              "reading": "そんちょうする",
-              "meaning": "လေးစားတန်ဖိုးထားသည်"
-            },
-            {
-              "word": "尊敬する",
-              "reading": "そんけいする",
-              "meaning": "လေးစားသည်"
-            }
-          ]
-        },
-        {
-          "character": "敬",
-          "onyomi": "ケイ",
-          "kunyomi": "うやま・う",
-          "meaning": "ရိုသေလေးစားသည်",
-          "vocab": [
-            {
-              "word": "敬意",
-              "reading": "けいい",
-              "meaning": "လေးစားမှု"
-            },
-            {
-              "word": "敬語",
-              "reading": "けいご",
-              "meaning": "ယဉ်ကျေးသောစကား"
-            },
-            {
-              "word": "敬老",
-              "reading": "けいろう",
-              "meaning": "သက်ကြီးရွယ်အိုလေးစားရေး"
-            }
-          ]
-        },
-        {
-          "character": "紹",
-          "onyomi": "ショウ",
+          "character": "兵",
+          "onyomi": "ヘイ",
           "kunyomi": "",
-          "meaning": "မိတ်ဆက်သည်",
+          "meaning": "စစ်သား၊ စစ်လက်နက်",
           "vocab": [
             {
-              "word": "紹介する",
-              "reading": "しょうかいする",
-              "meaning": "မိတ်ဆက်သည်"
+              "word": "兵",
+              "reading": "へい",
+              "meaning": "သာမန်စစ်သား"
             },
             {
-              "word": "自己紹介",
-              "reading": "じこしょうかい",
-              "meaning": "မိမိကိုယ်ကိုမိတ်ဆက်ခြင်း"
-            }
-          ]
-        },
-        {
-          "character": "介",
-          "onyomi": "カイ",
-          "kunyomi": "",
-          "meaning": "အကူအညီပေးသည်၊ မိတ်ဆက်သည်",
-          "vocab": [
-            {
-              "word": "紹介する",
-              "reading": "しょうかいする",
-              "meaning": "မိတ်ဆက်သည်"
+              "word": "兵器",
+              "reading": "へいき",
+              "meaning": "စစ်လက်နက်"
             },
             {
-              "word": "介護する",
-              "reading": "かいごする",
-              "meaning": "ပြုစုစောင့်ရှောက်သည်"
+              "word": "兵糧",
+              "reading": "ひょうろう",
+              "meaning": "စစ်သုံးရိက္ခာ"
             }
           ]
         },
         {
-          "character": "留",
-          "onyomi": "リュウ",
+          "character": "軍",
+          "onyomi": "グン",
           "kunyomi": "",
-          "meaning": "နေထိုင်သည်၊ ချန်ထားသည်",
+          "meaning": "စစ်တပ်",
           "vocab": [
             {
-              "word": "留学生",
-              "reading": "りゅうがくせい",
-              "meaning": "နိုင်ငံခြားကျောင်းသား"
+              "word": "軍",
+              "reading": "ぐん",
+              "meaning": "စစ်တပ်"
+            },
+            {
+              "word": "空軍",
+              "reading": "くうぐん",
+              "meaning": "လေတပ်"
+            },
+            {
+              "word": "一軍",
+              "reading": "いちぐん",
+              "meaning": "စစ်တပ်တစ်ခုလုံး"
             }
           ]
         },
         {
-          "character": "貿",
-          "onyomi": "ボウ",
+          "character": "役",
+          "onyomi": "ヤク、エキ",
           "kunyomi": "",
-          "meaning": "ကုန်သွယ်ရေး",
+          "meaning": "တာဝန်၊ အခန်းကဏ္ဍ",
           "vocab": [
             {
-              "word": "貿易",
-              "reading": "ぼうえき",
-              "meaning": "နိုင်ငံတကာကုန်သွယ်ရေး"
+              "word": "役所",
+              "reading": "やくしょ",
+              "meaning": "အစိုးရရုံး"
+            },
+            {
+              "word": "役割",
+              "reading": "やくわり",
+              "meaning": "လုပ်ငန်းတာဝန်"
+            },
+            {
+              "word": "配役",
+              "reading": "はいやく",
+              "meaning": "သရုပ်ဆောင်ရွေးခြင်း"
+            },
+            {
+              "word": "兵役",
+              "reading": "へいえき",
+              "meaning": "စစ်မှုထမ်းခြင်း"
+            },
+            {
+              "word": "役員",
+              "reading": "やくいん",
+              "meaning": "ဒါရိုက်တာ / အမှုဆောင်"
+            },
+            {
+              "word": "大役",
+              "reading": "たいやく",
+              "meaning": "အရေးကြီးသောအလုပ်"
+            },
+            {
+              "word": "使役形",
+              "reading": "しえきけい",
+              "meaning": "စေခိုင်းခြင်းပုံစံ (Causative Form)"
+            }
+          ]
+        },
+        {
+          "character": "臣",
+          "onyomi": "ジン、シン",
+          "kunyomi": "",
+          "meaning": "ဝန်ကြီး၊ အစေခံ",
+          "vocab": [
+            {
+              "word": "大臣",
+              "reading": "だいじん",
+              "meaning": "ဝန်ကြီး"
+            },
+            {
+              "word": "臣下",
+              "reading": "しんか",
+              "meaning": "ဘုရင်၏ အစေခံ"
             }
           ]
         }
