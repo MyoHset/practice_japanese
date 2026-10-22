@@ -99,22 +99,32 @@ class LibraryRepository {
   }
 
   /// Watches all items within a unit formatted as [StudyItem]s for List mode.
-  Stream<List<StudyItem>> watchUnitItems(int unitId, ContentKind kind) {
+  Stream<List<StudyItem>> watchUnitItems(
+    int unitId,
+    ContentKind kind, {
+    bool onlyWeak = false,
+  }) {
+    final weakClause = onlyWeak
+        ? 'AND (p.is_bookmarked = 1 OR p.wrong_count > 0 OR (p.streak == 0 AND p.last_reviewed IS NOT NULL))'
+        : '';
+
     switch (kind) {
       case ContentKind.vocab:
-        const query = '''
+        final query = '''
           SELECT 
             v.id AS item_id,
             v.word AS item_primary,
             v.reading AS item_secondary,
             v.meaning_my AS item_meaning,
             NULL AS item_connection,
-            COALESCE(p.streak, 0) AS item_streak
+            COALESCE(p.streak, 0) AS item_streak,
+            COALESCE(p.wrong_count, 0) AS item_wrong_count,
+            COALESCE(p.is_bookmarked, 0) AS item_is_bookmarked
           FROM vocab_source_items vsi
           JOIN vocabularies v ON v.id = vsi.vocab_id
           LEFT JOIN progress p ON p.item_id = v.id AND p.item_type = 1
-          WHERE vsi.unit_id = :unitId
-          ORDER BY vsi.position ASC, v.id ASC
+          WHERE vsi.unit_id = :unitId $weakClause
+          ORDER BY ${onlyWeak ? 'COALESCE(p.is_bookmarked, 0) DESC, COALESCE(p.wrong_count, 0) DESC, COALESCE(p.streak, 0) ASC, ' : ''}vsi.position ASC, v.id ASC
         ''';
         return _db
             .customSelect(
@@ -126,7 +136,7 @@ class LibraryRepository {
             .map((rows) => rows.map(_mapStudyItem).toList());
 
       case ContentKind.kanji:
-        const query = '''
+        final query = '''
           SELECT 
             k.id AS item_id,
             k.character AS item_primary,
@@ -134,12 +144,14 @@ class LibraryRepository {
             (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id AND type = 1) AS kun_readings,
             k.meaning_my AS item_meaning,
             NULL AS item_connection,
-            COALESCE(p.streak, 0) AS item_streak
+            COALESCE(p.streak, 0) AS item_streak,
+            COALESCE(p.wrong_count, 0) AS item_wrong_count,
+            COALESCE(p.is_bookmarked, 0) AS item_is_bookmarked
           FROM kanji_source_items ksi
           JOIN kanjis k ON k.id = ksi.kanji_id
           LEFT JOIN progress p ON p.item_id = k.id AND p.item_type = 0
-          WHERE ksi.unit_id = :unitId
-          ORDER BY ksi.position ASC, k.id ASC
+          WHERE ksi.unit_id = :unitId $weakClause
+          ORDER BY ${onlyWeak ? 'COALESCE(p.is_bookmarked, 0) DESC, COALESCE(p.wrong_count, 0) DESC, COALESCE(p.streak, 0) ASC, ' : ''}ksi.position ASC, k.id ASC
         ''';
         return _db
             .customSelect(
@@ -156,7 +168,7 @@ class LibraryRepository {
             .map((rows) => rows.map(_mapStudyItem).toList());
 
       case ContentKind.grammar:
-        const query = '''
+        final query = '''
           SELECT 
             g.id AS item_id,
             g.pattern AS item_primary,
@@ -165,12 +177,14 @@ class LibraryRepository {
             g.connection AS item_connection,
             g.example_jp AS item_example_jp,
             g.example_my AS item_example_my,
-            COALESCE(p.streak, 0) AS item_streak
+            COALESCE(p.streak, 0) AS item_streak,
+            COALESCE(p.wrong_count, 0) AS item_wrong_count,
+            COALESCE(p.is_bookmarked, 0) AS item_is_bookmarked
           FROM grammar_source_items gsi
           JOIN grammar_points g ON g.id = gsi.grammar_id
           LEFT JOIN progress p ON p.item_id = g.id AND p.item_type = 2
-          WHERE gsi.unit_id = :unitId
-          ORDER BY gsi.position ASC, g.id ASC
+          WHERE gsi.unit_id = :unitId $weakClause
+          ORDER BY ${onlyWeak ? 'COALESCE(p.is_bookmarked, 0) DESC, COALESCE(p.wrong_count, 0) DESC, COALESCE(p.streak, 0) ASC, ' : ''}gsi.position ASC, g.id ASC
         ''';
         return _db
             .customSelect(
@@ -191,8 +205,9 @@ class LibraryRepository {
   Stream<List<StudyItem>> watchMultiChapterItems(
     int sourceId,
     List<int> chapterNumbers,
-    ContentKind kind,
-  ) {
+    ContentKind kind, {
+    bool onlyWeak = false,
+  }) {
     final String chapterClause;
     if (chapterNumbers.isEmpty) {
       chapterClause = '';
@@ -203,6 +218,10 @@ class LibraryRepository {
       chapterClause = 'AND ($conditions)';
     }
 
+    final weakClause = onlyWeak
+        ? 'AND (p.is_bookmarked = 1 OR p.wrong_count > 0 OR (p.streak == 0 AND p.last_reviewed IS NOT NULL))'
+        : '';
+
     switch (kind) {
       case ContentKind.vocab:
         final query = '''
@@ -212,13 +231,15 @@ class LibraryRepository {
             v.reading AS item_secondary,
             v.meaning_my AS item_meaning,
             NULL AS item_connection,
-            COALESCE(p.streak, 0) AS item_streak
+            COALESCE(p.streak, 0) AS item_streak,
+            COALESCE(p.wrong_count, 0) AS item_wrong_count,
+            COALESCE(p.is_bookmarked, 0) AS item_is_bookmarked
           FROM vocab_source_items vsi
           JOIN vocabularies v ON v.id = vsi.vocab_id
           JOIN units u ON u.id = vsi.unit_id
           LEFT JOIN progress p ON p.item_id = v.id AND p.item_type = 1
-          WHERE u.source_id = :sourceId $chapterClause
-          ORDER BY u.order_no ASC, vsi.position ASC, v.id ASC
+          WHERE u.source_id = :sourceId $chapterClause $weakClause
+          ORDER BY ${onlyWeak ? 'COALESCE(p.is_bookmarked, 0) DESC, COALESCE(p.wrong_count, 0) DESC, COALESCE(p.streak, 0) ASC, ' : ''}u.order_no ASC, vsi.position ASC, v.id ASC
         ''';
         return _db
             .customSelect(
@@ -245,13 +266,15 @@ class LibraryRepository {
             (SELECT GROUP_CONCAT(reading, '、') FROM kanji_readings WHERE kanji_id = k.id AND type = 1) AS kun_readings,
             k.meaning_my AS item_meaning,
             NULL AS item_connection,
-            COALESCE(p.streak, 0) AS item_streak
+            COALESCE(p.streak, 0) AS item_streak,
+            COALESCE(p.wrong_count, 0) AS item_wrong_count,
+            COALESCE(p.is_bookmarked, 0) AS item_is_bookmarked
           FROM kanji_source_items ksi
           JOIN kanjis k ON k.id = ksi.kanji_id
           JOIN units u ON u.id = ksi.unit_id
           LEFT JOIN progress p ON p.item_id = k.id AND p.item_type = 0
-          WHERE u.source_id = :sourceId $chapterClause
-          ORDER BY u.order_no ASC, ksi.position ASC, k.id ASC
+          WHERE u.source_id = :sourceId $chapterClause $weakClause
+          ORDER BY ${onlyWeak ? 'COALESCE(p.is_bookmarked, 0) DESC, COALESCE(p.wrong_count, 0) DESC, COALESCE(p.streak, 0) ASC, ' : ''}u.order_no ASC, ksi.position ASC, k.id ASC
         ''';
         return _db
             .customSelect(
@@ -280,13 +303,15 @@ class LibraryRepository {
             g.connection AS item_connection,
             g.example_jp AS item_example_jp,
             g.example_my AS item_example_my,
-            COALESCE(p.streak, 0) AS item_streak
+            COALESCE(p.streak, 0) AS item_streak,
+            COALESCE(p.wrong_count, 0) AS item_wrong_count,
+            COALESCE(p.is_bookmarked, 0) AS item_is_bookmarked
           FROM grammar_source_items gsi
           JOIN grammar_points g ON g.id = gsi.grammar_id
           JOIN units u ON u.id = gsi.unit_id
           LEFT JOIN progress p ON p.item_id = g.id AND p.item_type = 2
-          WHERE u.source_id = :sourceId $chapterClause
-          ORDER BY u.order_no ASC, gsi.position ASC, g.id ASC
+          WHERE u.source_id = :sourceId $chapterClause $weakClause
+          ORDER BY ${onlyWeak ? 'COALESCE(p.is_bookmarked, 0) DESC, COALESCE(p.wrong_count, 0) DESC, COALESCE(p.streak, 0) ASC, ' : ''}u.order_no ASC, gsi.position ASC, g.id ASC
         ''';
         return _db
             .customSelect(
@@ -310,9 +335,101 @@ class LibraryRepository {
   Stream<List<StudyItem>> watchChapterItems(
     int sourceId,
     int chapterNumber,
-    ContentKind kind,
-  ) {
-    return watchMultiChapterItems(sourceId, [chapterNumber], kind);
+    ContentKind kind, {
+    bool onlyWeak = false,
+  }) {
+    return watchMultiChapterItems(
+      sourceId,
+      [chapterNumber],
+      kind,
+      onlyWeak: onlyWeak,
+    );
+  }
+
+  /// Watches the total count of weak items for a source and optional chapters.
+  Stream<int> watchWeakItemsCount(
+    int sourceId,
+    ContentKind kind, {
+    List<int>? chapterNumbers,
+  }) {
+    return watchMultiChapterItems(
+      sourceId,
+      chapterNumbers ?? const [],
+      kind,
+      onlyWeak: true,
+    ).map((items) => items.length);
+  }
+
+  /// Toggles whether an item is bookmarked as weak / easily forgotten.
+  Future<bool> toggleBookmark({
+    required ContentKind kind,
+    required int itemId,
+  }) async {
+    final itemType = kind.itemType;
+    final existing = await (_db.select(_db.progress)
+          ..where(
+            (p) => p.itemType.equalsValue(itemType) & p.itemId.equals(itemId),
+          ))
+        .getSingleOrNull();
+
+    if (existing == null) {
+      await _db.into(_db.progress).insert(
+            ProgressCompanion.insert(
+              itemType: itemType,
+              itemId: itemId,
+              direction: const Value(Direction.none),
+              isBookmarked: const Value(true),
+            ),
+          );
+      return true;
+    } else {
+      final newValue = !existing.isBookmarked;
+      await (_db.update(_db.progress)
+            ..where(
+              (p) => p.itemType.equalsValue(itemType) & p.itemId.equals(itemId),
+            ))
+          .write(
+        ProgressCompanion(
+          isBookmarked: Value(newValue),
+        ),
+      );
+      return newValue;
+    }
+  }
+
+  /// Sets whether an item is bookmarked as weak / easily forgotten.
+  Future<void> setBookmark({
+    required ContentKind kind,
+    required int itemId,
+    required bool isBookmarked,
+  }) async {
+    final itemType = kind.itemType;
+    final existing = await (_db.select(_db.progress)
+          ..where(
+            (p) => p.itemType.equalsValue(itemType) & p.itemId.equals(itemId),
+          ))
+        .getSingleOrNull();
+
+    if (existing == null) {
+      await _db.into(_db.progress).insert(
+            ProgressCompanion.insert(
+              itemType: itemType,
+              itemId: itemId,
+              direction: const Value(Direction.none),
+              isBookmarked: Value(isBookmarked),
+            ),
+          );
+    } else {
+      await (_db.update(_db.progress)
+            ..where(
+              (p) => p.itemType.equalsValue(itemType) & p.itemId.equals(itemId),
+            ))
+          .write(
+        ProgressCompanion(
+          isBookmarked: Value(isBookmarked),
+        ),
+      );
+    }
   }
 
   /// Records a flashcard review for an item: increments streak if remembered,
@@ -390,6 +507,11 @@ class LibraryRepository {
       secondary = lines.isNotEmpty ? lines.join('\n') : null;
     }
 
+    final rawBookmarked = row.data['item_is_bookmarked'];
+    final bool isBookmarked = rawBookmarked is bool
+        ? rawBookmarked
+        : (row.readNullable<int>('item_is_bookmarked') ?? 0) == 1;
+
     return StudyItem(
       id: row.read<int>('item_id'),
       primary: row.read<String>('item_primary'),
@@ -399,6 +521,8 @@ class LibraryRepository {
       exampleJp: row.readNullable<String>('item_example_jp'),
       exampleMy: row.readNullable<String>('item_example_my'),
       streak: row.read<int>('item_streak'),
+      wrongCount: row.readNullable<int>('item_wrong_count') ?? 0,
+      isBookmarked: isBookmarked,
     );
   }
 

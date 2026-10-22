@@ -45,9 +45,12 @@ class AppRoutes {
     ContentKind kind,
     int sourceId,
     int chapterNumber,
-    StudyMode mode,
-  ) =>
-      '/library/${kind.slug}/source/$sourceId/chapter/$chapterNumber/${mode.slug}';
+    StudyMode mode, {
+    bool onlyWeak = false,
+  }) {
+    final query = onlyWeak ? '?onlyWeak=true' : '';
+    return '/library/${kind.slug}/source/$sourceId/chapter/$chapterNumber/${mode.slug}$query';
+  }
 
   static String practiceStudy(
     ContentKind kind,
@@ -56,6 +59,7 @@ class AppRoutes {
     List<int>? chapters,
     int? limit,
     bool isRandom = true,
+    bool onlyWeak = false,
   }) {
     final params = <String>[];
     if (chapters != null && chapters.isNotEmpty) {
@@ -66,6 +70,9 @@ class AppRoutes {
     }
     if (!isRandom) {
       params.add('isRandom=false');
+    }
+    if (onlyWeak) {
+      params.add('onlyWeak=true');
     }
     final query = params.isNotEmpty ? '?${params.join('&')}' : '';
     return '/library/${kind.slug}/source/$sourceId/practice/${mode.slug}$query';

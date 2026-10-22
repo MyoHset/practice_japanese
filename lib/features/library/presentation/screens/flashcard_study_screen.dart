@@ -25,6 +25,7 @@ class FlashcardStudyScreen extends ConsumerStatefulWidget {
     this.chapterNumbers,
     this.questionLimit,
     this.isRandom = true,
+    this.onlyWeak = false,
   }) : assert(
           unitId != null || chapterNumber != null || chapterNumbers != null,
           'Either unitId, chapterNumber, or chapterNumbers must be provided',
@@ -37,6 +38,7 @@ class FlashcardStudyScreen extends ConsumerStatefulWidget {
   final List<int>? chapterNumbers;
   final int? questionLimit;
   final bool isRandom;
+  final bool onlyWeak;
 
   @override
   ConsumerState<FlashcardStudyScreen> createState() =>
@@ -408,6 +410,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
               (
                 unitId: widget.unitId!,
                 kind: widget.kind,
+                onlyWeak: widget.onlyWeak,
               ),
             ),
           )
@@ -417,6 +420,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
                 sourceId: widget.sourceId,
                 chapterNumbers: effectiveChapters ?? const [],
                 kind: widget.kind,
+                onlyWeak: widget.onlyWeak,
               ),
             ),
           );
@@ -427,8 +431,9 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
         widget.unitId != null ? ref.watch(unitProvider(widget.unitId!)) : null;
 
     final String screenTitle;
+    final weakTag = widget.onlyWeak ? ' · မေ့လွယ်တာများ' : '';
     if (widget.unitId != null) {
-      screenTitle = unitAsync?.value?.name ?? widget.kind.label;
+      screenTitle = '${unitAsync?.value?.name ?? widget.kind.label}$weakTag';
     } else {
       final chLabel = (effectiveChapters == null || effectiveChapters.isEmpty)
           ? 'All Chapters'
@@ -437,7 +442,7 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
               : 'Chapters ${effectiveChapters.join(", ")}');
       final limitLabel =
           widget.questionLimit != null ? ' (${widget.questionLimit} ခု)' : '';
-      screenTitle = '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel';
+      screenTitle = '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel$weakTag';
     }
 
     // Get active deck length early to pass to endDrawer if needed
@@ -464,6 +469,56 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
               ),
         ),
         actions: [
+          if (!_isCompleted &&
+              _activeDeck != null &&
+              _activeDeck!.isNotEmpty &&
+              _currentIndex < _activeDeck!.length) ...[
+            Builder(
+              builder: (context) {
+                final currentItem = _activeDeck![_currentIndex];
+                return IconButton(
+                  tooltip: currentItem.isBookmarked
+                      ? 'မေ့လွယ်သောစာရင်းမှ ဖယ်ထုတ်မည်'
+                      : 'မေ့လွယ်သောစာရင်းထဲ ထည့်မည်',
+                  icon: Icon(
+                    currentItem.isBookmarked
+                        ? Icons.bookmark_rounded
+                        : Icons.bookmark_border_rounded,
+                    color: currentItem.isBookmarked
+                        ? Colors.amber.shade700
+                        : AppColors.textSoft,
+                  ),
+                  onPressed: () async {
+                    final isNow = await ref
+                        .read(libraryRepositoryProvider)
+                        .toggleBookmark(
+                          kind: widget.kind,
+                          itemId: currentItem.id,
+                        );
+                    setState(() {
+                      final updated =
+                          currentItem.copyWith(isBookmarked: isNow);
+                      _activeDeck![_currentIndex] = updated;
+                    });
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isNow
+                                ? '"${currentItem.primary}" ကို မေ့လွယ်သောစာရင်းထဲ ထည့်လိုက်ပါပြီ'
+                                : '"${currentItem.primary}" ကို မေ့လွယ်သောစာရင်းမှ ဖယ်ထုတ်လိုက်ပါပြီ',
+                          ),
+                          duration: const Duration(seconds: 1),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  },
+                );
+              },
+            ),
+          ],
           IconButton(
             tooltip: 'ကတ်ရွေးရန်',
             icon: const Icon(Icons.grid_view_rounded, color: AppColors.textSoft),
@@ -499,7 +554,9 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
       body: AsyncValueView<List<StudyItem>>(
         value: itemsAsync,
         isEmpty: (items) => items.isEmpty,
-        emptyMessage: AppStrings.itemsCount(0),
+        emptyMessage: widget.onlyWeak
+            ? 'မေ့လွယ်သော စကားလုံး မရှိသေးပါ\n(အားလုံး မှတ်မိထားပြီး ဖြစ်ပါသည်)'
+            : AppStrings.itemsCount(0),
         data: (items) {
           _syncDeck(items);
           final deck = _activeDeck ?? items;
@@ -640,10 +697,23 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AppPill(
-                  label: widget.kind.label,
-                  color: AppColors.levelSoft('N3'),
-                  textColor: AppColors.primary,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AppPill(
+                      label: widget.kind.label,
+                      color: AppColors.levelSoft('N3'),
+                      textColor: AppColors.primary,
+                    ),
+                    if (item.isBookmarked) ...[
+                      const SizedBox(width: AppSpacing.xs),
+                      const AppPill(
+                        label: '⭐ မေ့လွယ်',
+                        color: Color(0xFFFEF3C7),
+                        textColor: Color(0xFFB45309),
+                      ),
+                    ],
+                  ],
                 ),
                 if (item.isMastered)
                   const AppPill(
@@ -774,10 +844,23 @@ class _FlashcardStudyScreenState extends ConsumerState<FlashcardStudyScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const AppPill(
-                  label: 'အဓိပ္ပာယ်',
-                  color: AppColors.primarySoft,
-                  textColor: AppColors.primary,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const AppPill(
+                      label: 'အဓိပ္ပာယ်',
+                      color: AppColors.primarySoft,
+                      textColor: AppColors.primary,
+                    ),
+                    if (item.isBookmarked) ...[
+                      const SizedBox(width: AppSpacing.xs),
+                      const AppPill(
+                        label: '⭐ မေ့လွယ်',
+                        color: Color(0xFFFEF3C7),
+                        textColor: Color(0xFFB45309),
+                      ),
+                    ],
+                  ],
                 ),
                 Text(
                   '$index / $total',

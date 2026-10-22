@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:practice_janpanese/core/constants/app_radius.dart';
 import 'package:practice_janpanese/core/constants/app_sizes.dart';
 import 'package:practice_janpanese/core/constants/app_spacing.dart';
 import 'package:practice_janpanese/core/constants/app_strings.dart';
 import 'package:practice_janpanese/core/theme/app_colors.dart';
 import 'package:practice_janpanese/core/widgets/app_card.dart';
+import 'package:practice_janpanese/features/library/domain/content_kind.dart';
 import 'package:practice_janpanese/features/library/domain/study_item.dart';
+import 'package:practice_janpanese/features/library/presentation/providers/library_providers.dart';
 
 /// Card displaying a single study item (Kanji, Vocab, or Grammar) in List mode.
-class StudyItemCard extends StatelessWidget {
+class StudyItemCard extends ConsumerWidget {
   const StudyItemCard({
     super.key,
     required this.item,
     required this.index,
+    this.kind,
+    this.onBookmarkTap,
   });
 
   final StudyItem item;
   final int index;
+  final ContentKind? kind;
+  final VoidCallback? onBookmarkTap;
 
   @override
-  Widget build(BuildContext context) => AppCard(
+  Widget build(BuildContext context, WidgetRef ref) => AppCard(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -213,36 +220,159 @@ class StudyItemCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (item.isMastered)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withAlpha(25),
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(color: AppColors.secondary),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.check_circle_rounded,
-                      color: AppColors.secondary,
-                      size: AppSizes.iconSm,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (onBookmarkTap != null || kind != null)
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    tooltip: item.isBookmarked
+                        ? 'မေ့လွယ်သောစာရင်းမှ ဖယ်ထုတ်မည်'
+                        : 'မေ့လွယ်သောစာရင်းထဲ ထည့်မည်',
+                    icon: Icon(
+                      item.isBookmarked
+                          ? Icons.bookmark_rounded
+                          : Icons.bookmark_border_rounded,
+                      color: item.isBookmarked
+                          ? Colors.amber.shade700
+                          : AppColors.textSoft.withValues(alpha: 0.5),
+                      size: 22,
                     ),
-                    const SizedBox(width: AppSpacing.xs),
-                    Text(
-                      AppStrings.masteredCount(1).replaceAll('1 ', ''),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: AppColors.secondary,
-                            fontWeight: FontWeight.w700,
-                          ),
+                    onPressed: () async {
+                      if (onBookmarkTap != null) {
+                        onBookmarkTap!();
+                      } else if (kind != null) {
+                        final isNow = await ref
+                            .read(libraryRepositoryProvider)
+                            .toggleBookmark(
+                              kind: kind!,
+                              itemId: item.id,
+                            );
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                isNow
+                                    ? '"${item.primary}" ကို မေ့လွယ်သောစာရင်းထဲ ထည့်လိုက်ပါပြီ'
+                                    : '"${item.primary}" ကို မေ့လွယ်သောစာရင်းမှ ဖယ်ထုတ်လိုက်ပါပြီ',
+                              ),
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                if (item.isBookmarked) ...[
+                  const SizedBox(height: 2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
                     ),
-                  ],
-                ),
-              ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      border: Border.all(color: Colors.amber.shade300),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.star_rounded,
+                          color: Colors.amber.shade800,
+                          size: 11,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          'မေ့လွယ်',
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Colors.amber.shade900,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 9,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                if (item.isMastered) ...[
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withAlpha(25),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      border: Border.all(color: AppColors.secondary),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.secondary,
+                          size: AppSizes.iconSm,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          AppStrings.masteredCount(1).replaceAll('1 ', ''),
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: AppColors.secondary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                if (item.wrongCount > 0) ...[
+                  if (item.isMastered) const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      border: Border.all(
+                        color: AppColors.error.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
+                          color: AppColors.error,
+                          size: 13,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${item.wrongCount} ကြိမ်မှား',
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: AppColors.error,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 10,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ],
         ),
       );

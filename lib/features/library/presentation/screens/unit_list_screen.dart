@@ -20,6 +20,7 @@ import 'package:practice_janpanese/features/library/presentation/widgets/chapter
 import 'package:practice_janpanese/features/library/presentation/widgets/study_mode_sheet.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/unit_summary_card.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/unit_tile.dart';
+import 'package:practice_janpanese/features/library/presentation/widgets/weak_items_modal.dart';
 
 /// Screen listing all units for a given source along with Chapter/Section organization and Flashcard access.
 class UnitListScreen extends ConsumerStatefulWidget {
@@ -177,6 +178,33 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                 )
             : null;
 
+    final singleChapterWeakCountAsync = singleSelectedChapter == null
+        ? null
+        : ref.watch(
+            weakItemsCountProvider(
+              WeakItemsCountParams(
+                sourceId: activeSourceId,
+                kind: activeKind,
+                chapterNumbers: [singleSelectedChapter.chapterNumber],
+              ),
+            ),
+          );
+    final singleChapterWeakCount =
+        singleChapterWeakCountAsync?.valueOrNull ?? 0;
+
+    final allWeakCountAsync = _selectedChapterNumbers.isEmpty
+        ? ref.watch(
+            weakItemsCountProvider(
+              WeakItemsCountParams(
+                sourceId: activeSourceId,
+                kind: activeKind,
+                chapterNumbers: null,
+              ),
+            ),
+          )
+        : null;
+    final allWeakCount = allWeakCountAsync?.valueOrNull ?? 0;
+
     final List<UnitProgress> displayedSections = _selectedChapterNumbers.isEmpty
         ? allUnits
         : chapterGroups
@@ -238,6 +266,98 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
           ),
         ),
 
+        // If All Chapters is selected and there are weak items across all chapters:
+        if (_selectedChapterNumbers.isEmpty && allWeakCount > 0)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenH,
+                vertical: AppSpacing.xs,
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade50,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: Colors.amber.shade300),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.amber,
+                      size: 22,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'မေ့လွယ် / မှားလေ့ရှိ ($allWeakCount ခု)',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const Text(
+                            'အခန်းအားလုံးမှ မကြာခဏမှားသော စကားလုံးများ',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSoft,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      onPressed: () {
+                        WeakItemsModal.show(
+                          context,
+                          kind: activeKind,
+                          sourceId: activeSourceId,
+                          sourceName: sourceTitle,
+                          chapterNumbers: null,
+                        );
+                      },
+                      child: const Text('စာရင်း'),
+                    ),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.deepOrange,
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                      ),
+                      onPressed: () {
+                        ChapterPracticeSheet.show(
+                          context,
+                          kind: activeKind,
+                          sourceId: activeSourceId,
+                          sourceName: sourceTitle,
+                          selectedChapters: const {},
+                          totalItems: totalAcrossUnits,
+                          initialOnlyWeak: true,
+                        );
+                      },
+                      child: const Text(
+                        'လေ့ကျင့်မည်',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
         // Chapter Filter Bar
         SliverToBoxAdapter(
           child: SizedBox(
@@ -296,6 +416,28 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
               ),
               child: ChapterSummaryCard(
                 chapter: singleSelectedChapter,
+                weakCount: singleChapterWeakCount,
+                onViewWeakListTap: () {
+                  WeakItemsModal.show(
+                    context,
+                    kind: activeKind,
+                    sourceId: activeSourceId,
+                    sourceName: sourceTitle,
+                    chapterNumbers: [singleSelectedChapter.chapterNumber],
+                    chapterTitle: singleSelectedChapter.title,
+                  );
+                },
+                onWeakPracticeTap: () {
+                  ChapterPracticeSheet.show(
+                    context,
+                    kind: activeKind,
+                    sourceId: activeSourceId,
+                    sourceName: sourceTitle,
+                    selectedChapters: {singleSelectedChapter.chapterNumber},
+                    totalItems: singleSelectedChapter.total,
+                    initialOnlyWeak: true,
+                  );
+                },
                 onFlashcardTap: () {
                   ChapterPracticeSheet.show(
                     context,
@@ -437,6 +579,17 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
         totalItems == 0 ? 0.0 : (masteredItems / totalItems).clamp(0.0, 1.0);
     final sortedNums = selectedChapters.toList()..sort();
 
+    final multiWeakCountAsync = ref.watch(
+      weakItemsCountProvider(
+        WeakItemsCountParams(
+          sourceId: activeSourceId,
+          kind: activeKind,
+          chapterNumbers: sortedNums,
+        ),
+      ),
+    );
+    final multiWeakCount = multiWeakCountAsync.valueOrNull ?? 0;
+
     return AppCard(
       color: AppColors.surface,
       child: Column(
@@ -489,6 +642,78 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
             value: ratio,
             color: AppColors.secondary,
           ),
+          if (multiWeakCount > 0) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                border: Border.all(color: Colors.amber.shade300),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.amber,
+                    size: 18,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Expanded(
+                    child: Text(
+                      'မေ့လွယ် / မှားလေ့ရှိ ($multiWeakCount ခု)',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    onPressed: () {
+                      WeakItemsModal.show(
+                        context,
+                        kind: activeKind,
+                        sourceId: activeSourceId,
+                        sourceName: sourceTitle,
+                        chapterNumbers: sortedNums,
+                      );
+                    },
+                    child: const Text('စာရင်း'),
+                  ),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.deepOrange,
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                    onPressed: () {
+                      ChapterPracticeSheet.show(
+                        context,
+                        kind: activeKind,
+                        sourceId: activeSourceId,
+                        sourceName: sourceTitle,
+                        selectedChapters: selectedChapters,
+                        totalItems: totalItems,
+                        initialOnlyWeak: true,
+                      );
+                    },
+                    child: const Text(
+                      'လေ့ကျင့်မည်',
+                      style: TextStyle(fontSize: 11),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [

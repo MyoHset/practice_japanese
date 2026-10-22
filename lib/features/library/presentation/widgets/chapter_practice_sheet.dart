@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practice_janpanese/core/constants/app_radius.dart';
 import 'package:practice_janpanese/core/constants/app_sizes.dart';
@@ -7,10 +8,11 @@ import 'package:practice_janpanese/core/router/app_routes.dart';
 import 'package:practice_janpanese/core/theme/app_colors.dart';
 import 'package:practice_janpanese/features/library/domain/content_kind.dart';
 import 'package:practice_janpanese/features/library/domain/study_mode.dart';
+import 'package:practice_janpanese/features/library/presentation/providers/library_providers.dart';
 
 /// Modal bottom sheet allowing users to configure multi-chapter practice,
-/// including Study Mode (Quiz/Flashcard) and Random Question Limit (10, 20, 50, All).
-class ChapterPracticeSheet extends StatefulWidget {
+/// including Study Mode (Quiz/Flashcard), Target Items (All/Weak), and Random Question Limit (10, 20, 50, All).
+class ChapterPracticeSheet extends ConsumerStatefulWidget {
   const ChapterPracticeSheet({
     super.key,
     required this.kind,
@@ -18,6 +20,7 @@ class ChapterPracticeSheet extends StatefulWidget {
     required this.sourceName,
     required this.selectedChapters,
     required this.totalItems,
+    this.initialOnlyWeak = false,
   });
 
   final ContentKind kind;
@@ -25,6 +28,7 @@ class ChapterPracticeSheet extends StatefulWidget {
   final String sourceName;
   final Set<int> selectedChapters;
   final int totalItems;
+  final bool initialOnlyWeak;
 
   /// Shows the practice configuration bottom sheet.
   static Future<void> show(
@@ -34,6 +38,7 @@ class ChapterPracticeSheet extends StatefulWidget {
     required String sourceName,
     required Set<int> selectedChapters,
     required int totalItems,
+    bool initialOnlyWeak = false,
   }) =>
       showModalBottomSheet<void>(
         context: context,
@@ -50,17 +55,26 @@ class ChapterPracticeSheet extends StatefulWidget {
           sourceName: sourceName,
           selectedChapters: selectedChapters,
           totalItems: totalItems,
+          initialOnlyWeak: initialOnlyWeak,
         ),
       );
 
   @override
-  State<ChapterPracticeSheet> createState() => _ChapterPracticeSheetState();
+  ConsumerState<ChapterPracticeSheet> createState() =>
+      _ChapterPracticeSheetState();
 }
 
-class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
+class _ChapterPracticeSheetState extends ConsumerState<ChapterPracticeSheet> {
   StudyMode _selectedMode = StudyMode.quick;
   int? _selectedLimit = 20;
   bool _isRandom = true;
+  late bool _onlyWeak;
+
+  @override
+  void initState() {
+    super.initState();
+    _onlyWeak = widget.initialOnlyWeak;
+  }
 
   static const List<({int? limit, String label})> _limitOptions = [
     (limit: 10, label: '၁၀ ပုဒ်'),
@@ -84,12 +98,28 @@ class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
         chapters: sortedChapters,
         limit: _selectedLimit,
         isRandom: _isRandom,
+        onlyWeak: _onlyWeak,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final sortedChapters = widget.selectedChapters.isEmpty
+        ? null
+        : (widget.selectedChapters.toList()..sort());
+
+    final weakCountAsync = ref.watch(
+      weakItemsCountProvider(
+        WeakItemsCountParams(
+          sourceId: widget.sourceId,
+          kind: widget.kind,
+          chapterNumbers: sortedChapters,
+        ),
+      ),
+    );
+    final weakCount = weakCountAsync.valueOrNull ?? 0;
+
     final chapterDescription = widget.selectedChapters.isEmpty
         ? 'အခန်းအားလုံး (All Chapters)'
         : (widget.selectedChapters.length == 1
@@ -136,6 +166,41 @@ class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
                 ),
               ],
             ),
+            if (weakCount > 0 || widget.initialOnlyWeak) ...[
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'လေ့ကျင့်မည့် အပိုင်း',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSoft,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              SegmentedButton<bool>(
+                segments: [
+                  ButtonSegment<bool>(
+                    value: false,
+                    label: Text(
+                      'အားလုံး (${widget.totalItems})',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    icon: const Icon(Icons.apps_rounded, size: 16),
+                  ),
+                  ButtonSegment<bool>(
+                    value: true,
+                    label: Text(
+                      'မေ့လွယ်/မှားလေ့ရှိ ($weakCount)',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    icon: const Icon(Icons.warning_amber_rounded, size: 16),
+                  ),
+                ],
+                selected: {_onlyWeak},
+                onSelectionChanged: (set) {
+                  setState(() => _onlyWeak = set.first);
+                },
+              ),
+            ],
             const SizedBox(height: AppSpacing.lg),
             Text(
               'လေ့ကျင့်မည့် ပုံစံ',
@@ -231,16 +296,25 @@ class _ChapterPracticeSheetState extends State<ChapterPracticeSheet> {
               child: FilledButton.icon(
                 onPressed: _onStart,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor:
+                      _onlyWeak ? Colors.deepOrange : AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
                 ),
-                icon: const Icon(Icons.play_arrow_rounded),
+                icon: Icon(
+                  _onlyWeak
+                      ? Icons.warning_amber_rounded
+                      : Icons.play_arrow_rounded,
+                ),
                 label: Text(
-                  _selectedLimit != null
-                      ? '${_isRandom ? "Random " : "စဉ်တိုင်း "}$_selectedLimit ပုဒ် စတင်ဖြေဆိုမည်'
-                      : 'အားလုံး စတင်ဖြေဆိုမည်',
+                  _onlyWeak
+                      ? (_selectedLimit != null
+                          ? 'မေ့လွယ်သောစာလုံး ${_isRandom ? "Random " : ""}$_selectedLimit ပုဒ်'
+                          : 'မေ့လွယ်သောစာလုံးများ စတင်လေ့ကျင့်မည်')
+                      : (_selectedLimit != null
+                          ? '${_isRandom ? "Random " : "စဉ်တိုင်း "}$_selectedLimit ပုဒ် စတင်ဖြေဆိုမည်'
+                          : 'အားလုံး စတင်ဖြေဆိုမည်'),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,

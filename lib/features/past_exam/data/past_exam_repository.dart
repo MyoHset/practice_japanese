@@ -4,7 +4,6 @@ import 'package:drift/drift.dart';
 import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:practice_janpanese/features/past_exam/domain/past_exam_filter.dart';
 import 'package:practice_janpanese/features/past_exam/domain/past_exam_question.dart';
-import 'package:practice_janpanese/features/past_exam/domain/past_exam_filter.dart';
 
 /// Repository for retrieving JLPT past exam data and questions from Drift.
 class PastExamRepository {

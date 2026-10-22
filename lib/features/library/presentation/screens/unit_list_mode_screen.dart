@@ -24,8 +24,9 @@ class UnitListModeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unitAsync = ref.watch(unitProvider(unitId));
-    final itemsAsync =
-        ref.watch(unitItemsProvider((unitId: unitId, kind: kind)));
+    final itemsAsync = ref.watch(
+      unitItemsProvider((unitId: unitId, kind: kind, onlyWeak: false)),
+    );
 
     final unitTitle = unitAsync.maybeWhen(
       data: (unit) => unit?.name ?? kind.label,
@@ -50,6 +51,7 @@ class UnitListModeScreen extends ConsumerWidget {
           itemBuilder: (context, index) => StudyItemCard(
             item: items[index],
             index: index + 1,
+            kind: kind,
           ),
         ),
       ),

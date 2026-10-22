@@ -953,7 +953,9 @@ class _PastExamPracticeScreenState
   }
 
   Widget _buildCompletionScreen(
-      BuildContext context, List<PastExamQuestion> questions) {
+    BuildContext context,
+    List<PastExamQuestion> questions,
+  ) {
     final totalQuestions = questions.length;
     final percentage = totalQuestions > 0
         ? ((_correctCount / totalQuestions) * 100).round()

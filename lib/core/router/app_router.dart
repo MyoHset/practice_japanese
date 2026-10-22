@@ -154,11 +154,15 @@ final GoRouter appRouter = GoRouter(
         final chapterNumber = int.parse(state.pathParameters['chapterNumber']!);
         final mode = StudyMode.fromSlug(state.pathParameters['mode']!);
 
+        final onlyWeakStr = state.uri.queryParameters['onlyWeak'];
+        final onlyWeak = onlyWeakStr == 'true';
+
         if (mode == StudyMode.flashcard) {
           return FlashcardStudyScreen(
             kind: kind,
             sourceId: sourceId,
             chapterNumber: chapterNumber,
+            onlyWeak: onlyWeak,
           );
         }
 
@@ -167,6 +171,7 @@ final GoRouter appRouter = GoRouter(
             kind: kind,
             sourceId: sourceId,
             chapterNumber: chapterNumber,
+            onlyWeak: onlyWeak,
           );
         }
 
@@ -200,6 +205,8 @@ final GoRouter appRouter = GoRouter(
         final chaptersParam = state.uri.queryParameters['chapters'];
         final limitParam = state.uri.queryParameters['limit'];
         final isRandomStr = state.uri.queryParameters['isRandom'];
+        final onlyWeakStr = state.uri.queryParameters['onlyWeak'];
+        final onlyWeak = onlyWeakStr == 'true';
 
         final chapterNumbers = chaptersParam != null && chaptersParam.isNotEmpty
             ? chaptersParam
@@ -219,6 +226,7 @@ final GoRouter appRouter = GoRouter(
             chapterNumbers: chapterNumbers,
             questionLimit: questionLimit,
             isRandom: isRandom,
+            onlyWeak: onlyWeak,
           );
         }
 
@@ -229,6 +237,7 @@ final GoRouter appRouter = GoRouter(
             chapterNumbers: chapterNumbers,
             questionLimit: questionLimit,
             isRandom: isRandom,
+            onlyWeak: onlyWeak,
           );
         }
 

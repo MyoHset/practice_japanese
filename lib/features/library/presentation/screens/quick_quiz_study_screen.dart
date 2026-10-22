@@ -44,6 +44,7 @@ class QuickQuizStudyScreen extends ConsumerStatefulWidget {
     this.chapterNumbers,
     this.questionLimit,
     this.isRandom = true,
+    this.onlyWeak = false,
   }) : assert(
           unitId != null || chapterNumber != null || chapterNumbers != null,
           'Either unitId, chapterNumber, or chapterNumbers must be provided',
@@ -56,6 +57,7 @@ class QuickQuizStudyScreen extends ConsumerStatefulWidget {
   final List<int>? chapterNumbers;
   final int? questionLimit;
   final bool isRandom;
+  final bool onlyWeak;
 
   @override
   ConsumerState<QuickQuizStudyScreen> createState() =>
@@ -430,6 +432,7 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
               (
                 unitId: widget.unitId!,
                 kind: widget.kind,
+                onlyWeak: widget.onlyWeak,
               ),
             ),
           )
@@ -439,6 +442,7 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
                 sourceId: widget.sourceId,
                 chapterNumbers: effectiveChapters ?? const [],
                 kind: widget.kind,
+                onlyWeak: widget.onlyWeak,
               ),
             ),
           );
@@ -448,8 +452,9 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
         widget.unitId != null ? ref.watch(unitProvider(widget.unitId!)) : null;
 
     final String screenTitle;
+    final weakTag = widget.onlyWeak ? ' · မေ့လွယ်တာများ' : '';
     if (widget.unitId != null) {
-      screenTitle = '${unitAsync?.value?.name ?? widget.kind.label} Quiz';
+      screenTitle = '${unitAsync?.value?.name ?? widget.kind.label}$weakTag Quiz';
     } else {
       final chLabel = (effectiveChapters == null || effectiveChapters.isEmpty)
           ? 'All Chapters'
@@ -459,7 +464,7 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
       final limitLabel =
           widget.questionLimit != null ? ' (${widget.questionLimit} ပုဒ်)' : '';
       screenTitle =
-          '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel Quiz';
+          '${sourceAsync.value?.name ?? ''} · $chLabel$limitLabel$weakTag Quiz';
     }
 
     return Scaffold(
@@ -474,6 +479,64 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
               ),
         ),
         actions: [
+          if (!_isCompleted &&
+              _questions != null &&
+              _questions!.isNotEmpty &&
+              _currentIndex < _questions!.length) ...[
+            Builder(
+              builder: (context) {
+                final currentItem = _questions![_currentIndex].item;
+                return IconButton(
+                  tooltip: currentItem.isBookmarked
+                      ? 'မေ့လွယ်သောစာရင်းမှ ဖယ်ထုတ်မည်'
+                      : 'မေ့လွယ်သောစာရင်းထဲ ထည့်မည်',
+                  icon: Icon(
+                    currentItem.isBookmarked
+                        ? Icons.bookmark_rounded
+                        : Icons.bookmark_border_rounded,
+                    color: currentItem.isBookmarked
+                        ? Colors.amber.shade700
+                        : AppColors.textSoft,
+                  ),
+                  onPressed: () async {
+                    final isNow = await ref
+                        .read(libraryRepositoryProvider)
+                        .toggleBookmark(
+                          kind: widget.kind,
+                          itemId: currentItem.id,
+                        );
+                    setState(() {
+                      final q = _questions![_currentIndex];
+                      final updatedItem =
+                          currentItem.copyWith(isBookmarked: isNow);
+                      _questions![_currentIndex] = QuizQuestion(
+                        item: updatedItem,
+                        options: q.options,
+                        correctIndex: q.correctIndex,
+                        promptText: q.promptText,
+                        promptSubtitle: q.promptSubtitle,
+                        isFillInTheBlank: q.isFillInTheBlank,
+                      );
+                    });
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isNow
+                                ? '"${currentItem.primary}" ကို မေ့လွယ်သောစာရင်းထဲ ထည့်လိုက်ပါပြီ'
+                                : '"${currentItem.primary}" ကို မေ့လွယ်သောစာရင်းမှ ဖယ်ထုတ်လိုက်ပါပြီ',
+                          ),
+                          duration: const Duration(seconds: 1),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  },
+                );
+              },
+            ),
+          ],
           IconButton(
             tooltip: 'မေးခွန်းရွေးရန်',
             icon: const Icon(Icons.grid_view_rounded, color: AppColors.textSoft),
@@ -496,7 +559,9 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
       body: AsyncValueView<List<StudyItem>>(
         value: itemsAsync,
         isEmpty: (items) => items.isEmpty,
-        emptyMessage: AppStrings.itemsCount(0),
+        emptyMessage: widget.onlyWeak
+            ? 'မေ့လွယ်သော စကားလုံး မရှိသေးပါ\n(အားလုံး မှတ်မိထားပြီး ဖြစ်ပါသည်)'
+            : AppStrings.itemsCount(0),
         data: (items) {
           _generateQuestions(items);
 

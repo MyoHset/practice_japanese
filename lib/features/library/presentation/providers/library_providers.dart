@@ -57,13 +57,17 @@ final unitProvider = FutureProvider.family<Unit?, int>((ref, id) {
 });
 
 /// Parameter record for unitItemsProvider.
-typedef UnitItemsParams = ({int unitId, ContentKind kind});
+typedef UnitItemsParams = ({int unitId, ContentKind kind, bool? onlyWeak});
 
 /// Provides study items in a unit for List mode and Flashcard mode.
 final unitItemsProvider =
     StreamProvider.family<List<StudyItem>, UnitItemsParams>((ref, params) {
   final repo = ref.watch(libraryRepositoryProvider);
-  return repo.watchUnitItems(params.unitId, params.kind);
+  return repo.watchUnitItems(
+    params.unitId,
+    params.kind,
+    onlyWeak: params.onlyWeak ?? false,
+  );
 });
 
 /// Parameter class for multiChapterItemsProvider with proper list equality.
@@ -72,17 +76,23 @@ class MultiChapterItemsParams {
     required this.sourceId,
     required this.chapterNumbers,
     required this.kind,
+    this.onlyWeak = false,
   });
 
   final int sourceId;
   final List<int> chapterNumbers;
   final ContentKind kind;
+  final bool onlyWeak;
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! MultiChapterItemsParams) return false;
-    if (sourceId != other.sourceId || kind != other.kind) return false;
+    if (sourceId != other.sourceId ||
+        kind != other.kind ||
+        onlyWeak != other.onlyWeak) {
+      return false;
+    }
     if (chapterNumbers.length != other.chapterNumbers.length) return false;
     for (var i = 0; i < chapterNumbers.length; i++) {
       if (chapterNumbers[i] != other.chapterNumbers[i]) return false;
@@ -92,7 +102,7 @@ class MultiChapterItemsParams {
 
   @override
   int get hashCode =>
-      Object.hash(sourceId, kind, Object.hashAll(chapterNumbers));
+      Object.hash(sourceId, kind, onlyWeak, Object.hashAll(chapterNumbers));
 }
 
 /// Provides study items across multiple chapters (or all) for Flashcard and Quiz.
@@ -104,6 +114,7 @@ final multiChapterItemsProvider =
     params.sourceId,
     params.chapterNumbers,
     params.kind,
+    onlyWeak: params.onlyWeak,
   );
 });
 
@@ -112,6 +123,7 @@ typedef ChapterItemsParams = ({
   int sourceId,
   int chapterNumber,
   ContentKind kind,
+  bool? onlyWeak,
 });
 
 /// Provides study items across all units in a chapter for Flashcard mode.
@@ -122,6 +134,52 @@ final chapterItemsProvider =
     params.sourceId,
     params.chapterNumber,
     params.kind,
+    onlyWeak: params.onlyWeak ?? false,
+  );
+});
+
+/// Parameter class for weakItemsCountProvider.
+class WeakItemsCountParams {
+  const WeakItemsCountParams({
+    required this.sourceId,
+    required this.kind,
+    this.chapterNumbers,
+  });
+
+  final int sourceId;
+  final ContentKind kind;
+  final List<int>? chapterNumbers;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WeakItemsCountParams) return false;
+    if (sourceId != other.sourceId || kind != other.kind) return false;
+    if (chapterNumbers == null && other.chapterNumbers == null) return true;
+    if (chapterNumbers == null || other.chapterNumbers == null) return false;
+    if (chapterNumbers!.length != other.chapterNumbers!.length) return false;
+    for (var i = 0; i < chapterNumbers!.length; i++) {
+      if (chapterNumbers![i] != other.chapterNumbers![i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        sourceId,
+        kind,
+        chapterNumbers != null ? Object.hashAll(chapterNumbers!) : null,
+      );
+}
+
+/// Provides the count of weak/forgotten items for a source and optional chapters.
+final weakItemsCountProvider =
+    StreamProvider.family<int, WeakItemsCountParams>((ref, params) {
+  final repo = ref.watch(libraryRepositoryProvider);
+  return repo.watchWeakItemsCount(
+    params.sourceId,
+    params.kind,
+    chapterNumbers: params.chapterNumbers,
   );
 });
 
