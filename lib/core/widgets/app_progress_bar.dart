@@ -8,20 +8,25 @@ class AppProgressBar extends StatelessWidget {
     super.key,
     required this.value,
     this.color,
+    this.height,
   });
 
   /// 0.0 → 1.0
   final double value;
   final Color? color;
+  final double? height;
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(AppSizes.progressBarHeight / 2),
-        child: LinearProgressIndicator(
-          value: value.clamp(0.0, 1.0),
-          minHeight: AppSizes.progressBarHeight,
-          color: color ?? AppColors.secondary,
-          backgroundColor: AppColors.divider,
-        ),
-      );
+  Widget build(BuildContext context) {
+    final effectiveHeight = height ?? AppSizes.progressBarHeight;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(effectiveHeight / 2),
+      child: LinearProgressIndicator(
+        value: value.clamp(0.0, 1.0),
+        minHeight: effectiveHeight,
+        color: color ?? AppColors.secondary,
+        backgroundColor: AppColors.divider,
+      ),
+    );
+  }
 }

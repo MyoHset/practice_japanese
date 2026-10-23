@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:practice_janpanese/core/constants/app_radius.dart';
 import 'package:practice_janpanese/core/constants/app_spacing.dart';
 import 'package:practice_janpanese/core/constants/app_strings.dart';
 import 'package:practice_janpanese/core/database/app_database.dart' show Source;
-import 'package:practice_janpanese/core/router/app_routes.dart';
 import 'package:practice_janpanese/core/theme/app_colors.dart';
 import 'package:practice_janpanese/core/widgets/app_card.dart';
 import 'package:practice_janpanese/core/widgets/app_progress_bar.dart';
 import 'package:practice_janpanese/core/widgets/async_value_view.dart';
 import 'package:practice_janpanese/features/library/domain/chapter_group.dart';
 import 'package:practice_janpanese/features/library/domain/content_kind.dart';
-import 'package:practice_janpanese/features/library/domain/study_mode.dart';
 import 'package:practice_janpanese/features/library/domain/unit_progress.dart';
 import 'package:practice_janpanese/features/library/presentation/providers/library_providers.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/chapter_practice_sheet.dart';
-import 'package:practice_janpanese/features/library/presentation/widgets/chapter_summary_card.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/study_mode_sheet.dart';
-import 'package:practice_janpanese/features/library/presentation/widgets/unit_summary_card.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/unit_tile.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/weak_items_modal.dart';
 
@@ -154,7 +149,7 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
     );
   }
 
-  /// Builds a chapter and section organized view with filter pills and chapter flashcard buttons.
+  /// Builds a chapter and section organized view with a unified compact header and clean list.
   Widget _buildChapterOrganizedView(
     BuildContext context,
     List<UnitProgress> allUnits,
@@ -205,12 +200,70 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
         : null;
     final allWeakCount = allWeakCountAsync?.valueOrNull ?? 0;
 
+    final multiWeakCountAsync = _selectedChapterNumbers.length > 1
+        ? ref.watch(
+            weakItemsCountProvider(
+              WeakItemsCountParams(
+                sourceId: activeSourceId,
+                kind: activeKind,
+                chapterNumbers: _selectedChapterNumbers.toList()..sort(),
+              ),
+            ),
+          )
+        : null;
+    final multiWeakCount = multiWeakCountAsync?.valueOrNull ?? 0;
+
+    final effectiveWeakCount = _selectedChapterNumbers.isEmpty
+        ? allWeakCount
+        : (_selectedChapterNumbers.length == 1
+            ? singleChapterWeakCount
+            : multiWeakCount);
+
     final List<UnitProgress> displayedSections = _selectedChapterNumbers.isEmpty
         ? allUnits
         : chapterGroups
             .where((c) => _selectedChapterNumbers.contains(c.chapterNumber))
             .expand((c) => c.sections)
             .toList();
+
+    // Determine scope data for the single unified summary card
+    final String scopeTitle;
+    final String scopeSubtitle;
+    final int scopeTotal;
+    final int scopeMastered;
+
+    if (_selectedChapterNumbers.isEmpty) {
+      scopeTitle = AppStrings.allChapters;
+      scopeSubtitle =
+          '${chapterGroups.length} Chapters · ${allUnits.length} Sections · စုစုပေါင်း $totalAcrossUnits လုံး';
+      scopeTotal = totalAcrossUnits;
+      scopeMastered = masteredAcrossUnits;
+    } else if (_selectedChapterNumbers.length == 1 &&
+        singleSelectedChapter != null) {
+      scopeTitle = singleSelectedChapter.title;
+      scopeSubtitle =
+          '${singleSelectedChapter.sections.length} Sections · စုစုပေါင်း ${singleSelectedChapter.total} လုံး';
+      scopeTotal = singleSelectedChapter.total;
+      scopeMastered = singleSelectedChapter.mastered;
+    } else {
+      final sorted = _selectedChapterNumbers.toList()..sort();
+      final matchingGroups = chapterGroups
+          .where((c) => _selectedChapterNumbers.contains(c.chapterNumber));
+      final matchingTotal =
+          matchingGroups.fold<int>(0, (sum, c) => sum + c.total);
+      final matchingMastered =
+          matchingGroups.fold<int>(0, (sum, c) => sum + c.mastered);
+      scopeTitle =
+          'ရွေးချယ်ထားသော Chapter (${_selectedChapterNumbers.length}) ခု';
+      scopeSubtitle =
+          'Ch. ${sorted.join(", ")} · ${displayedSections.length} Sections · စုစုပေါင်း $matchingTotal လုံး';
+      scopeTotal = matchingTotal;
+      scopeMastered = matchingMastered;
+    }
+
+    final scopeRatio =
+        scopeTotal == 0 ? 0.0 : (scopeMastered / scopeTotal).clamp(0.0, 1.0);
+    final scopePercentage = (scopeRatio * 100).toInt();
 
     return CustomScrollView(
       slivers: [
@@ -250,261 +303,112 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
               ),
             ),
           ),
-        // Source Overview Summary Card
+
+        // Chapter Filter Bar (Top placement, clean pill tabs)
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.only(
-              left: AppSpacing.screenH,
-              right: AppSpacing.screenH,
-              top: AppSpacing.screenV,
-              bottom: AppSpacing.sm,
-            ),
-            child: UnitSummaryCard(
-              total: totalAcrossUnits,
-              mastered: masteredAcrossUnits,
-            ),
-          ),
-        ),
-
-        // If All Chapters is selected and there are weak items across all chapters:
-        if (_selectedChapterNumbers.isEmpty && allWeakCount > 0)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenH,
-                vertical: AppSpacing.xs,
-              ),
-              child: Container(
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            child: SizedBox(
+              height: 42,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
+                  horizontal: AppSpacing.screenH,
+                  vertical: 2,
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: Colors.amber.shade300),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.warning_amber_rounded,
-                      color: Colors.amber,
-                      size: 22,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'မေ့လွယ် / မှားလေ့ရှိ ($allWeakCount ခု)',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const Text(
-                            'အခန်းအားလုံးမှ မကြာခဏမှားသော စကားလုံးများ',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.textSoft,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        visualDensity: VisualDensity.compact,
-                      ),
-                      onPressed: () {
-                        WeakItemsModal.show(
-                          context,
-                          kind: activeKind,
-                          sourceId: activeSourceId,
-                          sourceName: sourceTitle,
-                          chapterNumbers: null,
-                        );
+                itemCount: chapterGroups.length + 1,
+                separatorBuilder: (_, __) =>
+                    const SizedBox(width: AppSpacing.xs),
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    final isSelected = _selectedChapterNumbers.isEmpty;
+                    return _buildChapterFilterChip(
+                      label: AppStrings.allChapters,
+                      isSelected: isSelected,
+                      onTap: () {
+                        setState(() => _selectedChapterNumbers = {});
                       },
-                      child: const Text('စာရင်း'),
-                    ),
-                    FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.deepOrange,
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                      ),
-                      onPressed: () {
-                        ChapterPracticeSheet.show(
-                          context,
-                          kind: activeKind,
-                          sourceId: activeSourceId,
-                          sourceName: sourceTitle,
-                          selectedChapters: const {},
-                          totalItems: totalAcrossUnits,
-                          initialOnlyWeak: true,
-                        );
-                      },
-                      child: const Text(
-                        'လေ့ကျင့်မည်',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+                    );
+                  }
 
-        // Chapter Filter Bar
-        SliverToBoxAdapter(
-          child: SizedBox(
-            height: 48,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenH,
-                vertical: AppSpacing.xs,
-              ),
-              itemCount: chapterGroups.length + 1,
-              separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  final isSelected = _selectedChapterNumbers.isEmpty;
+                  final ch = chapterGroups[index - 1];
+                  final isSelected =
+                      _selectedChapterNumbers.contains(ch.chapterNumber);
                   return _buildChapterFilterChip(
-                    label: AppStrings.allChapters,
+                    label: 'Ch. ${ch.chapterNumber}',
                     isSelected: isSelected,
                     onTap: () {
-                      setState(() => _selectedChapterNumbers = {});
+                      setState(() {
+                        if (_selectedChapterNumbers.isEmpty) {
+                          _selectedChapterNumbers = {ch.chapterNumber};
+                        } else if (_selectedChapterNumbers
+                            .contains(ch.chapterNumber)) {
+                          _selectedChapterNumbers.remove(ch.chapterNumber);
+                        } else {
+                          _selectedChapterNumbers.add(ch.chapterNumber);
+                        }
+                      });
                     },
                   );
-                }
-
-                final ch = chapterGroups[index - 1];
-                final isSelected =
-                    _selectedChapterNumbers.contains(ch.chapterNumber);
-                return _buildChapterFilterChip(
-                  label: 'Ch. ${ch.chapterNumber}',
-                  isSelected: isSelected,
-                  onTap: () {
-                    setState(() {
-                      if (_selectedChapterNumbers.isEmpty) {
-                        _selectedChapterNumbers = {ch.chapterNumber};
-                      } else if (_selectedChapterNumbers
-                          .contains(ch.chapterNumber)) {
-                        _selectedChapterNumbers.remove(ch.chapterNumber);
-                      } else {
-                        _selectedChapterNumbers.add(ch.chapterNumber);
-                      }
-                    });
-                  },
-                );
-              },
+                },
+              ),
             ),
           ),
         ),
 
-        // If a single chapter is selected, show ChapterSummaryCard with practice options
-        if (singleSelectedChapter != null)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenH,
-                vertical: AppSpacing.sm,
-              ),
-              child: ChapterSummaryCard(
-                chapter: singleSelectedChapter,
-                weakCount: singleChapterWeakCount,
-                onViewWeakListTap: () {
-                  WeakItemsModal.show(
-                    context,
-                    kind: activeKind,
-                    sourceId: activeSourceId,
-                    sourceName: sourceTitle,
-                    chapterNumbers: [singleSelectedChapter.chapterNumber],
-                    chapterTitle: singleSelectedChapter.title,
-                  );
-                },
-                onWeakPracticeTap: () {
-                  ChapterPracticeSheet.show(
-                    context,
-                    kind: activeKind,
-                    sourceId: activeSourceId,
-                    sourceName: sourceTitle,
-                    selectedChapters: {singleSelectedChapter.chapterNumber},
-                    totalItems: singleSelectedChapter.total,
-                    initialOnlyWeak: true,
-                  );
-                },
-                onFlashcardTap: () {
-                  ChapterPracticeSheet.show(
-                    context,
-                    kind: activeKind,
-                    sourceId: activeSourceId,
-                    sourceName: sourceTitle,
-                    selectedChapters: {singleSelectedChapter.chapterNumber},
-                    totalItems: singleSelectedChapter.total,
-                  );
-                },
-                onQuickQuizTap: () {
-                  ChapterPracticeSheet.show(
-                    context,
-                    kind: activeKind,
-                    sourceId: activeSourceId,
-                    sourceName: sourceTitle,
-                    selectedChapters: {singleSelectedChapter.chapterNumber},
-                    totalItems: singleSelectedChapter.total,
-                  );
-                },
-              ),
+        // Single Unified Scope Summary Card
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenH,
+              AppSpacing.sm,
+              AppSpacing.screenH,
+              AppSpacing.xs,
+            ),
+            child: _buildUnifiedSummaryCard(
+              context,
+              title: scopeTitle,
+              subtitle: scopeSubtitle,
+              total: scopeTotal,
+              mastered: scopeMastered,
+              ratio: scopeRatio,
+              percentage: scopePercentage,
+              weakCount: effectiveWeakCount,
+              activeKind: activeKind,
+              activeSourceId: activeSourceId,
+              sourceTitle: sourceTitle,
+              selectedChapters: _selectedChapterNumbers,
             ),
           ),
-
-        // If multiple chapters are selected (> 1), show MultiChapterCard
-        if (_selectedChapterNumbers.length > 1)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenH,
-                vertical: AppSpacing.sm,
-              ),
-              child: _buildMultiChapterCard(
-                context,
-                selectedChapters: _selectedChapterNumbers,
-                chapterGroups: chapterGroups,
-                activeKind: activeKind,
-                activeSourceId: activeSourceId,
-                sourceTitle: sourceTitle,
-              ),
-            ),
-          ),
+        ),
 
         // Section list header
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.only(
-              left: AppSpacing.screenH,
-              right: AppSpacing.screenH,
-              top: AppSpacing.sm,
-              bottom: AppSpacing.xs,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenH,
+              AppSpacing.md,
+              AppSpacing.screenH,
+              AppSpacing.xs,
             ),
-            child: Text(
-              _selectedChapterNumbers.length == 1
-                  ? '${singleSelectedChapter?.title} — ${AppStrings.section}'
-                  : (_selectedChapterNumbers.length > 1
-                      ? 'Sections (${displayedSections.length} ခု)'
-                      : '${AppStrings.chapter} & ${AppStrings.section}'),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.textSoft,
-                    fontWeight: FontWeight.w700,
-                  ),
+            child: Row(
+              children: [
+                Text(
+                  _selectedChapterNumbers.length == 1
+                      ? '${singleSelectedChapter?.title} — Sections'
+                      : 'Sections (${displayedSections.length} ခု)',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppColors.textSoft,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                ),
+              ],
             ),
           ),
         ),
 
-        // Sections
+        // Clean & Compact Section List
         SliverPadding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.screenH,
@@ -512,7 +416,8 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
           ),
           sliver: SliverList.separated(
             itemCount: displayedSections.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+            separatorBuilder: (_, __) =>
+                const SizedBox(height: AppSpacing.xs + 2),
             itemBuilder: (context, index) {
               final section = displayedSections[index];
               final sectionTitle = _selectedChapterNumbers.length == 1
@@ -528,91 +433,59 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                   sourceId: activeSourceId,
                   unit: section,
                 ),
-                onFlashcardTap: () {
-                  context.push(
-                    AppRoutes.study(
-                      activeKind,
-                      activeSourceId,
-                      section.id,
-                      StudyMode.flashcard,
-                    ),
-                  );
-                },
-                onQuickQuizTap: () {
-                  context.push(
-                    AppRoutes.study(
-                      activeKind,
-                      activeSourceId,
-                      section.id,
-                      StudyMode.quick,
-                    ),
-                  );
-                },
               );
             },
           ),
         ),
 
         const SliverToBoxAdapter(
-          child: SizedBox(height: AppSpacing.xxl),
+          child: SizedBox(height: 80),
         ),
       ],
     );
   }
 
-  /// Builds summary card when multiple chapters (> 1) are selected.
-  Widget _buildMultiChapterCard(
+  /// Single unified summary card for overall or chapter scope.
+  Widget _buildUnifiedSummaryCard(
     BuildContext context, {
-    required Set<int> selectedChapters,
-    required List<ChapterGroup> chapterGroups,
+    required String title,
+    required String subtitle,
+    required int total,
+    required int mastered,
+    required double ratio,
+    required int percentage,
+    required int weakCount,
     required ContentKind activeKind,
     required int activeSourceId,
     required String sourceTitle,
+    required Set<int> selectedChapters,
   }) {
-    final matchingGroups = chapterGroups
-        .where((c) => selectedChapters.contains(c.chapterNumber))
-        .toList();
-    final totalItems = matchingGroups.fold<int>(0, (sum, c) => sum + c.total);
-    final masteredItems =
-        matchingGroups.fold<int>(0, (sum, c) => sum + c.mastered);
-    final ratio =
-        totalItems == 0 ? 0.0 : (masteredItems / totalItems).clamp(0.0, 1.0);
-    final sortedNums = selectedChapters.toList()..sort();
-
-    final multiWeakCountAsync = ref.watch(
-      weakItemsCountProvider(
-        WeakItemsCountParams(
-          sourceId: activeSourceId,
-          kind: activeKind,
-          chapterNumbers: sortedNums,
-        ),
-      ),
-    );
-    final multiWeakCount = multiWeakCountAsync.valueOrNull ?? 0;
-
     return AppCard(
-      color: AppColors.surface,
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Row
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'ရွေးချယ်ထားသော Chapter (${selectedChapters.length}) ခု',
+                      title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
                           ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Ch. ${sortedNums.join(", ")} · စုစုပေါင်း $totalItems ခု',
+                      subtitle,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.textSoft,
+                            fontSize: 11.5,
                           ),
                     ),
                   ],
@@ -621,110 +494,139 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
+                  vertical: 3,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withAlpha(20),
+                  color: AppColors.secondary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
                 child: Text(
-                  '$masteredItems / $totalItems',
+                  '$mastered / $total  ($percentage%)',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: AppColors.secondary,
                         fontWeight: FontWeight.w700,
+                        fontSize: 11,
                       ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
+
+          // Progress Bar
           AppProgressBar(
             value: ratio,
             color: AppColors.secondary,
+            height: 4.5,
           ),
-          if (multiWeakCount > 0) ...[
+
+          // Weak Items Banner (if any)
+          if (weakCount > 0) ...[
             const SizedBox(height: AppSpacing.sm),
             Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.xs,
+                horizontal: AppSpacing.sm,
+                vertical: 5,
               ),
               decoration: BoxDecoration(
-                color: Colors.amber.shade50,
-                borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: Colors.amber.shade300),
+                color: const Color(0xFFFFF8E7),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                border: Border.all(color: const Color(0xFFFFE082)),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.warning_amber_rounded,
-                    color: Colors.amber,
-                    size: 18,
+                    color: Color(0xFFB78103),
+                    size: 16,
                   ),
-                  const SizedBox(width: AppSpacing.xs),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'မေ့လွယ် / မှားလေ့ရှိ ($multiWeakCount ခု)',
+                      'မေ့လွယ်သော စကားလုံး ($weakCount ခု)',
                       style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF7A5400),
                       ),
                     ),
                   ),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    onPressed: () {
+                  InkWell(
+                    onTap: () {
                       WeakItemsModal.show(
                         context,
                         kind: activeKind,
                         sourceId: activeSourceId,
                         sourceName: sourceTitle,
-                        chapterNumbers: sortedNums,
+                        chapterNumbers: selectedChapters.isEmpty
+                            ? null
+                            : selectedChapters.toList(),
                       );
                     },
-                    child: const Text('စာရင်း'),
-                  ),
-                  FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.deepOrange,
-                      visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    borderRadius: BorderRadius.circular(4),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      child: Text(
+                        'စာရင်း',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFB78103),
+                        ),
+                      ),
                     ),
-                    onPressed: () {
+                  ),
+                  const SizedBox(width: 4),
+                  InkWell(
+                    onTap: () {
                       ChapterPracticeSheet.show(
                         context,
                         kind: activeKind,
                         sourceId: activeSourceId,
                         sourceName: sourceTitle,
                         selectedChapters: selectedChapters,
-                        totalItems: totalItems,
+                        totalItems: total,
                         initialOnlyWeak: true,
                       );
                     },
-                    child: const Text(
-                      'လေ့ကျင့်မည်',
-                      style: TextStyle(fontSize: 11),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFB78103),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                      child: const Text(
+                        'လေ့ကျင့်မည်',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ],
-          const SizedBox(height: AppSpacing.md),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          // Quick Actions (Flashcard & Quick Quiz) - Sleek & Compact
           Row(
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 44,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
+                  height: 36,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.primary),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
@@ -736,13 +638,16 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                         sourceId: activeSourceId,
                         sourceName: sourceTitle,
                         selectedChapters: selectedChapters,
-                        totalItems: totalItems,
+                        totalItems: total,
                       );
                     },
-                    icon: const Icon(Icons.style_rounded, size: 18),
+                    icon: const Icon(Icons.style_rounded, size: 16),
                     label: const Text(
                       AppStrings.modeFlashcard,
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ),
@@ -750,12 +655,12 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: SizedBox(
-                  height: 44,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
+                  height: 36,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.accent,
+                      side: const BorderSide(color: AppColors.accent),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
@@ -767,13 +672,16 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
                         sourceId: activeSourceId,
                         sourceName: sourceTitle,
                         selectedChapters: selectedChapters,
-                        totalItems: totalItems,
+                        totalItems: total,
                       );
                     },
-                    icon: const Icon(Icons.quiz_rounded, size: 18),
+                    icon: const Icon(Icons.quiz_rounded, size: 16),
                     label: const Text(
                       AppStrings.modeQuick,
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ),
@@ -798,7 +706,7 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: AppSpacing.xs,
+          vertical: 6,
         ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.surface,
@@ -821,14 +729,14 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (isSelected) ...[
-                const Icon(Icons.check, size: 14, color: Colors.white),
+                const Icon(Icons.check, size: 13, color: Colors.white),
                 const SizedBox(width: 4),
               ],
               Text(
                 label,
                 style: TextStyle(
                   color: isSelected ? Colors.white : AppColors.text,
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
@@ -850,6 +758,10 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
     final totalAcrossUnits = units.fold<int>(0, (sum, u) => sum + u.total);
     final masteredAcrossUnits =
         units.fold<int>(0, (sum, u) => sum + u.mastered);
+    final ratio = totalAcrossUnits == 0
+        ? 0.0
+        : (masteredAcrossUnits / totalAcrossUnits).clamp(0.0, 1.0);
+    final percentage = (ratio * 100).toInt();
 
     return ListView.separated(
       padding: const EdgeInsets.symmetric(
@@ -857,12 +769,25 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
         vertical: AppSpacing.screenV,
       ),
       itemCount: units.length + 1,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.xs + 2),
       itemBuilder: (context, index) {
         if (index == 0) {
-          return UnitSummaryCard(
-            total: totalAcrossUnits,
-            mastered: masteredAcrossUnits,
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            child: _buildUnifiedSummaryCard(
+              context,
+              title: sourceTitle,
+              subtitle: '${units.length} Units · စုစုပေါင်း $totalAcrossUnits ခု',
+              total: totalAcrossUnits,
+              mastered: masteredAcrossUnits,
+              ratio: ratio,
+              percentage: percentage,
+              weakCount: 0,
+              activeKind: activeKind,
+              activeSourceId: activeSourceId,
+              sourceTitle: sourceTitle,
+              selectedChapters: const {},
+            ),
           );
         }
         final unit = units[index - 1];
@@ -874,26 +799,6 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
             sourceId: activeSourceId,
             unit: unit,
           ),
-          onFlashcardTap: () {
-            context.push(
-              AppRoutes.study(
-                activeKind,
-                activeSourceId,
-                unit.id,
-                StudyMode.flashcard,
-              ),
-            );
-          },
-          onQuickQuizTap: () {
-            context.push(
-              AppRoutes.study(
-                activeKind,
-                activeSourceId,
-                unit.id,
-                StudyMode.quick,
-              ),
-            );
-          },
         );
       },
     );
