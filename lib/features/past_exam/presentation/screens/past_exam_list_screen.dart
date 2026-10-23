@@ -617,15 +617,28 @@ class _FilterPanelState extends ConsumerState<_FilterPanel> {
                         if (sessions.isEmpty) return const SizedBox.shrink();
                         final allSelected =
                             sessions.every(_draft.selectedSessions.contains);
-                        return TextButton(
-                          onPressed: () => _toggleAllSessions(sessions),
-                          style: TextButton.styleFrom(
-                            visualDensity: VisualDensity.compact,
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: Text(
-                            allSelected ? 'အားလုံးပယ်' : 'အားလုံးရွေး',
-                            style: const TextStyle(fontSize: 12),
+                        final selectedCount = sessions
+                            .where(_draft.selectedSessions.contains)
+                            .length;
+                        return InkWell(
+                          onTap: () => _toggleAllSessions(sessions),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 4,
+                            ),
+                            child: Icon(
+                              allSelected
+                                  ? Icons.check_box_rounded
+                                  : (selectedCount > 0
+                                      ? Icons.indeterminate_check_box_rounded
+                                      : Icons.check_box_outline_blank_rounded),
+                              size: 20,
+                              color: selectedCount > 0
+                                  ? AppColors.primary
+                                  : AppColors.textSoft,
+                            ),
                           ),
                         );
                       },
@@ -723,52 +736,66 @@ class _FilterPanelState extends ConsumerState<_FilterPanel> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Category title row
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.md,
-                                  vertical: AppSpacing.sm,
+                              // Category title row with Checkbox
+                              InkWell(
+                                onTap: () => _toggleSectionTypes(sectionTypes),
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(AppRadius.card),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: section.color,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: AppSpacing.sm),
-                                    Expanded(
-                                      child: Text(
-                                        section.titleMy,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: section.color,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.md,
+                                    vertical: AppSpacing.sm,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          section.titleMy,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: section.color,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          _toggleSectionTypes(sectionTypes),
-                                      style: TextButton.styleFrom(
-                                        visualDensity: VisualDensity.compact,
-                                        padding: EdgeInsets.zero,
-                                      ),
-                                      child: Text(
+                                      if (selectedCount > 0)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: section.color
+                                                .withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(
+                                              AppRadius.pill,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '$selectedCount/${sectionTypes.length}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: section.color,
+                                            ),
+                                          ),
+                                        ),
+                                      Icon(
                                         allSelected
-                                            ? 'အားလုံးပယ်'
-                                            : 'အားလုံးရွေး',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: section.color,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                            ? Icons.check_box_rounded
+                                            : (selectedCount > 0
+                                                ? Icons
+                                                    .indeterminate_check_box_rounded
+                                                : Icons
+                                                    .check_box_outline_blank_rounded),
+                                        size: 20,
+                                        color: selectedCount > 0
+                                            ? section.color
+                                            : AppColors.textSoft,
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                               const Divider(height: 1),
