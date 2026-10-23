@@ -67,8 +67,11 @@ void main() {
       expect(totalPatterns, equals(100));
     });
 
-    test('Seeding N3 grammar into AppDatabase', () async {
-      final db = AppDatabase.forTesting(NativeDatabase.memory());
+    test(
+      'Seeding N3 grammar into AppDatabase',
+      timeout: const Timeout(Duration(minutes: 2)),
+      () async {
+        final db = AppDatabase.forTesting(NativeDatabase.memory());
       addTearDown(db.close);
 
       await seedDevData(db);

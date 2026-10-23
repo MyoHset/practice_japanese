@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:practice_janpanese/core/constants/app_radius.dart';
+import 'package:practice_janpanese/core/constants/app_sizes.dart';
 import 'package:practice_janpanese/core/theme/app_colors.dart';
 import 'package:practice_janpanese/core/theme/app_typography.dart';
 
@@ -102,6 +103,10 @@ class AppTheme {
         ),
         elevation: 0,
         dragHandleColor: AppColors.divider,
+        dragHandleSize: Size(
+          AppSizes.dragHandleWidth,
+          AppSizes.dragHandleHeight,
+        ),
       ),
       // ── Progress indicator ────────────────────────────────────────────────
       progressIndicatorTheme: const ProgressIndicatorThemeData(

@@ -27,8 +27,6 @@ Future<void> main() async {
     ),
   );
 
-  if (kDebugMode) {
-    // Run seeding asynchronously in the background so it does not block the first frame.
-    unawaited(seedDevData(db, prefs: prefs));
-  }
+  // Run seeding asynchronously in the background so it does not block the first frame.
+  unawaited(seedDevData(db, prefs: prefs));
 }

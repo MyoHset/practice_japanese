@@ -361,17 +361,6 @@ class _QuickQuizStudyScreenState extends ConsumerState<QuickQuizStudyScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
               Text(
                 'မေးခွန်းရွေးရန်',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practice_janpanese/core/constants/app_radius.dart';
-import 'package:practice_janpanese/core/constants/app_sizes.dart';
 import 'package:practice_janpanese/core/constants/app_spacing.dart';
 import 'package:practice_janpanese/core/router/app_routes.dart';
 import 'package:practice_janpanese/core/theme/app_colors.dart';
@@ -88,25 +87,11 @@ class WeakItemsModal extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Drag handle
-            Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.sm),
-              child: Center(
-                child: Container(
-                  width: AppSizes.dragHandleWidth,
-                  height: AppSizes.dragHandleHeight,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                  ),
-                ),
-              ),
-            ),
             // Header
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.lg,
-                AppSpacing.md,
+                0,
                 AppSpacing.lg,
                 AppSpacing.sm,
               ),

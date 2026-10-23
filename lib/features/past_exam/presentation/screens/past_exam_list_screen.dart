@@ -126,6 +126,7 @@ class PastExamListScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
+      showDragHandle: false,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _FilterBottomSheet(ref: ref),
     );

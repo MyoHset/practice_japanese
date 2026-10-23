@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practice_janpanese/core/constants/app_radius.dart';
-import 'package:practice_janpanese/core/constants/app_sizes.dart';
 import 'package:practice_janpanese/core/constants/app_spacing.dart';
 import 'package:practice_janpanese/core/constants/app_strings.dart';
 import 'package:practice_janpanese/core/router/app_routes.dart';
@@ -81,25 +80,16 @@ class _StudyModeSheetState extends State<StudyModeSheet> {
   @override
   Widget build(BuildContext context) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.md,
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.md,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Container(
-                  width: AppSizes.dragHandleWidth,
-                  height: AppSizes.dragHandleHeight,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
               Text(
                 widget.unit.name,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(

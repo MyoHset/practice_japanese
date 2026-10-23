@@ -8,15 +8,14 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 47;
+const int _kCurrentDevSeedVersion = 48;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
 Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
-  if (!kDebugMode) return;
-
-  // Always ensure grammar books exist even if other sources were already seeded
+  // Always ensure grammar and vocabulary books exist even if other sources were already seeded
   await _ensureGrammarBooks(db, DateTime.now());
+  await _ensureTangoBook(db, DateTime.now());
 
   if (prefs != null) {
     final completedVersion = prefs.getInt(_kDevSeedVersionKey) ?? 0;
@@ -27,9 +26,7 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
 
   final sourceCount = await db.sources.count().getSingle();
   if (sourceCount > 0) {
-    await _ensureTangoLevelN3(db);
-    await _updateTangoIfCorrupted(db);
-    await _restoreTango2000VocabItems(db);
+    await _ensureTangoBook(db, DateTime.now());
     await _ensureSpeedMasterN3Kanji(db, DateTime.now());
     await _ensureGrammarBooks(db, DateTime.now());
     await _ensurePastExam201007(db, DateTime.now());
@@ -877,6 +874,47 @@ Future<void> _restoreTango2000VocabItems(AppDatabase db) async {
       }
     }
   });
+}
+
+/// Ensures Tango 2000 vocabulary book is properly seeded in an already populated or partially seeded database.
+Future<void> _ensureTangoBook(AppDatabase db, DateTime now) async {
+  try {
+    final existingTango = await (db.sources.select()
+          ..where((s) => s.name.equals('Tango 2000')))
+        .getSingleOrNull();
+
+    if (existingTango == null) {
+      await _seedTangoFromJson(db, now);
+      return;
+    }
+
+    // Ensure jlptLevel is N3
+    if (existingTango.jlptLevel != 'N3') {
+      await (db.update(db.sources)..where((s) => s.id.equals(existingTango.id)))
+          .write(const SourcesCompanion(jlptLevel: Value('N3')));
+    }
+
+    final unitCount = await db.units
+        .count(where: (u) => u.sourceId.equals(existingTango.id))
+        .getSingle();
+
+    final itemsCount = await db.vocabSourceItems
+        .count(where: (vsi) => vsi.sourceId.equals(existingTango.id))
+        .getSingle();
+
+    if (unitCount == 0 || itemsCount == 0) {
+      // Missing units or vocab items - clean and re-seed
+      await db.transaction(() async {
+        await (db.delete(db.sources)..where((s) => s.id.equals(existingTango.id)))
+            .go();
+        await _seedTangoFromJson(db, now);
+      });
+    } else {
+      await _updateTangoIfCorrupted(db);
+    }
+  } catch (e, stack) {
+    debugPrint('Error in _ensureTangoBook: $e\n$stack');
+  }
 }
 
 /// Ensures Tango 2000 has its jlptLevel set to N3 in an already seeded database.
