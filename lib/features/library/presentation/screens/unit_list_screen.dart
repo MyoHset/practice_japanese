@@ -777,7 +777,8 @@ class _UnitListScreenState extends ConsumerState<UnitListScreen> {
             child: _buildUnifiedSummaryCard(
               context,
               title: sourceTitle,
-              subtitle: '${units.length} Units · စုစုပေါင်း $totalAcrossUnits ခု',
+              subtitle:
+                  '${units.length} Units · စုစုပေါင်း $totalAcrossUnits ခု',
               total: totalAcrossUnits,
               mastered: masteredAcrossUnits,
               ratio: ratio,

@@ -138,9 +138,8 @@ class UnitTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: isMastered
-                          ? AppColors.secondary
-                          : AppColors.textSoft,
+                      color:
+                          isMastered ? AppColors.secondary : AppColors.textSoft,
                     ),
                   ),
                 ),
