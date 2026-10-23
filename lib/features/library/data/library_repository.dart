@@ -432,6 +432,54 @@ class LibraryRepository {
     }
   }
 
+  /// Toggles whether an item is mastered (streak >= 3).
+  Future<bool> toggleMastered({
+    required ContentKind kind,
+    required int itemId,
+  }) async {
+    final itemType = kind.itemType;
+    final now = DateTime.now();
+
+    final existing = await (_db.select(_db.progress)
+          ..where(
+            (p) => p.itemType.equalsValue(itemType) & p.itemId.equals(itemId),
+          ))
+        .getSingleOrNull();
+
+    if (existing == null) {
+      await _db.into(_db.progress).insert(
+            ProgressCompanion.insert(
+              itemType: itemType,
+              itemId: itemId,
+              direction: const Value(Direction.none),
+              streak: const Value(3),
+              correctCount: const Value(3),
+              lastReviewed: Value(now),
+              nextReview: Value(now.add(const Duration(days: 7))),
+            ),
+          );
+      return true;
+    } else {
+      final isNowMastered = existing.streak < 3;
+      final newStreak = isNowMastered ? 3 : 0;
+      await (_db.update(_db.progress)
+            ..where(
+              (p) => p.itemType.equalsValue(itemType) & p.itemId.equals(itemId),
+            ))
+          .write(
+        ProgressCompanion(
+          streak: Value(newStreak),
+          correctCount: Value(
+            isNowMastered ? existing.correctCount + 1 : existing.correctCount,
+          ),
+          lastReviewed: Value(now),
+          nextReview: Value(now.add(Duration(days: isNowMastered ? 7 : 0))),
+        ),
+      );
+      return isNowMastered;
+    }
+  }
+
   /// Records a flashcard review for an item: increments streak if remembered,
   /// resets streak if forgotten, updates lastReviewed and nextReview.
   Future<void> recordReview({

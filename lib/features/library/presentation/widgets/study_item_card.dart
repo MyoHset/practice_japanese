@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:practice_janpanese/core/constants/app_radius.dart';
 import 'package:practice_janpanese/core/constants/app_sizes.dart';
 import 'package:practice_janpanese/core/constants/app_spacing.dart';
-import 'package:practice_janpanese/core/constants/app_strings.dart';
 import 'package:practice_janpanese/core/theme/app_colors.dart';
 import 'package:practice_janpanese/core/widgets/app_card.dart';
 import 'package:practice_janpanese/features/library/domain/content_kind.dart';
@@ -18,15 +17,18 @@ class StudyItemCard extends ConsumerWidget {
     required this.index,
     this.kind,
     this.onBookmarkTap,
+    this.onTap,
   });
 
   final StudyItem item;
   final int index;
   final ContentKind? kind;
   final VoidCallback? onBookmarkTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => AppCard(
+        onTap: onTap,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -35,17 +37,13 @@ class StudyItemCard extends ConsumerWidget {
               height: AppSizes.unitBadgeSize,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: item.isMastered
-                    ? AppColors.secondary.withAlpha(35)
-                    : AppColors.primarySoft,
+                color: AppColors.primarySoft,
                 borderRadius: BorderRadius.circular(AppRadius.unitBadge),
               ),
               child: Text(
                 '$index',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: item.isMastered
-                          ? AppColors.secondary
-                          : AppColors.primary,
+                      color: AppColors.primary,
                       fontWeight: FontWeight.w700,
                     ),
               ),
@@ -296,75 +294,6 @@ class StudyItemCard extends ConsumerWidget {
                                     color: Colors.amber.shade900,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 9,
-                                  ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                if (item.isMastered) ...[
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary.withAlpha(25),
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                      border: Border.all(color: AppColors.secondary),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.check_circle_rounded,
-                          color: AppColors.secondary,
-                          size: AppSizes.iconSm,
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          AppStrings.masteredCount(1).replaceAll('1 ', ''),
-                          style:
-                              Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: AppColors.secondary,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                if (item.wrongCount > 0) ...[
-                  if (item.isMastered) const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                      border: Border.all(
-                        color: AppColors.error.withValues(alpha: 0.4),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.warning_amber_rounded,
-                          color: AppColors.error,
-                          size: 13,
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          '${item.wrongCount} ကြိမ်မှား',
-                          style:
-                              Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: AppColors.error,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 10,
                                   ),
                         ),
                       ],

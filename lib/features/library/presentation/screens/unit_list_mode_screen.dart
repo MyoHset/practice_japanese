@@ -6,6 +6,7 @@ import 'package:practice_janpanese/core/widgets/async_value_view.dart';
 import 'package:practice_janpanese/features/library/domain/content_kind.dart';
 import 'package:practice_janpanese/features/library/domain/study_item.dart';
 import 'package:practice_janpanese/features/library/presentation/providers/library_providers.dart';
+import 'package:practice_janpanese/features/library/presentation/screens/study_item_detail_screen.dart';
 import 'package:practice_janpanese/features/library/presentation/widgets/study_item_card.dart';
 
 /// Screen displaying the full list of study items for a unit in List mode.
@@ -52,6 +53,18 @@ class UnitListModeScreen extends ConsumerWidget {
             item: items[index],
             index: index + 1,
             kind: kind,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => StudyItemDetailScreen(
+                    items: items,
+                    initialIndex: index,
+                    kind: kind,
+                    title: unitTitle,
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
