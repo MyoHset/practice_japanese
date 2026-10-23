@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -42,11 +44,62 @@ class _PastExamPracticeScreenState
   bool _isCompleted = false;
   bool _isPassageExpanded = true;
 
+  /// Timer state
+  Timer? _timer;
+  int _secondsElapsed = 0;
+  int? _countdownLimitSeconds; // null = stopwatch, positive = countdown
+  bool _isPaused = false;
+
   /// When non-null, overrides the provider's questions (e.g. retry-wrong-only).
   List<PastExamQuestion>? _filteredQuestions;
 
   int get _correctCount => _correctness.values.where((c) => c).length;
   int get _wrongCount => _correctness.values.where((c) => !c).length;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted || _isCompleted || _isPaused) return;
+
+      setState(() {
+        _secondsElapsed++;
+        if (_countdownLimitSeconds != null &&
+            _secondsElapsed >= _countdownLimitSeconds!) {
+          _timer?.cancel();
+          _isCompleted = true;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('⏱️ အချိန်ပြည့်သွားပါပြီ! အဖြေများကို တင်လိုက်ပါပြီ။'),
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      });
+    });
+  }
+
+  void _pauseResumeTimer() {
+    setState(() => _isPaused = !_isPaused);
+  }
+
+  String _formatDuration(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
 
   void _onOptionSelected(PastExamQuestion question, int position) {
     if (_answers.containsKey(_currentIndex)) return;
@@ -67,6 +120,7 @@ class _PastExamPracticeScreenState
 
   void _nextQuestion(int totalQuestions) {
     if (_currentIndex + 1 >= totalQuestions) {
+      _timer?.cancel();
       setState(() => _isCompleted = true);
     } else {
       setState(() {
@@ -204,7 +258,10 @@ class _PastExamPracticeScreenState
       _isCompleted = false;
       _isPassageExpanded = true;
       _filteredQuestions = null;
+      _secondsElapsed = 0;
+      _isPaused = false;
     });
+    _startTimer();
   }
 
   /// Retry only the questions that were answered incorrectly.
@@ -223,7 +280,202 @@ class _PastExamPracticeScreenState
       _correctness.clear();
       _isCompleted = false;
       _isPassageExpanded = true;
+      _secondsElapsed = 0;
+      _isPaused = false;
     });
+    _startTimer();
+  }
+
+  /// Retry questions belonging to weak Mondai Types.
+  void _retryWeakOnly(
+    List<PastExamQuestion> allQuestions,
+    Set<MondaiType> weakMondaiTypes,
+  ) {
+    final weakQuestions = allQuestions
+        .where((q) => weakMondaiTypes.contains(q.mondaiType))
+        .toList();
+
+    if (weakQuestions.isEmpty) return;
+
+    setState(() {
+      _filteredQuestions = weakQuestions;
+      _currentIndex = 0;
+      _answers.clear();
+      _correctness.clear();
+      _isCompleted = false;
+      _isPassageExpanded = true;
+      _secondsElapsed = 0;
+      _isPaused = false;
+    });
+    _startTimer();
+  }
+
+  void _showTimerSettingsSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            return Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.timer_outlined, color: AppColors.primary),
+                      const SizedBox(width: AppSpacing.sm),
+                      const Text(
+                        'Mock Exam Timer ဆက်တင်',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(sheetContext),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  const Text(
+                    'စာမေးပွဲ အချိန်သတ်မှတ်ချက် ရွေးချယ်ပါ:',
+                    style: TextStyle(fontSize: 13, color: AppColors.textSoft),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildTimerOption(
+                        label: 'Stopwatch (အချိန်မကန့်သတ်)',
+                        seconds: null,
+                        sheetContext: sheetContext,
+                      ),
+                      _buildTimerOption(
+                        label: '၁၅ မိနစ် (Quick Drill)',
+                        seconds: 15 * 60,
+                        sheetContext: sheetContext,
+                      ),
+                      _buildTimerOption(
+                        label: '၃၀ မိနစ် (Vocab Session)',
+                        seconds: 30 * 60,
+                        sheetContext: sheetContext,
+                      ),
+                      _buildTimerOption(
+                        label: '၆၀ မိနစ် (Grammar & Reading)',
+                        seconds: 60 * 60,
+                        sheetContext: sheetContext,
+                      ),
+                      _buildTimerOption(
+                        label: '၁၀၅ မိနစ် (JLPT Full)',
+                        seconds: 105 * 60,
+                        sheetContext: sheetContext,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        _pauseResumeTimer();
+                        Navigator.pop(sheetContext);
+                      },
+                      icon: Icon(
+                        _isPaused
+                            ? Icons.play_arrow_rounded
+                            : Icons.pause_rounded,
+                      ),
+                      label: Text(_isPaused ? 'Resume Timer' : 'Pause Timer'),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildTimerOption({
+    required String label,
+    required int? seconds,
+    required BuildContext sheetContext,
+  }) {
+    final isSelected = _countdownLimitSeconds == seconds;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) {
+        setState(() {
+          _countdownLimitSeconds = seconds;
+          _secondsElapsed = 0;
+          _isPaused = false;
+        });
+        Navigator.pop(sheetContext);
+      },
+    );
+  }
+
+  Widget _buildTimerPill(BuildContext context) {
+    final isCountdown = _countdownLimitSeconds != null;
+    final int displaySeconds = isCountdown
+        ? (_countdownLimitSeconds! - _secondsElapsed).clamp(0, 999999)
+        : _secondsElapsed;
+    final bool isUrgent =
+        isCountdown && displaySeconds <= 180 && displaySeconds > 0;
+
+    return Center(
+      child: InkWell(
+        onTap: () => _showTimerSettingsSheet(context),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: isUrgent
+                ? AppColors.error.withValues(alpha: 0.12)
+                : AppColors.primarySoft,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            border: Border.all(
+              color: isUrgent
+                  ? AppColors.error
+                  : AppColors.primary.withValues(alpha: 0.25),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _isPaused
+                    ? Icons.pause_circle_rounded
+                    : (isCountdown
+                        ? Icons.timer_rounded
+                        : Icons.timer_outlined),
+                size: 14,
+                color: isUrgent ? AppColors.error : AppColors.primary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                _formatDuration(displaySeconds),
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: isUrgent ? AppColors.error : AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   String _getSubjectLabel(Subject? subject) {
@@ -363,6 +615,8 @@ class _PastExamPracticeScreenState
         ),
         actions: [
           if (!_isCompleted) ...[
+            _buildTimerPill(context),
+            const SizedBox(width: AppSpacing.xs),
             Builder(
               builder: (buttonContext) => IconButton(
                 icon: const Icon(Icons.grid_view_rounded),
@@ -960,124 +1214,459 @@ class _PastExamPracticeScreenState
     final percentage = totalQuestions > 0
         ? ((_correctCount / totalQuestions) * 100).round()
         : 0;
+    final isPassed = percentage >= 60;
 
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.screenH),
-        child: AppCard(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
+    // ── Analytics Calculation ──────────────────────────────────────────────
+    // 1. Group by Subject
+    final Map<Subject, ({int correct, int total})> subjectStats = {};
+    // 2. Group by MondaiType
+    final Map<MondaiType, ({int correct, int total})> mondaiStats = {};
+
+    for (int i = 0; i < questions.length; i++) {
+      final q = questions[i];
+      final isCorrect = _correctness[i] ?? false;
+
+      // Subject stats
+      final prevSubject = subjectStats[q.subject] ?? (correct: 0, total: 0);
+      subjectStats[q.subject] = (
+        correct: prevSubject.correct + (isCorrect ? 1 : 0),
+        total: prevSubject.total + 1,
+      );
+
+      // Mondai stats
+      final prevMondai = mondaiStats[q.mondaiType] ?? (correct: 0, total: 0);
+      mondaiStats[q.mondaiType] = (
+        correct: prevMondai.correct + (isCorrect ? 1 : 0),
+        total: prevMondai.total + 1,
+      );
+    }
+
+    // Identify weak Mondais (accuracy < 60%)
+    final List<MapEntry<MondaiType, ({int correct, int total})>> weakMondais =
+        mondaiStats.entries.where((e) {
+      if (e.value.total == 0) return false;
+      return (e.value.correct / e.value.total) < 0.6;
+    }).toList()
+          ..sort(
+            (a, b) => (a.value.correct / a.value.total)
+                .compareTo(b.value.correct / b.value.total),
+          );
+
+    final weakMondaiTypes = weakMondais.map((e) => e.key).toSet();
+    final weakQuestionsCount =
+        questions.where((q) => weakMondaiTypes.contains(q.mondaiType)).length;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenH,
+        vertical: AppSpacing.md,
+      ),
+      child: Column(
+        children: [
+          // ── 1. Result Header Card ─────────────────────────────────────────
+          AppCard(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: (isPassed ? AppColors.secondary : AppColors.error)
+                        .withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isPassed
+                        ? Icons.emoji_events_rounded
+                        : Icons.psychology_alt_rounded,
+                    color: isPassed ? AppColors.secondary : AppColors.error,
+                    size: 48,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.emoji_events_rounded,
-                  color: AppColors.accent,
-                  size: 56,
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  isPassed
+                      ? 'ဂုဏ်ယူပါသည်! အောင်မှတ်ရရှိပါသည်'
+                      : 'လေ့ကျင့်မှု ပြီးဆုံးပါပြီ (ထပ်မံကြိုးစားပါ)',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                'လေ့ကျင့်မှု ပြီးဆုံးပါပြီ!',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                const SizedBox(height: 2),
+                Text(
+                  _getSubjectLabel(widget.subject),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSoft,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  '$percentage%',
+                  style: TextStyle(
+                    fontSize: 46,
+                    fontWeight: FontWeight.w800,
+                    color: isPassed ? AppColors.secondary : AppColors.error,
+                    height: 1.1,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                // Key metrics row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildStatBadge(
+                      label: 'ကြာမြင့်ချိန်',
+                      countStr: _formatDuration(_secondsElapsed),
+                      color: AppColors.primary,
+                      icon: Icons.timer_outlined,
                     ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                _getSubjectLabel(widget.subject),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    _buildStatBadge(
+                      label: 'အမှန်',
+                      countStr: '$_correctCount',
+                      color: AppColors.secondary,
+                      icon: Icons.check_circle_rounded,
+                    ),
+                    _buildStatBadge(
+                      label: 'အမှား',
+                      countStr: '$_wrongCount',
+                      color: AppColors.error,
+                      icon: Icons.cancel_rounded,
+                    ),
+                    _buildStatBadge(
+                      label: 'စုစုပေါင်း',
+                      countStr: '$totalQuestions',
                       color: AppColors.textSoft,
+                      icon: Icons.format_list_numbered_rounded,
                     ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              Text(
-                '$percentage%',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: percentage >= 60
-                          ? AppColors.secondary
-                          : AppColors.error,
-                    ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // ── 2. Subject Breakdown Card (ဘာသာရပ်အလိုက် စွမ်းဆောင်ရည်) ─────────
+          if (subjectStats.length > 1) ...[
+            AppCard(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildStatBadge(
-                    label: 'မှန်',
-                    count: _correctCount,
-                    color: AppColors.secondary,
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.donut_small_rounded,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(
+                        'ဘာသာရပ်အလိုက် စွမ်းဆောင်ရည် (Subject Breakdown)',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: AppSpacing.lg),
-                  _buildStatBadge(
-                    label: 'မှား',
-                    count: _wrongCount,
-                    color: AppColors.error,
+                  const SizedBox(height: AppSpacing.md),
+                  for (final entry in subjectStats.entries) ...[
+                    Builder(
+                      builder: (context) {
+                        final subRatio = entry.value.total > 0
+                            ? entry.value.correct / entry.value.total
+                            : 0.0;
+                        final subPct = (subRatio * 100).round();
+                        final isSubPass = subPct >= 60;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _getSubjectLabel(entry.key),
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${entry.value.correct}/${entry.value.total} ($subPct%)',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSubPass
+                                          ? AppColors.secondary
+                                          : AppColors.error,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              AppProgressBar(
+                                value: subRatio,
+                                color: isSubPass
+                                    ? AppColors.secondary
+                                    : AppColors.error,
+                                height: 5,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
+
+          // ── 3. Weakness Analysis Card (⚠️ အားနည်းချက် သုံးသပ်ချက်) ─────────
+          if (weakMondais.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF8E7),
+                borderRadius: BorderRadius.circular(AppRadius.card),
+                border: Border.all(color: const Color(0xFFFFE082)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Color(0xFFB78103),
+                        size: 20,
+                      ),
+                      SizedBox(width: AppSpacing.xs),
+                      Text(
+                        'အားနည်းချက် သုံးသပ်ချက် (Weakness Insights)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF7A5400),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: AppSpacing.lg),
-                  _buildStatBadge(
-                    label: 'စုစုပေါင်း',
-                    count: totalQuestions,
-                    color: AppColors.primary,
+                  const SizedBox(height: AppSpacing.xs),
+                  const Text(
+                    'အောက်ပါ မေးခွန်းအပိုင်းများတွင် အမှတ်ရနည်းနေသဖြင့် ထပ်မံလေ့ကျင့်ရန် လိုအပ်ပါသည်:',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF8D6200),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: weakMondais.map((entry) {
+                      final acc = ((entry.value.correct / entry.value.total) * 100).round();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          border: Border.all(color: const Color(0xFFFFD54F)),
+                        ),
+                        child: Text(
+                          '${mondaiTypeShortLabel(entry.key)}: ${entry.value.correct}/${entry.value.total} ($acc%)',
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF9E6600),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.xl),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: _restartQuiz,
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('ပြန်လည်ဖြေဆိုမည် (Retry)'),
-                ),
-              ),
-              if (_wrongCount > 0) ...[
-                const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.error,
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
+
+          // ── 4. Detailed Mondai Breakdown (မေးခွန်း အမျိုးအစားအလိုက်) ───────
+          AppCard(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.analytics_outlined,
+                      size: 18,
+                      color: AppColors.primary,
                     ),
-                    onPressed: () => _retryWrongOnly(questions),
-                    icon: const Icon(Icons.replay_rounded),
-                    label: Text('မှားခဲ့သည့်များ ပြန်ဖြေမည် ($_wrongCount)'),
-                  ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      'မေးခွန်း အမျိုးအစားအလိုက် အမှတ်စာရင်း',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: AppSpacing.sm),
+                for (final entry in mondaiStats.entries) ...[
+                  Builder(
+                    builder: (context) {
+                      final mRatio = entry.value.total > 0
+                          ? entry.value.correct / entry.value.total
+                          : 0.0;
+                      final mPct = (mRatio * 100).round();
+                      final isMPass = mPct >= 60;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    mondaiTypeLabel(entry.key),
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    mondaiTypeBurmeseDescription(entry.key),
+                                    style: const TextStyle(
+                                      fontSize: 10.5,
+                                      color: AppColors.textSoft,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: (isMPass
+                                        ? AppColors.secondary
+                                        : AppColors.error)
+                                    .withValues(alpha: 0.12),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.pill),
+                              ),
+                              child: Text(
+                                '${entry.value.correct}/${entry.value.total} ($mPct%)',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: isMPass
+                                      ? AppColors.secondary
+                                      : AppColors.error,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  if (entry.key != mondaiStats.keys.last)
+                    const Divider(height: 8),
+                ],
               ],
-              const SizedBox(height: AppSpacing.sm),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => context.pop(),
-                  icon: const Icon(Icons.arrow_back_rounded),
-                  label: const Text('မေးခွန်းဟောင်း စာရင်းသို့'),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // ── 5. Action Buttons ─────────────────────────────────────────────
+          if (weakMondais.isNotEmpty && weakQuestionsCount > 0) ...[
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFD97706),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onPressed: () => _retryWeakOnly(questions, weakMondaiTypes),
+                icon: const Icon(Icons.gps_fixed_rounded, size: 18),
+                label: Text(
+                  'အားနည်းသည့် အပိုင်းများသာ သီးသန့်ပြန်ဖြေမည် ($weakQuestionsCount ပုဒ်)',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-            ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+          if (_wrongCount > 0) ...[
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onPressed: () => _retryWrongOnly(questions),
+                icon: const Icon(Icons.replay_rounded, size: 18),
+                label: Text(
+                  'မှားခဲ့သည့်များ ပြန်ဖြေမည် ($_wrongCount ပုဒ်)',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _restartQuiz,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('အားလုံး ပြန်လည်ဖြေဆိုမည် (Retry All)'),
+            ),
           ),
-        ),
+          const SizedBox(height: AppSpacing.xs),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+              onPressed: () => context.pop(),
+              icon: const Icon(Icons.arrow_back_rounded, size: 18),
+              label: const Text('မေးခွန်းဟောင်း စာရင်းသို့ ပြန်သွားမည်'),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+        ],
       ),
     );
   }
 
   Widget _buildStatBadge({
     required String label,
-    required int count,
+    required String countStr,
     required Color color,
+    required IconData icon,
   }) {
     return Column(
       children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(height: 2),
         Text(
-          '$count',
+          countStr,
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: color,
           ),
@@ -1085,8 +1674,8 @@ class _PastExamPracticeScreenState
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
-            color: color,
+            fontSize: 11,
+            color: color.withValues(alpha: 0.8),
             fontWeight: FontWeight.w600,
           ),
         ),
