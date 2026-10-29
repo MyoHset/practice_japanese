@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 64;
+const int _kCurrentDevSeedVersion = 74;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -19,7 +19,16 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
   await _ensureMinnaNoNihongo2Vocab(db, DateTime.now());
   await _ensureN4Kanji(db, DateTime.now());
   await _ensurePastExam202512N4(db, DateTime.now());
+  await _ensurePastExam202507N4(db, DateTime.now());
   await _ensurePastExam202412N4(db, DateTime.now());
+  await _ensurePastExam202407N4(db, DateTime.now());
+  await _ensurePastExam202307N4(db, DateTime.now());
+  await _ensurePastExam202112N4(db, DateTime.now());
+  await _ensurePastExam202107N4(db, DateTime.now());
+  await _ensurePastExam201812N4(db, DateTime.now());
+  await _ensurePastExam201707N4(db, DateTime.now());
+  await _ensurePastExam201612N4(db, DateTime.now());
+  await _ensurePastExam201507N4(db, DateTime.now());
 
   if (prefs != null) {
     final completedVersion = prefs.getInt(_kDevSeedVersionKey) ?? 0;
@@ -64,16 +73,16 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
     await _ensurePastExam201507(db, DateTime.now());
     await _ensurePastExam201812(db, DateTime.now());
     await _ensurePastExam202512N4(db, DateTime.now(), force: true);
-    await _ensurePastExam202507N4(db, DateTime.now());
+    await _ensurePastExam202507N4(db, DateTime.now(), force: true);
     await _ensurePastExam202412N4(db, DateTime.now(), force: true);
-    await _ensurePastExam202407N4(db, DateTime.now());
-    await _ensurePastExam202307N4(db, DateTime.now());
-    await _ensurePastExam202112N4(db, DateTime.now());
-    await _ensurePastExam202107N4(db, DateTime.now());
-    await _ensurePastExam201812N4(db, DateTime.now());
-    await _ensurePastExam201707N4(db, DateTime.now());
-    await _ensurePastExam201612N4(db, DateTime.now());
-    await _ensurePastExam201507N4(db, DateTime.now());
+    await _ensurePastExam202407N4(db, DateTime.now(), force: true);
+    await _ensurePastExam202307N4(db, DateTime.now(), force: true);
+    await _ensurePastExam202112N4(db, DateTime.now(), force: true);
+    await _ensurePastExam202107N4(db, DateTime.now(), force: true);
+    await _ensurePastExam201812N4(db, DateTime.now(), force: true);
+    await _ensurePastExam201707N4(db, DateTime.now(), force: true);
+    await _ensurePastExam201612N4(db, DateTime.now(), force: true);
+    await _ensurePastExam201507N4(db, DateTime.now(), force: true);
     await _ensureMinnaNoNihongo2Vocab(db, DateTime.now());
     await _ensureN4Kanji(db, DateTime.now());
 
@@ -2739,7 +2748,7 @@ Future<void> _ensurePastExam202512N4(AppDatabase db, DateTime now, {bool force =
 }
 
 /// Ensures the 2025-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202507N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202507N4(AppDatabase db, DateTime now, {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2750,13 +2759,17 @@ Future<void> _ensurePastExam202507N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
@@ -2803,7 +2816,7 @@ Future<void> _ensurePastExam202412N4(AppDatabase db, DateTime now, {bool force =
 }
 
 /// Ensures the 2024-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202407N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202407N4(AppDatabase db, DateTime now, {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2814,13 +2827,17 @@ Future<void> _ensurePastExam202407N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
@@ -2833,7 +2850,8 @@ Future<void> _ensurePastExam202407N4(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2023-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202307N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202307N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2844,13 +2862,17 @@ Future<void> _ensurePastExam202307N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
@@ -2863,7 +2885,8 @@ Future<void> _ensurePastExam202307N4(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2021-12 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202112N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202112N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2874,13 +2897,17 @@ Future<void> _ensurePastExam202112N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
@@ -2893,7 +2920,8 @@ Future<void> _ensurePastExam202112N4(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2021-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202107N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202107N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2904,13 +2932,17 @@ Future<void> _ensurePastExam202107N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
@@ -2923,7 +2955,8 @@ Future<void> _ensurePastExam202107N4(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2018-12 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201812N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201812N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2934,13 +2967,17 @@ Future<void> _ensurePastExam201812N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
@@ -2953,7 +2990,8 @@ Future<void> _ensurePastExam201812N4(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2017-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201707N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201707N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2964,13 +3002,17 @@ Future<void> _ensurePastExam201707N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
@@ -2983,7 +3025,7 @@ Future<void> _ensurePastExam201707N4(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2016-12 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201612N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201612N4(AppDatabase db, DateTime now, {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2994,13 +3036,17 @@ Future<void> _ensurePastExam201612N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
@@ -3013,7 +3059,7 @@ Future<void> _ensurePastExam201612N4(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2015-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201507N4(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201507N4(AppDatabase db, DateTime now, {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -3024,13 +3070,17 @@ Future<void> _ensurePastExam201507N4(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
-      return; // Already fully seeded
+    final groupCount = await (db.questionGroups.select()
+          ..where((g) => g.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50 && groupCount >= 3) {
+      return; // Already fully seeded with questions and reading passages!
     }
   }
 
