@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 57;
+const int _kCurrentDevSeedVersion = 61;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -68,6 +68,10 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
     await _ensurePastExam202307N4(db, DateTime.now());
     await _ensurePastExam202112N4(db, DateTime.now());
     await _ensurePastExam202107N4(db, DateTime.now());
+    await _ensurePastExam201812N4(db, DateTime.now());
+    await _ensurePastExam201707N4(db, DateTime.now());
+    await _ensurePastExam201612N4(db, DateTime.now());
+    await _ensurePastExam201507N4(db, DateTime.now());
     await _ensureMinnaNoNihongo2Vocab(db, DateTime.now());
     await _ensureN4Kanji(db, DateTime.now());
 
@@ -678,6 +682,30 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
       db,
       now,
       'assets/data/jlpt_n4_2021_07.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2018_12.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2017_07.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2016_12.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2015_07.json',
       sortOrder: 1,
     );
     await _seedMinnaNoNihongo2FromJson(db, now);
@@ -2880,6 +2908,126 @@ Future<void> _ensurePastExam202107N4(AppDatabase db, DateTime now) async {
     db,
     now,
     'assets/data/jlpt_n4_2021_07.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2018-12 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam201812N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2018) &
+              s.examMonth.equals(12),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2018_12.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2017-07 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam201707N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2017) &
+              s.examMonth.equals(7),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2017_07.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2016-12 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam201612N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2016) &
+              s.examMonth.equals(12),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2016_12.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2015-07 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam201507N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2015) &
+              s.examMonth.equals(7),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2015_07.json',
     sortOrder: 1,
   );
 }
