@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 48;
+const int _kCurrentDevSeedVersion = 57;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -16,6 +16,8 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
   // Always ensure grammar and vocabulary books exist even if other sources were already seeded
   await _ensureGrammarBooks(db, DateTime.now());
   await _ensureTangoBook(db, DateTime.now());
+  await _ensureMinnaNoNihongo2Vocab(db, DateTime.now());
+  await _ensureN4Kanji(db, DateTime.now());
 
   if (prefs != null) {
     final completedVersion = prefs.getInt(_kDevSeedVersionKey) ?? 0;
@@ -59,6 +61,15 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
     await _ensurePastExam202512(db, DateTime.now());
     await _ensurePastExam201507(db, DateTime.now());
     await _ensurePastExam201812(db, DateTime.now());
+    await _ensurePastExam202512N4(db, DateTime.now());
+    await _ensurePastExam202507N4(db, DateTime.now());
+    await _ensurePastExam202412N4(db, DateTime.now());
+    await _ensurePastExam202407N4(db, DateTime.now());
+    await _ensurePastExam202307N4(db, DateTime.now());
+    await _ensurePastExam202112N4(db, DateTime.now());
+    await _ensurePastExam202107N4(db, DateTime.now());
+    await _ensureMinnaNoNihongo2Vocab(db, DateTime.now());
+    await _ensureN4Kanji(db, DateTime.now());
 
     if (prefs != null) {
       await prefs.setInt(_kDevSeedVersionKey, _kCurrentDevSeedVersion);
@@ -627,6 +638,50 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
       'assets/data/jlpt_n3_2024_07.json',
       sortOrder: 12,
     );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2025_12.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2025_07.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2024_12.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2024_07.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2023_07.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2021_12.json',
+      sortOrder: 1,
+    );
+    await _seedPastExamFromJson(
+      db,
+      now,
+      'assets/data/jlpt_n4_2021_07.json',
+      sortOrder: 1,
+    );
+    await _seedMinnaNoNihongo2FromJson(db, now);
+    await _seedN4KanjiFromJson(db, now);
   });
 
   if (prefs != null) {
@@ -2386,7 +2441,6 @@ Future<void> _seedPastExamFromJson(
   for (final sectionData in sections) {
     final section = sectionData as Map<String, dynamic>;
     final subjectStr = section['subject'] as String;
-    final subject = Subject.values.byName(subjectStr);
     final mondaiTypesList = section['mondaiTypes'] as List<dynamic>;
 
     for (final mData in mondaiTypesList) {
@@ -2399,6 +2453,10 @@ Future<void> _seedPastExamFromJson(
         case 'midReading':
         case 'longReading':
         case 'infoSearch':
+        case 'readingShort':
+        case 'readingMedium':
+        case 'informationRetrieval':
+        case 'reading':
           mondaiType = MondaiType.reading;
           break;
         case 'taskUnderstanding':
@@ -2406,10 +2464,31 @@ Future<void> _seedPastExamFromJson(
         case 'summaryUnderstanding':
         case 'utterance':
         case 'quickResponse':
+        case 'listening':
           mondaiType = MondaiType.listening;
+          break;
+        case 'contextualUse':
+        case 'context':
+          mondaiType = MondaiType.context;
+          break;
+        case 'grammarFormat':
+        case 'grammarForm':
+          mondaiType = MondaiType.grammarForm;
+          break;
+        case 'sentenceComposition':
+        case 'sentenceOrder':
+          mondaiType = MondaiType.sentenceOrder;
           break;
         default:
           mondaiType = MondaiType.values.byName(typeStr);
+      }
+      final Subject subject;
+      if (subjectStr == 'grammar_reading') {
+        subject = (mondaiType == MondaiType.reading)
+            ? Subject.reading
+            : Subject.grammar;
+      } else {
+        subject = Subject.values.byName(subjectStr);
       }
       final nameJp = m['nameJp'] as String? ?? '';
       final nameMy = m['nameMy'] as String?;
@@ -2593,4 +2672,650 @@ Future<void> _ensurePastExam201812(AppDatabase db, DateTime now) async {
     'assets/data/jlpt_n3_2018_12.json',
     sortOrder: 9,
   );
+}
+
+/// Ensures the 2025-12 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202512N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2025) &
+              s.examMonth.equals(12),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2025_12.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2025-07 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202507N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2025) &
+              s.examMonth.equals(7),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2025_07.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2024-12 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202412N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2024) &
+              s.examMonth.equals(12),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2024_12.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2024-07 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202407N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2024) &
+              s.examMonth.equals(7),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2024_07.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2023-07 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202307N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2023) &
+              s.examMonth.equals(7),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2023_07.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2021-12 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202112N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2021) &
+              s.examMonth.equals(12),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2021_12.json',
+    sortOrder: 1,
+  );
+}
+
+/// Ensures the 2021-07 JLPT N4 Past Exam data is loaded into the DB.
+Future<void> _ensurePastExam202107N4(AppDatabase db, DateTime now) async {
+  final existingSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.pastExam) &
+              s.jlptLevel.equals('N4') &
+              s.examYear.equals(2021) &
+              s.examMonth.equals(7),
+        ))
+      .getSingleOrNull();
+
+  if (existingSource != null) {
+    final count = await (db.questions.select()
+          ..where((q) => q.sourceId.equals(existingSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 50) {
+      return; // Already fully seeded
+    }
+  }
+
+  await _seedPastExamFromJson(
+    db,
+    now,
+    'assets/data/jlpt_n4_2021_07.json',
+    sortOrder: 1,
+  );
+}
+
+/// Loads Minna no Nihongo II vocabulary from [assets/data/minna_no_nihongo_2_n4.json]
+/// into [Sources], [Units], [Vocabularies], and [VocabSourceItems].
+Future<void> _seedMinnaNoNihongo2FromJson(AppDatabase db, DateTime now) async {
+  String? jsonStr;
+  try {
+    jsonStr = await rootBundle.loadString('assets/data/minna_no_nihongo_2_n4.json');
+  } catch (_) {
+    if (!kIsWeb) {
+      final file = File('assets/data/minna_no_nihongo_2_n4.json');
+      if (file.existsSync()) {
+        jsonStr = await file.readAsString();
+      }
+    }
+  }
+
+  if (jsonStr == null || jsonStr.isEmpty) return;
+
+  final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+  final bookTitle = data['book'] as String? ?? 'Minna no Nihongo II (語彙)';
+  final bookLevel = data['level'] as String? ?? 'N4';
+  final sections = data['sections'] as List<dynamic>;
+
+  final sourceId = await db.into(db.sources).insert(
+        SourcesCompanion.insert(
+          type: SourceType.vocabBook,
+          name: bookTitle,
+          jlptLevel: Value(bookLevel),
+          sortOrder: const Value(1),
+        ),
+      );
+
+  for (var sIdx = 0; sIdx < sections.length; sIdx++) {
+    final sec = sections[sIdx] as Map<String, dynamic>;
+    final secTitle = sec['title'] as String;
+    final words = sec['words'] as List<dynamic>;
+
+    final unitId = await db.into(db.units).insert(
+          UnitsCompanion.insert(
+            sourceId: sourceId,
+            name: secTitle,
+            orderNo: sIdx + 1,
+          ),
+        );
+
+    for (var wIdx = 0; wIdx < words.length; wIdx++) {
+      final w = words[wIdx] as Map<String, dynamic>;
+      final wordStr = w['word'] as String;
+      final readingStr = w['reading'] as String;
+      final meaningStr = w['meaning'] as String;
+
+      final vocabId = await db.into(db.vocabularies).insert(
+            VocabulariesCompanion.insert(
+              word: wordStr,
+              reading: readingStr,
+              meaningMy: Value(meaningStr),
+            ),
+          );
+
+      await db.into(db.vocabSourceItems).insert(
+            VocabSourceItemsCompanion.insert(
+              vocabId: vocabId,
+              sourceId: sourceId,
+              unitId: Value(unitId),
+              position: Value(wIdx + 1),
+              jlptLevel: const Value('N4'),
+            ),
+          );
+
+      // Seed progress: First 2 vocab in Unit 1 are mastered (streak >= 3)
+      if (sIdx == 0 && wIdx < 2) {
+        await db.into(db.progress).insert(
+              ProgressCompanion.insert(
+                itemType: ItemType.vocab,
+                itemId: vocabId,
+                streak: const Value(3),
+                correctCount: const Value(3),
+                lastReviewed: Value(now.subtract(const Duration(days: 2))),
+                nextReview: Value(now.add(const Duration(days: 4))),
+              ),
+            );
+      }
+    }
+  }
+}
+
+/// Ensures Minna no Nihongo II N4 vocabulary book is properly seeded in an already populated or partially seeded database.
+Future<void> _ensureMinnaNoNihongo2Vocab(AppDatabase db, DateTime now) async {
+  try {
+    final existingSource = await (db.sources.select()
+          ..where(
+            (s) =>
+                s.type.equalsValue(SourceType.vocabBook) &
+                s.jlptLevel.equals('N4') &
+                s.name.contains('Minna no Nihongo'),
+          ))
+        .getSingleOrNull();
+
+    if (existingSource == null) {
+      await _seedMinnaNoNihongo2FromJson(db, now);
+      return;
+    }
+
+    final itemsCount = await db.vocabSourceItems
+        .count(where: (vsi) => vsi.sourceId.equals(existingSource.id))
+        .getSingle();
+
+    if (itemsCount < 500) {
+      await db.transaction(() async {
+        await (db.delete(db.sources)..where((s) => s.id.equals(existingSource.id)))
+            .go();
+        await _seedMinnaNoNihongo2FromJson(db, now);
+      });
+    }
+  } catch (e, stack) {
+    debugPrint('Error in _ensureMinnaNoNihongo2Vocab: $e\n$stack');
+  }
+}
+
+/// Seeds Nihongo Challenge N4 Kanji and its companion Vocab source from assets/data/kanji_nihongo_challenge_n4.json.
+Future<void> _seedN4KanjiFromJson(
+  AppDatabase db,
+  DateTime now,
+) async {
+  String? jsonStr;
+  try {
+    jsonStr =
+        await rootBundle.loadString('assets/data/kanji_nihongo_challenge_n4.json');
+  } catch (_) {
+    if (!kIsWeb) {
+      final file = File('assets/data/kanji_nihongo_challenge_n4.json');
+      if (file.existsSync()) {
+        jsonStr = await file.readAsString();
+      }
+    }
+  }
+
+  if (jsonStr == null || jsonStr.isEmpty) return;
+
+  final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+  final bookTitle = data['book'] as String? ?? 'Nihongo Challenge N4 漢字';
+  final bookLevel = data['level'] as String? ?? 'N4';
+  final chapters = data['chapters'] as List<dynamic>;
+
+  // 1) Kanji Source
+  final kanjiSource = await (db.sources.select()
+        ..where((s) => s.name.equals(bookTitle)))
+      .getSingleOrNull();
+
+  int kanjiSourceId;
+  if (kanjiSource == null) {
+    kanjiSourceId = await db.into(db.sources).insert(
+          SourcesCompanion.insert(
+            type: SourceType.kanjiBook,
+            name: bookTitle,
+            jlptLevel: Value(bookLevel),
+            sortOrder: const Value(1),
+          ),
+        );
+  } else {
+    kanjiSourceId = kanjiSource.id;
+  }
+
+  // 2) Companion Vocab Source for compound words (語彙)
+  const vocabBookTitle = 'Nihongo Challenge N4 語彙 (Kanji တွဲလုံးများ)';
+  final vocabSource = await (db.sources.select()
+        ..where((s) => s.name.equals(vocabBookTitle)))
+      .getSingleOrNull();
+
+  int vocabSourceId;
+  if (vocabSource == null) {
+    vocabSourceId = await db.into(db.sources).insert(
+          SourcesCompanion.insert(
+            type: SourceType.vocabBook,
+            name: vocabBookTitle,
+            jlptLevel: Value(bookLevel),
+            sortOrder: const Value(2),
+          ),
+        );
+  } else {
+    vocabSourceId = vocabSource.id;
+  }
+
+  for (final chObj in chapters) {
+    final ch = chObj as Map<String, dynamic>;
+    final chNum = ch['chapter'] as int;
+    final chTitle = ch['title'] as String;
+    final kanjiList = ch['kanjis'] as List<dynamic>;
+
+    // Kanji Unit
+    final kanjiUnit = await (db.units.select()
+          ..where(
+            (u) => u.sourceId.equals(kanjiSourceId) & u.orderNo.equals(chNum),
+          ))
+        .getSingleOrNull();
+    int kanjiUnitId;
+    if (kanjiUnit == null) {
+      kanjiUnitId = await db.into(db.units).insert(
+            UnitsCompanion.insert(
+              sourceId: kanjiSourceId,
+              name: chTitle,
+              orderNo: chNum,
+            ),
+          );
+    } else {
+      kanjiUnitId = kanjiUnit.id;
+    }
+
+    // Vocab Unit
+    final vocabUnit = await (db.units.select()
+          ..where(
+            (u) => u.sourceId.equals(vocabSourceId) & u.orderNo.equals(chNum),
+          ))
+        .getSingleOrNull();
+    int vocabUnitId;
+    if (vocabUnit == null) {
+      vocabUnitId = await db.into(db.units).insert(
+            UnitsCompanion.insert(
+              sourceId: vocabSourceId,
+              name: chTitle,
+              orderNo: chNum,
+            ),
+          );
+    } else {
+      vocabUnitId = vocabUnit.id;
+    }
+
+    var vocabPositionInChapter = 1;
+
+    for (var kIdx = 0; kIdx < kanjiList.length; kIdx++) {
+      final k = kanjiList[kIdx] as Map<String, dynamic>;
+      final char = k['character'] as String;
+      final on = k['onyomi'] as String? ?? '';
+      final kun = k['kunyomi'] as String? ?? '';
+      final my = k['meaning'] as String? ?? '';
+      final vocabList = (k['vocab'] as List<dynamic>?) ?? [];
+
+      final existingKanji = await (db.kanjis.select()
+            ..where((item) => item.character.equals(char)))
+          .getSingleOrNull();
+
+      int kanjiId;
+      if (existingKanji != null) {
+        kanjiId = existingKanji.id;
+        await (db.update(db.kanjis)..where((item) => item.id.equals(kanjiId)))
+            .write(KanjisCompanion(meaningMy: Value(my)));
+      } else {
+        kanjiId = await db.into(db.kanjis).insert(
+              KanjisCompanion.insert(
+                character: char,
+                meaningMy: Value(my),
+              ),
+            );
+      }
+
+      final existingReadings = await (db.kanjiReadings.select()
+            ..where((r) => r.kanjiId.equals(kanjiId)))
+          .get();
+      final existingKeys =
+          existingReadings.map((r) => '${r.type}_${r.reading}').toSet();
+
+      if (on.isNotEmpty && !existingKeys.contains('${ReadingType.on}_$on')) {
+        await db.into(db.kanjiReadings).insert(
+              KanjiReadingsCompanion.insert(
+                kanjiId: kanjiId,
+                type: ReadingType.on,
+                reading: on,
+              ),
+            );
+      }
+      if (kun.isNotEmpty && !existingKeys.contains('${ReadingType.kun}_$kun')) {
+        await db.into(db.kanjiReadings).insert(
+              KanjiReadingsCompanion.insert(
+                kanjiId: kanjiId,
+                type: ReadingType.kun,
+                reading: kun,
+              ),
+            );
+      }
+
+      final existingKsi = await (db.kanjiSourceItems.select()
+            ..where(
+              (ksi) =>
+                  ksi.kanjiId.equals(kanjiId) &
+                  ksi.sourceId.equals(kanjiSourceId) &
+                  ksi.unitId.equals(kanjiUnitId),
+            ))
+          .getSingleOrNull();
+
+      if (existingKsi == null) {
+        await db.into(db.kanjiSourceItems).insert(
+              KanjiSourceItemsCompanion.insert(
+                kanjiId: kanjiId,
+                sourceId: kanjiSourceId,
+                unitId: Value(kanjiUnitId),
+                position: Value(kIdx + 1),
+                jlptLevel: Value(bookLevel),
+              ),
+            );
+      }
+
+      // Seed initial progress for Chapter 1 first 3 kanjis
+      if (chNum == 1 && kIdx < 3) {
+        final existingProg = await (db.progress.select()
+              ..where(
+                (p) =>
+                    p.itemType.equals(ItemType.kanji.index) &
+                    p.itemId.equals(kanjiId),
+              ))
+            .getSingleOrNull();
+        if (existingProg == null) {
+          await db.into(db.progress).insert(
+                ProgressCompanion.insert(
+                  itemType: ItemType.kanji,
+                  itemId: kanjiId,
+                  streak: const Value(3),
+                  correctCount: const Value(4),
+                  lastReviewed: Value(now.subtract(const Duration(days: 1))),
+                  nextReview: Value(now.add(const Duration(days: 3))),
+                ),
+              );
+        }
+      }
+
+      // Process compound words (語彙)
+      for (var vIdx = 0; vIdx < vocabList.length; vIdx++) {
+        final v = vocabList[vIdx] as Map<String, dynamic>;
+        final wordStr = (v['word'] as String? ?? '').trim();
+        final readingStr = (v['reading'] as String? ?? '').trim();
+        final meaningStr = (v['meaning'] as String? ?? '').trim();
+
+        if (wordStr.isEmpty) continue;
+
+        final existingVocab = await (db.vocabularies.select()
+              ..where(
+                (item) =>
+                    item.word.equals(wordStr) & item.reading.equals(readingStr),
+              )
+              ..limit(1))
+            .getSingleOrNull();
+
+        int vocabId;
+        if (existingVocab != null) {
+          vocabId = existingVocab.id;
+          if (meaningStr.isNotEmpty) {
+            await (db.update(db.vocabularies)
+                  ..where((item) => item.id.equals(vocabId)))
+                .write(VocabulariesCompanion(meaningMy: Value(meaningStr)));
+          }
+        } else {
+          vocabId = await db.into(db.vocabularies).insert(
+                VocabulariesCompanion.insert(
+                  word: wordStr,
+                  reading: readingStr,
+                  meaningMy: Value(meaningStr),
+                ),
+              );
+        }
+
+        final existingKc = await (db.kanjiCompounds.select()
+              ..where(
+                (kc) =>
+                    kc.kanjiId.equals(kanjiId) &
+                    kc.vocabId.equals(vocabId) &
+                    kc.sourceId.equals(kanjiSourceId),
+              ))
+            .getSingleOrNull();
+
+        if (existingKc == null) {
+          await db.into(db.kanjiCompounds).insert(
+                KanjiCompoundsCompanion.insert(
+                  kanjiId: kanjiId,
+                  vocabId: vocabId,
+                  sourceId: kanjiSourceId,
+                  position: Value(vIdx + 1),
+                ),
+                mode: InsertMode.insertOrIgnore,
+              );
+        }
+
+        final existingVsi = await (db.vocabSourceItems.select()
+              ..where(
+                (vsi) =>
+                    vsi.vocabId.equals(vocabId) &
+                    vsi.sourceId.equals(vocabSourceId) &
+                    vsi.unitId.equals(vocabUnitId),
+              ))
+            .getSingleOrNull();
+
+        if (existingVsi == null) {
+          await db.into(db.vocabSourceItems).insert(
+                VocabSourceItemsCompanion.insert(
+                  vocabId: vocabId,
+                  sourceId: vocabSourceId,
+                  unitId: Value(vocabUnitId),
+                  position: Value(vocabPositionInChapter),
+                  jlptLevel: Value(bookLevel),
+                ),
+                mode: InsertMode.insertOrIgnore,
+              );
+          vocabPositionInChapter++;
+        }
+      }
+    }
+  }
+}
+
+/// Ensures Nihongo Challenge N4 Kanji and its companion Vocab source are seeded in an already populated database.
+Future<void> _ensureN4Kanji(AppDatabase db, DateTime now) async {
+  final existingKanjiSource = await (db.sources.select()
+        ..where(
+          (s) =>
+              s.type.equalsValue(SourceType.kanjiBook) &
+              s.jlptLevel.equals('N4') &
+              s.name.contains('Nihongo Challenge'),
+        ))
+      .getSingleOrNull();
+
+  if (existingKanjiSource != null) {
+    final count = await (db.kanjiSourceItems.select()
+          ..where((k) => k.sourceId.equals(existingKanjiSource.id)))
+        .get()
+        .then((l) => l.length);
+    if (count >= 150) {
+      return; // Already fully seeded
+    }
+  }
+
+  try {
+    await db.transaction(() async {
+      await _seedN4KanjiFromJson(db, now);
+    });
+  } catch (e, stack) {
+    debugPrint('Error in _ensureN4Kanji: $e\n$stack');
+  }
 }
