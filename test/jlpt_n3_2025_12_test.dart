@@ -73,8 +73,8 @@ void main() {
       // Call seedDevData which should detect version 61 < 62 and force re-seed
       await seedDevData(db, prefs: prefs);
 
-      // Verify SharedPreferences updated to 74
-      expect(prefs.getInt('dev_seed_completed_version'), equals(74));
+      // Verify SharedPreferences updated to 76
+      expect(prefs.getInt('dev_seed_completed_version'), equals(76));
 
       // Verify question explanations in DB are updated
       final questions = await (db.select(db.questions)

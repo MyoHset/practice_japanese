@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 74;
+const int _kCurrentDevSeedVersion = 76;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -70,8 +70,8 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
     await _ensurePastExam202412(db, DateTime.now());
     await _ensurePastExam202507(db, DateTime.now());
     await _ensurePastExam202512(db, DateTime.now(), force: true);
-    await _ensurePastExam201507(db, DateTime.now());
-    await _ensurePastExam201812(db, DateTime.now());
+    await _ensurePastExam201507(db, DateTime.now(), force: true);
+    await _ensurePastExam201812(db, DateTime.now(), force: true);
     await _ensurePastExam202512N4(db, DateTime.now(), force: true);
     await _ensurePastExam202507N4(db, DateTime.now(), force: true);
     await _ensurePastExam202412N4(db, DateTime.now(), force: true);
@@ -2494,6 +2494,7 @@ Future<void> _seedPastExamFromJson(
         case 'infoSearch':
         case 'readingShort':
         case 'readingMedium':
+        case 'readingLong':
         case 'informationRetrieval':
         case 'reading':
           mondaiType = MondaiType.reading;
@@ -2654,7 +2655,11 @@ Future<void> _ensurePastExam202512(AppDatabase db, DateTime now, {bool force = f
 }
 
 /// Ensures the 2015-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201507(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201507(
+  AppDatabase db,
+  DateTime now, {
+  bool force = false,
+}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2665,12 +2670,12 @@ Future<void> _ensurePastExam201507(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 70) {
+    if (count >= 74) {
       return; // Already fully seeded
     }
   }
@@ -2684,7 +2689,11 @@ Future<void> _ensurePastExam201507(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2018-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201812(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201812(
+  AppDatabase db,
+  DateTime now, {
+  bool force = false,
+}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2695,12 +2704,12 @@ Future<void> _ensurePastExam201812(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 70) {
+    if (count >= 74) {
       return; // Already fully seeded
     }
   }
