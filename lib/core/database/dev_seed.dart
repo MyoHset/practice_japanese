@@ -67,8 +67,8 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
     await _ensurePastExam202307(db, DateTime.now());
     await _ensurePastExam202312(db, DateTime.now());
     await _ensurePastExam202407(db, DateTime.now());
-    await _ensurePastExam202412(db, DateTime.now());
-    await _ensurePastExam202507(db, DateTime.now());
+    await _ensurePastExam202412(db, DateTime.now(), force: true);
+    await _ensurePastExam202507(db, DateTime.now(), force: true);
     await _ensurePastExam202512(db, DateTime.now(), force: true);
     await _ensurePastExam201507(db, DateTime.now(), force: true);
     await _ensurePastExam201812(db, DateTime.now(), force: true);
@@ -2257,7 +2257,7 @@ Future<void> _ensurePastExam202407(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2024-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202412(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202412(AppDatabase db, DateTime now, {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2268,7 +2268,7 @@ Future<void> _ensurePastExam202412(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
@@ -2287,7 +2287,7 @@ Future<void> _ensurePastExam202412(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2025-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202507(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202507(AppDatabase db, DateTime now, {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2298,7 +2298,7 @@ Future<void> _ensurePastExam202507(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
@@ -2572,7 +2572,9 @@ Future<void> _seedPastExamFromJson(
         final questionPassage = q['passage'] as String?;
 
         int? qGroupId = currentGroupId;
-        if (questionPassage != null && questionPassage.isNotEmpty) {
+        if (questionPassage != null &&
+            questionPassage.trim().isNotEmpty &&
+            questionPassage.trim() != questionText.trim()) {
           qGroupId = await db.into(db.questionGroups).insert(
                 QuestionGroupsCompanion.insert(
                   sourceId: sourceId,
