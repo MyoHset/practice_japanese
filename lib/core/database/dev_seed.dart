@@ -8,7 +8,7 @@ import 'package:practice_janpanese/core/database/app_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kDevSeedVersionKey = 'dev_seed_completed_version';
-const int _kCurrentDevSeedVersion = 76;
+const int _kCurrentDevSeedVersion = 105;
 
 /// Seeds the database with realistic development data per spec B1.
 /// Runs only when the database is empty or new exam datasets were added.
@@ -18,6 +18,26 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
   await _ensureTangoBook(db, DateTime.now());
   await _ensureMinnaNoNihongo2Vocab(db, DateTime.now());
   await _ensureN4Kanji(db, DateTime.now());
+  await _ensurePastExam201507(db, DateTime.now());
+  await _ensurePastExam201512(db, DateTime.now());
+  await _ensurePastExam201607(db, DateTime.now());
+  await _ensurePastExam201612(db, DateTime.now());
+  await _ensurePastExam201707(db, DateTime.now());
+  await _ensurePastExam201712(db, DateTime.now());
+  await _ensurePastExam201807(db, DateTime.now());
+  await _ensurePastExam201812(db, DateTime.now());
+  await _ensurePastExam201912(db, DateTime.now());
+  await _ensurePastExam202012(db, DateTime.now());
+  await _ensurePastExam202107(db, DateTime.now());
+  await _ensurePastExam202112(db, DateTime.now());
+  await _ensurePastExam202207(db, DateTime.now());
+  await _ensurePastExam202212(db, DateTime.now());
+  await _ensurePastExam202307(db, DateTime.now());
+  await _ensurePastExam202312(db, DateTime.now());
+  await _ensurePastExam202407(db, DateTime.now());
+  await _ensurePastExam202412(db, DateTime.now());
+  await _ensurePastExam202507(db, DateTime.now());
+  await _ensurePastExam202512(db, DateTime.now());
   await _ensurePastExam202512N4(db, DateTime.now());
   await _ensurePastExam202507N4(db, DateTime.now());
   await _ensurePastExam202412N4(db, DateTime.now());
@@ -52,21 +72,22 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
     await _ensurePastExam201312(db, DateTime.now());
     await _ensurePastExam201407(db, DateTime.now());
     await _ensurePastExam201412(db, DateTime.now());
-    await _ensurePastExam201512(db, DateTime.now());
-    await _ensurePastExam201607(db, DateTime.now());
-    await _ensurePastExam201612(db, DateTime.now());
-    await _ensurePastExam201707(db, DateTime.now());
-    await _ensurePastExam201712(db, DateTime.now());
-    await _ensurePastExam201807(db, DateTime.now());
-    await _ensurePastExam201912(db, DateTime.now());
-    await _ensurePastExam202012(db, DateTime.now());
-    await _ensurePastExam202107(db, DateTime.now());
-    await _ensurePastExam202112(db, DateTime.now());
-    await _ensurePastExam202207(db, DateTime.now());
-    await _ensurePastExam202212(db, DateTime.now());
-    await _ensurePastExam202307(db, DateTime.now());
-    await _ensurePastExam202312(db, DateTime.now());
-    await _ensurePastExam202407(db, DateTime.now());
+    await _ensurePastExam201507(db, DateTime.now(), force: true);
+    await _ensurePastExam201512(db, DateTime.now(), force: true);
+    await _ensurePastExam201607(db, DateTime.now(), force: true);
+    await _ensurePastExam201612(db, DateTime.now(), force: true);
+    await _ensurePastExam201707(db, DateTime.now(), force: true);
+    await _ensurePastExam201712(db, DateTime.now(), force: true);
+    await _ensurePastExam201807(db, DateTime.now(), force: true);
+    await _ensurePastExam201912(db, DateTime.now(), force: true);
+    await _ensurePastExam202012(db, DateTime.now(), force: true);
+    await _ensurePastExam202107(db, DateTime.now(), force: true);
+    await _ensurePastExam202112(db, DateTime.now(), force: true);
+    await _ensurePastExam202207(db, DateTime.now(), force: true);
+    await _ensurePastExam202212(db, DateTime.now(), force: true);
+    await _ensurePastExam202307(db, DateTime.now(), force: true);
+    await _ensurePastExam202312(db, DateTime.now(), force: true);
+    await _ensurePastExam202407(db, DateTime.now(), force: true);
     await _ensurePastExam202412(db, DateTime.now(), force: true);
     await _ensurePastExam202507(db, DateTime.now(), force: true);
     await _ensurePastExam202512(db, DateTime.now(), force: true);
@@ -426,7 +447,8 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
         meaning: '〜ကို အကြောင်းပြု၍ / အစပြုကာ',
         formation: 'N + を契機に',
         exampleJp: 'オリンピックの開催を契機に、街の再開発が一気に進んだ。',
-        exampleMy: 'အိုလံပစ်ကျင်းပခြင်းကို အကြောင်းပြု၍ မြို့တော်ပြန်လည်တည်ဆောက်ရေး အရှိန်အဟုန်ဖြင့် တိုးတက်လာခဲ့သည်။',
+        exampleMy:
+            'အိုလံပစ်ကျင်းပခြင်းကို အကြောင်းပြု၍ မြို့တော်ပြန်လည်တည်ဆောက်ရေး အရှိန်အဟုန်ဖြင့် တိုးတက်လာခဲ့သည်။',
         unit: grammarUnit1,
       ),
       (
@@ -434,7 +456,8 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
         meaning: '〜တိုင်း / ဖြစ်တိုင်း',
         formation: 'V-ru + につけ',
         exampleJp: 'この写真を見るにつけ、故郷の家族の温かさを思い出す。',
-        exampleMy: 'ဒီဓာတ်ပုံကို ကြည့်တိုင်း မွေးရပ်မြေမှ မိသားစု၏ နွေးထွေးမှုကို သတိရမိသည်။',
+        exampleMy:
+            'ဒီဓာတ်ပုံကို ကြည့်တိုင်း မွေးရပ်မြေမှ မိသားစု၏ နွေးထွေးမှုကို သတိရမိသည်။',
         unit: grammarUnit1,
       ),
       // Unit 2
@@ -443,7 +466,8 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
         meaning: '〜အပါအဝင် / ဦးစွာထား၍',
         formation: 'N + をはじめ',
         exampleJp: '日本には富士山をはじめ、世界に誇る名所がたくさんある。',
-        exampleMy: 'ဂျပန်နိုင်ငံတွင် ဖူဂျီတောင် အပါအဝင် ကမ္ဘာကဂုဏ်ယူရသော အထင်ကရနေရာများစွာ ရှိသည်။',
+        exampleMy:
+            'ဂျပန်နိုင်ငံတွင် ဖူဂျီတောင် အပါအဝင် ကမ္ဘာကဂုဏ်ယူရသော အထင်ကရနေရာများစွာ ရှိသည်။',
         unit: grammarUnit2,
       ),
       (
@@ -451,7 +475,8 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
         meaning: '〜ကို မခွဲခြားဘဲ / မသက်ဆိုင်ဘဲ',
         formation: 'N + を問わず',
         exampleJp: 'このイベントは、年齢や性別を問わずどなたでも参加できます。',
-        exampleMy: 'ဒီပွဲကို အသက်အရွယ် ကျား/မ မခွဲခြားဘဲ မည်သူမဆို ပါဝင်တက်ရောက်နိုင်သည်။',
+        exampleMy:
+            'ဒီပွဲကို အသက်အရွယ် ကျား/မ မခွဲခြားဘဲ မည်သူမဆို ပါဝင်တက်ရောက်နိုင်သည်။',
         unit: grammarUnit2,
       ),
       (
@@ -459,7 +484,8 @@ Future<void> seedDevData(AppDatabase db, {SharedPreferences? prefs}) async {
         meaning: '〜၏ လက်အောက်တွင် / လမ်းညွှန်မှုအောက်တွင်',
         formation: 'N + のもとで',
         exampleJp: '優れた指導者のもとで、選手たちは厳しい練習に励んでいる。',
-        exampleMy: 'ထူးချွန်သော နည်းပြ၏ လမ်းညွှန်မှုအောက်တွင် ကစားသမားများသည် ကြိုးစားလေ့ကျင့်နေကြသည်။',
+        exampleMy:
+            'ထူးချွန်သော နည်းပြ၏ လမ်းညွှန်မှုအောက်တွင် ကစားသမားများသည် ကြိုးစားလေ့ကျင့်နေကြသည်။',
         unit: grammarUnit2,
       ),
     ];
@@ -999,7 +1025,8 @@ Future<void> _ensureTangoBook(AppDatabase db, DateTime now) async {
     if (unitCount == 0 || itemsCount == 0) {
       // Missing units or vocab items - clean and re-seed
       await db.transaction(() async {
-        await (db.delete(db.sources)..where((s) => s.id.equals(existingTango.id)))
+        await (db.delete(db.sources)
+              ..where((s) => s.id.equals(existingTango.id)))
             .go();
         await _seedTangoFromJson(db, now);
       });
@@ -1158,11 +1185,9 @@ Future<void> _ensureGrammarBooks(AppDatabase db, DateTime now) async {
           await (db.grammarSourceItems.delete()
                 ..where((item) => item.sourceId.equals(source.id)))
               .go();
-          await (db.units.delete()
-                ..where((u) => u.sourceId.equals(source.id)))
+          await (db.units.delete()..where((u) => u.sourceId.equals(source.id)))
               .go();
-          await (db.sources.delete()
-                ..where((s) => s.id.equals(source.id)))
+          await (db.sources.delete()..where((s) => s.id.equals(source.id)))
               .go();
         }
         needsN3Seed = true;
@@ -1214,7 +1239,8 @@ Future<void> _ensureGrammarBooks(AppDatabase db, DateTime now) async {
             meaning: '〜ကို အကြောင်းပြု၍ / အစပြုကာ',
             formation: 'N + を契機に',
             exampleJp: 'オリンピックの開催を契機に、街の再開発が一気に進んだ。',
-            exampleMy: 'အိုလံပစ်ကျင်းပခြင်းကို အကြောင်းပြု၍ မြို့တော်ပြန်လည်တည်ဆောက်ရေး အရှိန်အဟုန်ဖြင့် တိုးတက်လာခဲ့သည်။',
+            exampleMy:
+                'အိုလံပစ်ကျင်းပခြင်းကို အကြောင်းပြု၍ မြို့တော်ပြန်လည်တည်ဆောက်ရေး အရှိန်အဟုန်ဖြင့် တိုးတက်လာခဲ့သည်။',
             unit: grammarUnit1,
           ),
           (
@@ -1222,7 +1248,8 @@ Future<void> _ensureGrammarBooks(AppDatabase db, DateTime now) async {
             meaning: '〜တိုင်း / ဖြစ်တိုင်း',
             formation: 'V-ru + につけ',
             exampleJp: 'この写真を見るにつけ、故郷の家族の温かさを思い出す。',
-            exampleMy: 'ဒီဓာတ်ပုံကို ကြည့်တိုင်း မွေးရပ်မြေမှ မိသားစု၏ နွေးထွေးမှုကို သတိရမိသည်။',
+            exampleMy:
+                'ဒီဓာတ်ပုံကို ကြည့်တိုင်း မွေးရပ်မြေမှ မိသားစု၏ နွေးထွေးမှုကို သတိရမိသည်။',
             unit: grammarUnit1,
           ),
           (
@@ -1230,7 +1257,8 @@ Future<void> _ensureGrammarBooks(AppDatabase db, DateTime now) async {
             meaning: '〜၏ လက်အောက်တွင် / လမ်းညွှန်မှုအောက်တွင်',
             formation: 'N + のもとで',
             exampleJp: '優れた指導者のもとで、選手たちは厳しい練習に励んでいる。',
-            exampleMy: 'ထူးချွန်သော နည်းပြ၏ လမ်းညွှန်မှုအောက်တွင် ကစားသမားများသည် ကြိုးစားလေ့ကျင့်နေကြသည်။',
+            exampleMy:
+                'ထူးချွန်သော နည်းပြ၏ လမ်းညွှန်မှုအောက်တွင် ကစားသမားများသည် ကြိုးစားလေ့ကျင့်နေကြသည်။',
             unit: grammarUnit2,
           ),
         ];
@@ -1328,7 +1356,6 @@ Future<void> _seedSpeedMasterN3KanjiFromJson(
   } else {
     vocabSourceId = vocabSource.id;
   }
-
 
   for (final chObj in chapters) {
     final ch = chObj as Map<String, dynamic>;
@@ -1867,7 +1894,8 @@ Future<void> _ensurePastExam201312(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2016-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201607(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201607(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -1878,13 +1906,20 @@ Future<void> _ensurePastExam201607(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -1897,7 +1932,8 @@ Future<void> _ensurePastExam201607(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2017-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201707(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201707(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -1908,13 +1944,27 @@ Future<void> _ensurePastExam201707(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      final readingQ = await (db.questions.select()
+            ..where((q) =>
+                q.sourceId.equals(existingSource.id) &
+                q.questionText.contains('このノート、意外に面白いのである')))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်') &&
+          readingQ?.explanation != null &&
+          readingQ!.explanation!.contains('食べた物についての記録')) {
+        return; // Already has rich explanations including correct reading explanation
+      }
     }
   }
 
@@ -1927,7 +1977,8 @@ Future<void> _ensurePastExam201707(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2017-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201712(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201712(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -1938,13 +1989,27 @@ Future<void> _ensurePastExam201712(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      final readingQ = await (db.questions.select()
+            ..where((q) =>
+                q.sourceId.equals(existingSource.id) &
+                q.questionText.contains('どうして姉は子どもにひらがなの名前をつけたのか')))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်') &&
+          readingQ?.explanation != null &&
+          readingQ!.explanation!.contains('優しい感じがするから')) {
+        return; // Already has rich explanations including correct reading explanation
+      }
     }
   }
 
@@ -1957,7 +2022,8 @@ Future<void> _ensurePastExam201712(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2018-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201807(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201807(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -1968,13 +2034,20 @@ Future<void> _ensurePastExam201807(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -1987,7 +2060,8 @@ Future<void> _ensurePastExam201807(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2019-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201912(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201912(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -1998,13 +2072,20 @@ Future<void> _ensurePastExam201912(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2017,7 +2098,8 @@ Future<void> _ensurePastExam201912(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2020-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202012(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202012(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2028,13 +2110,20 @@ Future<void> _ensurePastExam202012(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2047,7 +2136,8 @@ Future<void> _ensurePastExam202012(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2021-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202107(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202107(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2058,13 +2148,20 @@ Future<void> _ensurePastExam202107(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2077,7 +2174,8 @@ Future<void> _ensurePastExam202107(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2021-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202112(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202112(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2088,13 +2186,20 @@ Future<void> _ensurePastExam202112(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2107,7 +2212,8 @@ Future<void> _ensurePastExam202112(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2022-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202207(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202207(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2118,13 +2224,20 @@ Future<void> _ensurePastExam202207(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2137,7 +2250,8 @@ Future<void> _ensurePastExam202207(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2022-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202212(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202212(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2148,13 +2262,20 @@ Future<void> _ensurePastExam202212(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2167,7 +2288,8 @@ Future<void> _ensurePastExam202212(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2023-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202307(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202307(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2178,13 +2300,20 @@ Future<void> _ensurePastExam202307(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2197,7 +2326,8 @@ Future<void> _ensurePastExam202307(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2023-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202312(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202312(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2208,13 +2338,20 @@ Future<void> _ensurePastExam202312(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2227,7 +2364,8 @@ Future<void> _ensurePastExam202312(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2024-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202407(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam202407(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2238,13 +2376,20 @@ Future<void> _ensurePastExam202407(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
     if (count >= 70) {
-      return; // Already fully seeded
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2257,7 +2402,8 @@ Future<void> _ensurePastExam202407(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2024-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202412(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam202412(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2269,12 +2415,22 @@ Future<void> _ensurePastExam202412(AppDatabase db, DateTime now, {bool force = f
       .getSingleOrNull();
 
   if (existingSource != null && !force) {
-    final count = await (db.questions.select()
-          ..where((q) => q.sourceId.equals(existingSource.id)))
-        .get()
-        .then((l) => l.length);
-    if (count >= 70) {
-      return; // Already fully seeded
+    // Check if the seeded questions have the new rich explanations
+    final sampleQ = await (db.questions.select()
+          ..where((q) =>
+              q.sourceId.equals(existingSource.id) & q.questionNo.equals(1)))
+        .getSingleOrNull();
+    final hasNewExpl = sampleQ != null &&
+        sampleQ.explanation != null &&
+        sampleQ.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်');
+    if (hasNewExpl) {
+      final count = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id)))
+          .get()
+          .then((l) => l.length);
+      if (count >= 70) {
+        return; // Already fully seeded with new rich explanations
+      }
     }
   }
 
@@ -2287,7 +2443,8 @@ Future<void> _ensurePastExam202412(AppDatabase db, DateTime now, {bool force = f
 }
 
 /// Ensures the 2025-07 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202507(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam202507(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2317,7 +2474,8 @@ Future<void> _ensurePastExam202507(AppDatabase db, DateTime now, {bool force = f
 }
 
 /// Ensures the 2015-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201512(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201512(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2328,13 +2486,20 @@ Future<void> _ensurePastExam201512(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 80) {
-      return; // Already fully seeded
+    if (count >= 70) {
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2347,7 +2512,8 @@ Future<void> _ensurePastExam201512(AppDatabase db, DateTime now) async {
 }
 
 /// Ensures the 2016-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201612(AppDatabase db, DateTime now) async {
+Future<void> _ensurePastExam201612(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2358,13 +2524,20 @@ Future<void> _ensurePastExam201612(AppDatabase db, DateTime now) async {
         ))
       .getSingleOrNull();
 
-  if (existingSource != null) {
+  if (existingSource != null && !force) {
     final count = await (db.questions.select()
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 80) {
-      return; // Already fully seeded
+    if (count >= 70) {
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2417,13 +2590,32 @@ Future<void> _seedPastExamFromJson(
   int sortOrder = 1,
 }) async {
   String? jsonStr;
-  try {
-    jsonStr = await rootBundle.loadString(assetPath);
-  } catch (_) {
-    if (!kIsWeb) {
-      final file = File(assetPath);
-      if (file.existsSync()) {
-        jsonStr = await file.readAsString();
+  if (!kIsWeb) {
+    try {
+      final devFile = File(
+          '/Users/umgcidmobile/Documents/projects/practice_japanese/$assetPath');
+      if (devFile.existsSync()) {
+        jsonStr = await devFile.readAsString();
+      }
+    } catch (_) {}
+    if (jsonStr == null || jsonStr.isEmpty) {
+      try {
+        final file = File(assetPath);
+        if (file.existsSync()) {
+          jsonStr = await file.readAsString();
+        }
+      } catch (_) {}
+    }
+  }
+  if (jsonStr == null || jsonStr.isEmpty) {
+    try {
+      jsonStr = await rootBundle.loadString(assetPath);
+    } catch (_) {
+      if (!kIsWeb) {
+        final file = File(assetPath);
+        if (file.existsSync()) {
+          jsonStr = await file.readAsString();
+        }
       }
     }
   }
@@ -2627,7 +2819,8 @@ Future<void> _seedPastExamFromJson(
 Future<void> devSeed(AppDatabase db) => seedDevData(db);
 
 /// Ensures the 2025-12 JLPT N3 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202512(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam202512(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2643,7 +2836,7 @@ Future<void> _ensurePastExam202512(AppDatabase db, DateTime now, {bool force = f
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 50) {
+    if (count >= 70) {
       return; // Already fully seeded
     }
   }
@@ -2677,8 +2870,15 @@ Future<void> _ensurePastExam201507(
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 74) {
-      return; // Already fully seeded
+    if (count >= 70) {
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2711,8 +2911,15 @@ Future<void> _ensurePastExam201812(
           ..where((q) => q.sourceId.equals(existingSource.id)))
         .get()
         .then((l) => l.length);
-    if (count >= 74) {
-      return; // Already fully seeded
+    if (count >= 70) {
+      final sampleQ = await (db.questions.select()
+            ..where((q) => q.sourceId.equals(existingSource.id))
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleQ?.explanation != null &&
+          sampleQ!.explanation!.contains('ရွေးချယ်စရာများ ရှင်းလင်းချက်')) {
+        return; // Already has rich explanations
+      }
     }
   }
 
@@ -2725,7 +2932,8 @@ Future<void> _ensurePastExam201812(
 }
 
 /// Ensures the 2025-12 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202512N4(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam202512N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2759,7 +2967,8 @@ Future<void> _ensurePastExam202512N4(AppDatabase db, DateTime now, {bool force =
 }
 
 /// Ensures the 2025-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202507N4(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam202507N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2793,7 +3002,8 @@ Future<void> _ensurePastExam202507N4(AppDatabase db, DateTime now, {bool force =
 }
 
 /// Ensures the 2024-12 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202412N4(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam202412N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -2827,7 +3037,8 @@ Future<void> _ensurePastExam202412N4(AppDatabase db, DateTime now, {bool force =
 }
 
 /// Ensures the 2024-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam202407N4(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam202407N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -3036,7 +3247,8 @@ Future<void> _ensurePastExam201707N4(AppDatabase db, DateTime now,
 }
 
 /// Ensures the 2016-12 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201612N4(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam201612N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -3070,7 +3282,8 @@ Future<void> _ensurePastExam201612N4(AppDatabase db, DateTime now, {bool force =
 }
 
 /// Ensures the 2015-07 JLPT N4 Past Exam data is loaded into the DB.
-Future<void> _ensurePastExam201507N4(AppDatabase db, DateTime now, {bool force = false}) async {
+Future<void> _ensurePastExam201507N4(AppDatabase db, DateTime now,
+    {bool force = false}) async {
   final existingSource = await (db.sources.select()
         ..where(
           (s) =>
@@ -3108,7 +3321,8 @@ Future<void> _ensurePastExam201507N4(AppDatabase db, DateTime now, {bool force =
 Future<void> _seedMinnaNoNihongo2FromJson(AppDatabase db, DateTime now) async {
   String? jsonStr;
   try {
-    jsonStr = await rootBundle.loadString('assets/data/minna_no_nihongo_2_n4.json');
+    jsonStr =
+        await rootBundle.loadString('assets/data/minna_no_nihongo_2_n4.json');
   } catch (_) {
     if (!kIsWeb) {
       final file = File('assets/data/minna_no_nihongo_2_n4.json');
@@ -3211,7 +3425,8 @@ Future<void> _ensureMinnaNoNihongo2Vocab(AppDatabase db, DateTime now) async {
 
     if (itemsCount < 500) {
       await db.transaction(() async {
-        await (db.delete(db.sources)..where((s) => s.id.equals(existingSource.id)))
+        await (db.delete(db.sources)
+              ..where((s) => s.id.equals(existingSource.id)))
             .go();
         await _seedMinnaNoNihongo2FromJson(db, now);
       });
@@ -3228,8 +3443,8 @@ Future<void> _seedN4KanjiFromJson(
 ) async {
   String? jsonStr;
   try {
-    jsonStr =
-        await rootBundle.loadString('assets/data/kanji_nihongo_challenge_n4.json');
+    jsonStr = await rootBundle
+        .loadString('assets/data/kanji_nihongo_challenge_n4.json');
   } catch (_) {
     if (!kIsWeb) {
       final file = File('assets/data/kanji_nihongo_challenge_n4.json');
