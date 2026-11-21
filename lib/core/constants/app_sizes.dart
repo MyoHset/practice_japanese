@@ -15,6 +15,8 @@ class AppSizes {
 
   // Interaction
   static const double minTapTarget = 48;
+  static const double minTapTarget1 = 48;
+
 
   // Drag handle & Unit badge
   static const double dragHandleWidth = 36;
